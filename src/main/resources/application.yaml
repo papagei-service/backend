@@ -1,6 +1,12 @@
 ktor:
-    application:
-        modules:
-            - com.yaroslavzghoba.ApplicationKt.module
-    deployment:
-        port: 8080
+  application:
+    modules:
+      - com.yaroslavzghoba.ApplicationKt.module
+  deployment:
+    port: 8080
+
+jwt:
+  secret: $SECRET_OF_PAPAGEI
+  issuer: "/api/v1/sign-in"
+  audience: "/api"
+  realm: "Access to the API"

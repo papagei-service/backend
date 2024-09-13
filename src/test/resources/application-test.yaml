@@ -1,0 +1,12 @@
+ktor:
+  application:
+    modules:
+      - com.yaroslavzghoba.ApplicationKt.testingModule
+  deployment:
+    port: 8080
+
+jwt:
+  secret: "kK*hmb$*A*0rx$i!CoP6cNXGaQO*p4z5kjwk"
+  issuer: "/api/v1/sign-in"
+  audience: "/api"
+  realm: "Access to the API"
