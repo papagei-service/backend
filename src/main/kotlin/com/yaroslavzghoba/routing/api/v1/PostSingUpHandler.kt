@@ -2,17 +2,24 @@ package com.yaroslavzghoba.routing.api.v1
 
 import com.yaroslavzghoba.data.UserStorage
 import com.yaroslavzghoba.model.Credentials
+import com.yaroslavzghoba.model.User
 import com.yaroslavzghoba.routing.RouteHandlersProvider
+import com.yaroslavzghoba.security.hashing.HashingService
+import com.yaroslavzghoba.security.hashing.SaltGenerator
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-private typealias PostSignUpHandler =
-        suspend RoutingContext.(userStorage: UserStorage) -> Unit
+private typealias PostSignUpHandler = suspend RoutingContext.(
+    userStorage: UserStorage,
+    hashingService: HashingService,
+    saltGenerator: SaltGenerator,
+    pepper: String,
+) -> Unit
 
 val RouteHandlersProvider.Api.V1.postSignUp: PostSignUpHandler
-    get() = postSignUp@{ userStorage ->
+    get() = postSignUp@{ userStorage, hashingService, saltGenerator, pepper ->
         val credentials = call.receive<Credentials>()
 
         // Return 401 if the user with the same username is already exists
@@ -45,7 +52,11 @@ val RouteHandlersProvider.Api.V1.postSignUp: PostSignUpHandler
         }
 
         // Create an account and save it to the storage
-        userStorage.insert(credentials.toNewUser())
+        val user = User.Builder(credentials = credentials, hashingService = hashingService)
+            .withSalt(salt = saltGenerator.generate())
+            .build()
+        userStorage.insert(user = user)
+
         call.respond(
             status = HttpStatusCode.OK,
             message = mapOf("message" to "The account was created successfully")

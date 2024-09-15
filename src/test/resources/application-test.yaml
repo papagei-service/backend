@@ -5,8 +5,14 @@ ktor:
   deployment:
     port: 8080
 
-jwt:
-  secret: "kK*hmb$*A*0rx$i!CoP6cNXGaQO*p4z5kjwk"
-  issuer: "/api/v1/sign-in"
-  audience: "/api"
-  realm: "Access to the API"
+security:
+  jwt:
+    secret: "kK*hmb$*A*0rx$i!CoP6cNXGaQO*p4z5kjwk"
+    issuer: "/api/v1/sign-in"
+    audience: "/api"
+    realm: "Access to the API"
+    lifetime-ms: 300000  # 5 min
+  hashing:
+    pepper: "fUSF*mHjOt7qTpHW$zvR3xaJyAInt9#sGFn0"
+    algorithm: "SHA-512"
+    salt-length: 32

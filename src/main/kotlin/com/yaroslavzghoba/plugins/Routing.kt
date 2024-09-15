@@ -5,6 +5,8 @@ import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.routing.api.v1.getRoot
 import com.yaroslavzghoba.routing.api.v1.postSignIn
 import com.yaroslavzghoba.routing.api.v1.postSignUp
+import com.yaroslavzghoba.security.hashing.HashingService
+import com.yaroslavzghoba.security.hashing.SaltGenerator
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenService
 import io.ktor.server.application.*
@@ -15,6 +17,9 @@ fun Application.configureRouting(
     userStorage: UserStorage,
     jwtTokenConfig: JwtTokenConfig,
     jwtTokenService: JwtTokenService,
+    hashingService: HashingService,
+    saltGenerator: SaltGenerator,
+    pepper: String,
 ) {
     routing {
         route(path = "/api") {
@@ -26,12 +31,15 @@ fun Application.configureRouting(
                     path = "/sign-in",
                     body = {
                         RouteHandlersProvider.Api.V1
-                            .postSignIn(this, userStorage, jwtTokenConfig, jwtTokenService)
+                            .postSignIn(this, userStorage, hashingService, jwtTokenConfig, jwtTokenService)
                     },
                 )
                 post(
                     path = "/sign-up",
-                    body = { RouteHandlersProvider.Api.V1.postSignUp(this, userStorage) }
+                    body = {
+                        RouteHandlersProvider.Api.V1
+                            .postSignUp(this, userStorage, hashingService, saltGenerator, pepper)
+                    }
                 )
             }
         }

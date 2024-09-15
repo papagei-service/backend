@@ -5,8 +5,14 @@ ktor:
   deployment:
     port: 8080
 
-jwt:
-  secret: $SECRET_OF_PAPAGEI
-  issuer: "/api/v1/sign-in"
-  audience: "/api"
-  realm: "Access to the API"
+security:
+  jwt:
+    secret: $JWT_SECRET_OF_PAPAGEI
+    issuer: "/api/v1/sign-in"
+    audience: "/api"
+    realm: "Access to the API"
+    lifetime-ms: 900000  # 15 min
+  hashing:
+    pepper: $PEPPERED_SECRET
+    algorithm: "SHA-512"
+    salt-length: 32
