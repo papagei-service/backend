@@ -13,7 +13,6 @@ import io.ktor.server.application.*
 @Suppress("unused")  // Mark the IDE that the function is actually used
 fun Application.testingModule() {
     val userStorage = FakeUserStorage()
-
     val jwtTokenConfig = JwtTokenConfig(
         secret = environment.config.property("security.jwt.secret").getString(),
         issuer = environment.config.property("security.jwt.issuer").getString(),
@@ -23,10 +22,8 @@ fun Application.testingModule() {
             .property("security.jwt.lifetime-ms").getString().toLong(),
     )
     val jwtTokenService = JwtTokenServiceImpl()
-
-    val pepper = environment.config.property("security.hashing.pepper").getString()
     val hashingService = HashingServiceImpl(
-        pepper = pepper,
+        pepper = environment.config.property("security.hashing.pepper").getString(),
         algorithm = environment.config.property("security.hashing.algorithm").getString(),
     )
     val saltGenerator = SaltGeneratorImpl(
@@ -41,7 +38,6 @@ fun Application.testingModule() {
         jwtTokenService = jwtTokenService,
         hashingService = hashingService,
         saltGenerator = saltGenerator,
-        pepper = pepper,
     )
     configureSerialization()
 }

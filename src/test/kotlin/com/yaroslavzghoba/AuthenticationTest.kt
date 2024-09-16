@@ -1,6 +1,6 @@
 package com.yaroslavzghoba
 
-import com.yaroslavzghoba.model.Credentials
+import com.yaroslavzghoba.model.InputCredentials
 import com.yaroslavzghoba.model.SignInResponse
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -24,8 +24,8 @@ class AuthenticationTest {
         val response = client.post("/api/v1/sign-in") {
             contentType(ContentType.Application.Json)
 
-            val credentials = Credentials(username = "admin", password = "qwerty")
-            setBody(credentials)
+            val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
+            setBody(inputCredentials)
         }
         assertEquals(
             expected = HttpStatusCode.Unauthorized,
@@ -38,8 +38,8 @@ class AuthenticationTest {
         val response = client.post("/api/v1/sign-up") {
             contentType(ContentType.Application.Json)
 
-            val credentials = Credentials(username = " ", password = "qwerty")
-            setBody(credentials)
+            val inputCredentials = InputCredentials(username = " ", password = "qwerty")
+            setBody(inputCredentials)
         }
         assertEquals(
             expected = HttpStatusCode.Unauthorized,
@@ -52,8 +52,8 @@ class AuthenticationTest {
         val response = client.post("/api/v1/sign-up") {
             contentType(ContentType.Application.Json)
 
-            val credentials = Credentials(username = "admin", password = " ")
-            setBody(credentials)
+            val inputCredentials = InputCredentials(username = "admin", password = " ")
+            setBody(inputCredentials)
         }
         assertEquals(
             expected = HttpStatusCode.Unauthorized,
@@ -66,8 +66,8 @@ class AuthenticationTest {
         val response = client.post("/api/v1/sign-up") {
             contentType(ContentType.Application.Json)
 
-            val credentials = Credentials(username = "admin", password = "qwerty")
-            setBody(credentials)
+            val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
+            setBody(inputCredentials)
         }
         assertEquals(
             expected = HttpStatusCode.OK,
@@ -77,18 +77,18 @@ class AuthenticationTest {
 
     @Test
     fun `Do not sign in with an incorrect password`() = testConfiguredApplication { client ->
-        val credentials = Credentials(username = "admin", password = "qwerty")
+        val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         // Sign up the new user
         client.post("/api/v1/sign-up") {
             contentType(ContentType.Application.Json)
-            setBody(credentials)
+            setBody(inputCredentials)
         }
 
         // Sign in the existing user
         val response = client.post("/api/v1/sign-in") {
             contentType(ContentType.Application.Json)
-            setBody(credentials.copy(password = "password"))
+            setBody(inputCredentials.copy(password = "password"))
         }
 
         assertEquals(
@@ -99,18 +99,18 @@ class AuthenticationTest {
 
     @Test
     fun `Sign in with a correct password`() = testConfiguredApplication { client ->
-        val credentials = Credentials(username = "admin", password = "qwerty")
+        val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         // Sign up the new user
         client.post("/api/v1/sign-up") {
             contentType(ContentType.Application.Json)
-            setBody(credentials)
+            setBody(inputCredentials)
         }
 
         // Sign in the existing user
         val response = client.post("/api/v1/sign-in") {
             contentType(ContentType.Application.Json)
-            setBody(credentials)
+            setBody(inputCredentials)
         }
 
         assertEquals(
@@ -121,18 +121,18 @@ class AuthenticationTest {
 
     @Test
     fun `Grant access to an authorized user`() = testConfiguredApplication { client ->
-        val credentials = Credentials(username = "admin", password = "qwerty")
+        val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         // Sign up the new user
         client.post("/api/v1/sign-up") {
             contentType(ContentType.Application.Json)
-            setBody(credentials)
+            setBody(inputCredentials)
         }
 
         // Sign in the existing user & extract the JWT token
         val response0 = client.post("/api/v1/sign-in") {
             contentType(ContentType.Application.Json)
-            setBody(credentials)
+            setBody(inputCredentials)
         }
         val jwtToken = response0.body<SignInResponse>().token
 

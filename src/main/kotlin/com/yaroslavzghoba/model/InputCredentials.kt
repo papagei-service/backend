@@ -3,13 +3,13 @@ package com.yaroslavzghoba.model
 import kotlinx.serialization.Serializable
 
 /**
- * Represents credentials received from the client.
+ * Represents the credentials sent by the client.
  *
  * @param username A unique identifier of the user's account.
  * @param password A special code word that used to log in the system.
  */
 @Serializable
-data class Credentials(
+data class InputCredentials(
     val username: String,
     val password: String,
 )

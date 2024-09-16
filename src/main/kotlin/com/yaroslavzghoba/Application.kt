@@ -17,7 +17,6 @@ fun main(args: Array<String>) {
 @Suppress("unused")  // Mark the IDE that the function is actually used
 fun Application.module() {
     val userStorage = FakeUserStorage()
-
     val jwtTokenConfig = JwtTokenConfig(
         secret = environment.config.property("security.jwt.secret").getString(),
         issuer = environment.config.property("security.jwt.issuer").getString(),
@@ -27,10 +26,8 @@ fun Application.module() {
             .property("security.jwt.lifetime-ms").getString().toLong(),
     )
     val jwtTokenService = JwtTokenServiceImpl()
-
-    val pepper = environment.config.property("security.hashing.pepper").getString()
     val hashingService = HashingServiceImpl(
-        pepper = pepper,
+        pepper = environment.config.property("security.hashing.pepper").getString(),
         algorithm = environment.config.property("security.hashing.algorithm").getString(),
     )
     val saltGenerator = SaltGeneratorImpl(
@@ -45,7 +42,6 @@ fun Application.module() {
         jwtTokenService = jwtTokenService,
         hashingService = hashingService,
         saltGenerator = saltGenerator,
-        pepper = pepper,
     )
     configureSerialization()
 }

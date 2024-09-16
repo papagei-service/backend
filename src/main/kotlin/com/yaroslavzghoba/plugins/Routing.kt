@@ -19,27 +19,29 @@ fun Application.configureRouting(
     jwtTokenService: JwtTokenService,
     hashingService: HashingService,
     saltGenerator: SaltGenerator,
-    pepper: String,
 ) {
     routing {
         route(path = "/api") {
             route(path = "/v1") {
                 authenticate("jwt-authentication") {
-                    get(path = "/", body = RouteHandlersProvider.Api.V1.getRoot)
+                    get(path = "/", body = RouteHandlersProvider.Api.V1.getRoot())
                 }
                 post(
                     path = "/sign-in",
-                    body = {
-                        RouteHandlersProvider.Api.V1
-                            .postSignIn(this, userStorage, hashingService, jwtTokenConfig, jwtTokenService)
-                    },
+                    body = RouteHandlersProvider.Api.V1.postSignIn(
+                        userStorage = userStorage,
+                        hashingService = hashingService,
+                        jwtTokenConfig = jwtTokenConfig,
+                        jwtTokenService = jwtTokenService,
+                    )
                 )
                 post(
                     path = "/sign-up",
-                    body = {
-                        RouteHandlersProvider.Api.V1
-                            .postSignUp(this, userStorage, hashingService, saltGenerator, pepper)
-                    }
+                    body = RouteHandlersProvider.Api.V1.postSignUp(
+                        userStorage = userStorage,
+                        hashingService = hashingService,
+                        saltGenerator = saltGenerator,
+                    )
                 )
             }
         }
