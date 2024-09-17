@@ -7,6 +7,9 @@ object RouteHandlersProvider {
 
     object Api {
 
-        object V1
+        object V1 {
+
+            object Users
+        }
     }
 }

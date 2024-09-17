@@ -1,4 +1,4 @@
-package com.yaroslavzghoba.routing.api.v1
+package com.yaroslavzghoba.routing.api.v1.users
 
 import com.yaroslavzghoba.data.UserStorage
 import com.yaroslavzghoba.model.InputCredentials
@@ -11,11 +11,11 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun RouteHandlersProvider.Api.V1.postSignUp(
+fun RouteHandlersProvider.Api.V1.Users.postRegister(
     userStorage: UserStorage,
     hashingService: HashingService,
     saltGenerator: SaltGenerator,
-): suspend RoutingContext.() -> Unit = postSignUpHandler@{
+): suspend RoutingContext.() -> Unit = postRegisterHandler@{
 
     // Receive credentials sent by the client
     val inputCredentials = call.receive<InputCredentials>()
@@ -25,21 +25,21 @@ fun RouteHandlersProvider.Api.V1.postSignUp(
     correspondingUser?.let {
         val message = mapOf("message" to "The user with the \"${it.username}\" username is already exists")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@postSignUpHandler
+        return@postRegisterHandler
     }
 
     // Return 401 if the input username is blank
     if (inputCredentials.username.isBlank()) {
         val message = mapOf("message" to "The username cannot be blank")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@postSignUpHandler
+        return@postRegisterHandler
     }
 
     // Return 401 if the input password is blank
     if (inputCredentials.password.isBlank()) {
         val message = mapOf("message" to "The password cannot be blank")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@postSignUpHandler
+        return@postRegisterHandler
     }
 
     // Create an account and save it to the storage

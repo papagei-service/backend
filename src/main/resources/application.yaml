@@ -12,6 +12,8 @@ security:
     audience: "/api"
     realm: "Access to the API"
     lifetime-ms: 900000  # 15 min
+  sessions:
+    lifetime-ms: 900000  # 15 min
   hashing:
     pepper: $PEPPERED_SECRET
     algorithm: "SHA-512"

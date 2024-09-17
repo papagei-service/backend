@@ -3,41 +3,80 @@ package com.yaroslavzghoba.plugins
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
+import com.yaroslavzghoba.security.sessions.SessionsConfig
+import com.yaroslavzghoba.security.sessions.UserSession
 import io.ktor.http.*
 import io.ktor.server.application.*
-//import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
+import io.ktor.server.sessions.*
 
-fun Application.configureAuthentication(jwtTokenConfig: JwtTokenConfig) {
-    install(Authentication) {
-        jwt("jwt-authentication") {
-            realm = jwtTokenConfig.realm
-            verifier(
-                JWT
-                    .require(Algorithm.HMAC256(jwtTokenConfig.secret))
-                    .withAudience(jwtTokenConfig.audience)
-                    .withIssuer(jwtTokenConfig.issuer)
-                    .build()
-            )
-            validate { credential ->
-                if (credential.payload.getClaim("username").asString() != "") {
-                    JWTPrincipal(credential.payload)
-                } else {
-                    null
-                }
-            }
-            challenge { defaultScheme, realm ->
-                call.respond(
-                    status = HttpStatusCode.Unauthorized,
-                    message = mapOf(
-                        "message" to "Token is not valid or has expired",
-                        "defaultScheme" to defaultScheme,
-                        "realm" to realm,
-                    ),
-                )
-            }
+private const val MILLISECONDS_IN_SECOND: Long = 1000
+
+fun Application.configureAuthentication(
+    jwtTokenConfig: JwtTokenConfig,
+    sessionsConfig: SessionsConfig,
+    sessionStorage: SessionStorage,
+) {
+    val jwtAuthConfiguration = jwtAuthConfiguration(jwtTokenConfig = jwtTokenConfig)
+    val sessionsConfiguration = sessionsConfiguration<UserSession>(
+        sessionsConfig = sessionsConfig,
+        sessionStorage = sessionStorage,
+    )
+    val sessionAuthConfiguration = sessionAuthConfiguration<UserSession>()
+
+    install(plugin = Sessions, configure = sessionsConfiguration)
+    install(plugin = Authentication) {
+        jwt(name = "jwt-authentication", configure = jwtAuthConfiguration)
+        session(name = "session-authentication", configure = sessionAuthConfiguration)
+    }
+}
+
+private inline fun <reified T : Any> sessionsConfiguration(
+    sessionsConfig: SessionsConfig,
+    sessionStorage: SessionStorage,
+): io.ktor.server.sessions.SessionsConfig.() -> Unit = {
+
+    cookie<T>(name = "session", storage = sessionStorage) {
+        cookie.path = "/"
+        cookie.httpOnly = true
+        cookie.secure = true
+        sessionsConfig.lifetimeMs?.let { lifetimeMs ->
+            cookie.maxAgeInSeconds = lifetimeMs * MILLISECONDS_IN_SECOND
         }
+    }
+}
+
+private fun <T : Any> sessionAuthConfiguration(): SessionAuthenticationProvider.Config<T>.() -> Unit = {
+    validate { session ->
+        session
+    }
+
+    // Return 401 if session authentication fails
+    challenge { _ ->
+        val message = mapOf("message" to "User session is missing, invalid or expired")
+        call.respond(status = HttpStatusCode.Unauthorized, message = message)
+    }
+}
+
+private fun jwtAuthConfiguration(
+    jwtTokenConfig: JwtTokenConfig,
+): JWTAuthenticationProvider.Config.() -> Unit = {
+
+    realm = jwtTokenConfig.realm
+
+    // Set a token format and signature verifier
+    val verifier = JWT
+        .require(Algorithm.HMAC256(jwtTokenConfig.secret))
+        .withAudience(jwtTokenConfig.audience)
+        .withIssuer(jwtTokenConfig.issuer)
+        .build()
+    verifier(verifier)
+
+    // Return 401 if JWT authentication fails
+    challenge { defaultScheme, realm ->
+        val message = mapOf("message" to "Token is not valid or has expired")
+        call.respond(status = HttpStatusCode.Unauthorized, message = message)
     }
 }

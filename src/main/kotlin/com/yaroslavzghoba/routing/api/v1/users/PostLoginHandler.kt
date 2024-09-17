@@ -1,23 +1,20 @@
-package com.yaroslavzghoba.routing.api.v1
+package com.yaroslavzghoba.routing.api.v1.users
 
 import com.yaroslavzghoba.data.UserStorage
 import com.yaroslavzghoba.model.InputCredentials
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.hashing.HashingService
-import com.yaroslavzghoba.security.jwt.JwtTokenClaim
-import com.yaroslavzghoba.security.jwt.JwtTokenConfig
-import com.yaroslavzghoba.security.jwt.JwtTokenService
+import com.yaroslavzghoba.security.sessions.UserSession
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 
-fun RouteHandlersProvider.Api.V1.postSignIn(
+fun RouteHandlersProvider.Api.V1.Users.postLogin(
     userStorage: UserStorage,
     hashingService: HashingService,
-    jwtTokenConfig: JwtTokenConfig,
-    jwtTokenService: JwtTokenService,
-): suspend RoutingContext.() -> Unit = postSignInHandler@{
+): suspend RoutingContext.() -> Unit = postLoginHandler@{
 
     // Receive credentials sent by the client
     val inputCredentials = call.receive<InputCredentials>()
@@ -27,7 +24,7 @@ fun RouteHandlersProvider.Api.V1.postSignIn(
     if (correspondingUser == null) {
         val message = mapOf("meesage" to "There is no the user with the \"${inputCredentials.username}\" username")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@postSignInHandler
+        return@postLoginHandler
     }
 
     // Return 401 if the password hash sent by the client does not match the hash of the corresponding user
@@ -36,13 +33,12 @@ fun RouteHandlersProvider.Api.V1.postSignIn(
     if (inputPasswordHash != correspondingUser.hashedPassword) {
         val message = mapOf("message" to "The password is incorrect")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@postSignInHandler
+        return@postLoginHandler
     }
 
-    // Generate and return a JWT token
-    val usernameClaim = JwtTokenClaim(name = "username", value = inputCredentials.username)
-    val token = jwtTokenService.generate(
-        config = jwtTokenConfig.copy(claims = jwtTokenConfig.claims + usernameClaim)
-    )
-    call.respond(mapOf("token" to token))
+    // Generate a session
+    call.sessions.set(UserSession(username = correspondingUser.username))
+
+    val message = mapOf("message" to "Login was successful")
+    call.respond(status = HttpStatusCode.OK, message = message)
 }

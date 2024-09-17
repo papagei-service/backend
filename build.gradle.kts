@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.yaroslavzghoba"
-version = "0.1.2"
+version = "0.2.0"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -25,6 +25,7 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.server.auth.jwt)
+    implementation(libs.ktor.server.sessions)
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
 
