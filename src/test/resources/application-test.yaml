@@ -17,4 +17,5 @@ security:
   hashing:
     pepper: "fUSF*mHjOt7qTpHW$zvR3xaJyAInt9#sGFn0"
     algorithm: "SHA-512"
-    salt-length: 32
+    salt-min-length: 32
+    salt-max-length: 48

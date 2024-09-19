@@ -6,10 +6,11 @@ import com.yaroslavzghoba.plugins.configureAuthentication
 import com.yaroslavzghoba.plugins.configureRouting
 import com.yaroslavzghoba.plugins.configureSerialization
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
-import com.yaroslavzghoba.security.hashing.SaltGeneratorImpl
+import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenServiceImpl
 import com.yaroslavzghoba.security.sessions.SessionsConfig
+import com.yaroslavzghoba.utils.KeyGeneratorImpl
 import io.ktor.server.application.*
 
 @Suppress("unused")  // Mark the IDE that the function is actually used
@@ -32,9 +33,11 @@ fun Application.testingModule() {
         pepper = environment.config.property("security.hashing.pepper").getString(),
         algorithm = environment.config.property("security.hashing.algorithm").getString(),
     )
-    val saltGenerator = SaltGeneratorImpl(
-        length = environment.config.property("security.hashing.salt-length").getString().toInt(),
+    val saltConfig = PasswordSaltConfig(
+        minLength = environment.config.property("security.hashing.salt-min-length").getString().toInt(),
+        maxLength = environment.config.property("security.hashing.salt-max-length").getString().toInt(),
     )
+    val keyGenerator = KeyGeneratorImpl()
 
     configureAuthentication(
         jwtTokenConfig = jwtTokenConfig,
@@ -46,7 +49,8 @@ fun Application.testingModule() {
         jwtTokenConfig = jwtTokenConfig,
         jwtTokenService = jwtTokenService,
         hashingService = hashingService,
-        saltGenerator = saltGenerator,
+        saltConfig = saltConfig,
+        keyGenerator = keyGenerator,
     )
     configureSerialization()
 }

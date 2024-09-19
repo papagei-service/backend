@@ -7,9 +7,10 @@ import com.yaroslavzghoba.routing.api.v1.users.postLogin
 import com.yaroslavzghoba.routing.api.v1.users.postLogout
 import com.yaroslavzghoba.routing.api.v1.users.postRegister
 import com.yaroslavzghoba.security.hashing.HashingService
-import com.yaroslavzghoba.security.hashing.SaltGenerator
+import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenService
+import com.yaroslavzghoba.utils.KeyGenerator
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
@@ -19,7 +20,8 @@ fun Application.configureRouting(
     jwtTokenConfig: JwtTokenConfig,
     jwtTokenService: JwtTokenService,
     hashingService: HashingService,
-    saltGenerator: SaltGenerator,
+    saltConfig: PasswordSaltConfig,
+    keyGenerator: KeyGenerator,
 ) {
     routing {
         route(path = "/api") {
@@ -27,7 +29,8 @@ fun Application.configureRouting(
                 routingApiV1(
                     userStorage = userStorage,
                     hashingService = hashingService,
-                    saltGenerator = saltGenerator,
+                    saltConfig = saltConfig,
+                    saltGenerator = keyGenerator,
                 )
             }
             post(
@@ -35,6 +38,7 @@ fun Application.configureRouting(
                 body = RouteHandlersProvider.Api.postRegister(
                     jwtTokenConfig = jwtTokenConfig,
                     jwtTokenService = jwtTokenService,
+                    keyGenerator = keyGenerator,
                 )
             )
         }
@@ -44,7 +48,8 @@ fun Application.configureRouting(
 private fun Route.routingApiV1(
     userStorage: UserStorage,
     hashingService: HashingService,
-    saltGenerator: SaltGenerator,
+    saltConfig: PasswordSaltConfig,
+    saltGenerator: KeyGenerator,
 ) {
     route(path = "/v1") {
         route(path = "/users") {
@@ -60,6 +65,7 @@ private fun Route.routingApiV1(
                 body = RouteHandlersProvider.Api.V1.Users.postRegister(
                     userStorage = userStorage,
                     hashingService = hashingService,
+                    saltConfig = saltConfig,
                     saltGenerator = saltGenerator,
                 ),
             )

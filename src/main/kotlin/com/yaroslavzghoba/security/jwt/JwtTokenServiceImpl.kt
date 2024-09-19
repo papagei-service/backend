@@ -10,7 +10,7 @@ class JwtTokenServiceImpl : JwtTokenService {
         return JWT.create()
             .withAudience(config.audience)
             .withIssuer(config.issuer)
-            .apply { config.claims.forEach { withClaim(it.name, it.value) } }
+            .apply { config.claims.forEach { withClaim(it.key, it.value.toString()) } }
             .apply { config.lifetimeMs?.let { withExpiresAt(Date(System.currentTimeMillis() + it)) } }
             .sign(Algorithm.HMAC256(config.secret))
     }

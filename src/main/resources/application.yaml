@@ -17,4 +17,5 @@ security:
   hashing:
     pepper: $PEPPERED_SECRET
     algorithm: "SHA-512"
-    salt-length: 32
+    salt-min-length: 32
+    salt-max-length: 48

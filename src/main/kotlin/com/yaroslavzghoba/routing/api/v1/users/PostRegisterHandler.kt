@@ -5,7 +5,8 @@ import com.yaroslavzghoba.model.InputCredentials
 import com.yaroslavzghoba.model.User
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.hashing.HashingService
-import com.yaroslavzghoba.security.hashing.SaltGenerator
+import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
+import com.yaroslavzghoba.utils.KeyGenerator
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -14,7 +15,8 @@ import io.ktor.server.routing.*
 fun RouteHandlersProvider.Api.V1.Users.postRegister(
     userStorage: UserStorage,
     hashingService: HashingService,
-    saltGenerator: SaltGenerator,
+    saltConfig: PasswordSaltConfig,
+    saltGenerator: KeyGenerator,
 ): suspend RoutingContext.() -> Unit = postRegisterHandler@{
 
     // Receive credentials sent by the client
@@ -43,8 +45,10 @@ fun RouteHandlersProvider.Api.V1.Users.postRegister(
     }
 
     // Create an account and save it to the storage
+    val saltLength = with(saltConfig) { minLength..maxLength }.random()
+    val salt = saltGenerator.generate(length = saltLength)
     val user = User.Builder(inputCredentials = inputCredentials, hashingService = hashingService)
-        .withSalt(salt = saltGenerator.generate())
+        .withSalt(salt = salt)
         .build()
     userStorage.insert(user = user)
 
