@@ -49,9 +49,8 @@ private inline fun <reified T : Any> sessionsConfiguration(
 }
 
 private fun <T : Any> sessionAuthConfiguration(): SessionAuthenticationProvider.Config<T>.() -> Unit = {
-    validate { session ->
-        session
-    }
+    // Additional validations of the session
+    validate { it }
 
     // Return 401 if session authentication fails
     challenge { _ ->
@@ -66,6 +65,9 @@ private fun jwtAuthConfiguration(
 
     realm = jwtTokenConfig.realm
 
+    // Additional validations on the JWT payload
+    validate { it }
+
     // Set a token format and signature verifier
     val verifier = JWT
         .require(Algorithm.HMAC256(jwtTokenConfig.secret))
@@ -75,7 +77,7 @@ private fun jwtAuthConfiguration(
     verifier(verifier)
 
     // Return 401 if JWT authentication fails
-    challenge { defaultScheme, realm ->
+    challenge { _, _ ->
         val message = mapOf("message" to "Token is not valid or has expired")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
     }

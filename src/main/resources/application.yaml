@@ -8,8 +8,8 @@ ktor:
 security:
   jwt:
     secret: $JWT_SECRET_OF_PAPAGEI
-    issuer: "/api/v1/sign-in"
-    audience: "/api"
+    issuer: "/api/register"
+    audience: "/api/v*"
     realm: "Access to the API"
     lifetime-ms: 900000  # 15 min
   sessions:
