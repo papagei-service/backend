@@ -20,6 +20,7 @@ fun Application.configureAuthentication(
     sessionStorage: SessionStorage,
 ) {
     val jwtAuthConfiguration = jwtAuthConfiguration(jwtTokenConfig = jwtTokenConfig)
+    val strongJwtAuthConfiguration = strongJwtAuthConfiguration(jwtTokenConfig = jwtTokenConfig)
     val sessionsConfiguration = sessionsConfiguration<UserSession>(
         sessionsConfig = sessionsConfig,
         sessionStorage = sessionStorage,
@@ -29,6 +30,7 @@ fun Application.configureAuthentication(
     install(plugin = Sessions, configure = sessionsConfiguration)
     install(plugin = Authentication) {
         jwt(name = "jwt-authentication", configure = jwtAuthConfiguration)
+        jwt(name = "strong-jwt-authentication", configure = strongJwtAuthConfiguration)
         session(name = "session-authentication", configure = sessionAuthConfiguration)
     }
 }
@@ -66,7 +68,36 @@ private fun jwtAuthConfiguration(
     realm = jwtTokenConfig.realm
 
     // Additional validations on the JWT payload
-    validate { it }
+    validate { credential ->
+        JWTPrincipal(credential.payload)
+    }
+
+    // Set a token format and signature verifier
+    val verifier = JWT
+        .require(Algorithm.HMAC256(jwtTokenConfig.secret))
+        .withAudience(jwtTokenConfig.audience)
+        .withIssuer(jwtTokenConfig.issuer)
+        .build()
+    verifier(verifier)
+
+    // Return 401 if JWT authentication fails
+    challenge { _, _ ->
+        val message = mapOf("message" to "Token is not valid or has expired")
+        call.respond(status = HttpStatusCode.Unauthorized, message = message)
+    }
+}
+
+private fun strongJwtAuthConfiguration(
+    jwtTokenConfig: JwtTokenConfig,
+): JWTAuthenticationProvider.Config.() -> Unit = {
+
+    realm = jwtTokenConfig.realm
+
+    // Additional validations on the JWT payload
+    validate { credential ->
+        val isStrong = credential.payload.getClaim("strong").asString().toBooleanStrictOrNull() ?: return@validate null
+        if (isStrong) JWTPrincipal(credential.payload) else null
+    }
 
     // Set a token format and signature verifier
     val verifier = JWT

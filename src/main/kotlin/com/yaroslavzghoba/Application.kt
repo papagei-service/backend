@@ -11,7 +11,9 @@ import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenServiceImpl
 import com.yaroslavzghoba.security.sessions.SessionsConfig
 import com.yaroslavzghoba.utils.KeyGeneratorImpl
+import com.yaroslavzghoba.utils.generateAndSaveStrongTokens
 import io.ktor.server.application.*
+import kotlinx.coroutines.launch
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -25,7 +27,7 @@ fun Application.module() {
         issuer = environment.config.property("security.jwt.issuer").getString(),
         audience = environment.config.property("security.jwt.audience").getString(),
         realm = environment.config.property("security.jwt.realm").getString(),
-        lifetimeMs = environment.config.property("security.jwt.lifetime-ms").getString().toLong(),
+        lifetimeMs = null,
     )
     val jwtTokenService = JwtTokenServiceImpl()
     val sessionsConfig = SessionsConfig(
@@ -42,6 +44,15 @@ fun Application.module() {
         maxLength = environment.config.property("security.hashing.salt-max-length").getString().toInt(),
     )
     val keyGenerator = KeyGeneratorImpl()
+
+    // Generate strong tokens and save them in a file
+    launch {
+        generateAndSaveStrongTokens(
+            tokensAmount = 10,
+            jwtTokenConfig = jwtTokenConfig,
+            jwtTokenService = jwtTokenService,
+        )
+    }
 
     configureAuthentication(
         jwtTokenConfig = jwtTokenConfig,

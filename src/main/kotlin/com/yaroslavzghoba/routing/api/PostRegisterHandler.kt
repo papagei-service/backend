@@ -4,22 +4,28 @@ import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.jwt.JwtTokenClaim
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenService
-import com.yaroslavzghoba.utils.KeyGenerator
+import com.yaroslavzghoba.security.sessions.UserSession
+import com.yaroslavzghoba.utils.Constants
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 
 fun RouteHandlersProvider.Api.postRegister(
     jwtTokenConfig: JwtTokenConfig,
     jwtTokenService: JwtTokenService,
-    keyGenerator: KeyGenerator,
 ): suspend RoutingContext.() -> Unit = postRegisterHandler@{
 
+    // Get a user's session if specified
+    val username = call.sessions.get<UserSession>()?.username
+
     // Generate a JWT token
-    val clientIdLength = (32..48).random()
-    val clientId = keyGenerator.generate(length = clientIdLength)
-    val claims = jwtTokenConfig.claims
-        .plus(JwtTokenClaim(key = "client_id", value = clientId))
+    val claims = jwtTokenConfig.claims.toMutableList().apply {
+        removeIf { it.key in listOf(Constants.STRONG_TOKEN_CLAIM_KEY, Constants.OWNER_TOKEN_CLAIM_KEY) }
+        add(JwtTokenClaim(key = Constants.STRONG_TOKEN_CLAIM_KEY, value = true))
+        if (username != null)
+            add(JwtTokenClaim(key = Constants.OWNER_TOKEN_CLAIM_KEY, value = username))
+    }
     val token = jwtTokenService.generate(
         config = jwtTokenConfig.copy(claims = claims)
     )

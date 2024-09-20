@@ -8,7 +8,7 @@ ktor:
 security:
   jwt:
     secret: "kK*hmb$*A*0rx$i!CoP6cNXGaQO*p4z5kjwk"
-    issuer: "/api/v1/sign-in"
+    issuer: "/api/register"
     audience: "/api"
     realm: "Access to the API"
     lifetime-ms: 300000  # 5 min

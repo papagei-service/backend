@@ -9,7 +9,7 @@ security:
   jwt:
     secret: $JWT_SECRET_OF_PAPAGEI
     issuer: "/api/register"
-    audience: "/api/v*"
+    audience: "/api"
     realm: "Access to the API"
     lifetime-ms: 900000  # 15 min
   sessions:

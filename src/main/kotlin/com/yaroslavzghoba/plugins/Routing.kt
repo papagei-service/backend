@@ -33,14 +33,19 @@ fun Application.configureRouting(
                     saltGenerator = keyGenerator,
                 )
             }
-            post(
-                path = "/register",
-                body = RouteHandlersProvider.Api.postRegister(
-                    jwtTokenConfig = jwtTokenConfig,
-                    jwtTokenService = jwtTokenService,
-                    keyGenerator = keyGenerator,
-                )
-            )
+
+            // Register a new, not strong, access token
+            authenticate("strong-jwt-authentication", strategy = AuthenticationStrategy.Required) {
+                authenticate("session-authentication", strategy = AuthenticationStrategy.Optional) {
+                    post(
+                        path = "/register",
+                        body = RouteHandlersProvider.Api.postRegister(
+                            jwtTokenConfig = jwtTokenConfig,
+                            jwtTokenService = jwtTokenService,
+                        )
+                    )
+                }
+            }
         }
     }
 }
