@@ -1,7 +1,7 @@
 package com.yaroslavzghoba.routing.api.v1.users
 
-import com.yaroslavzghoba.data.UserStorage
 import com.yaroslavzghoba.model.InputCredentials
+import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.hashing.HashingService
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -12,7 +12,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
 fun RouteHandlersProvider.Api.V1.Users.postLogin(
-    userStorage: UserStorage,
+    repository: Repository,
     hashingService: HashingService,
 ): suspend RoutingContext.() -> Unit = postLoginHandler@{
 
@@ -20,7 +20,7 @@ fun RouteHandlersProvider.Api.V1.Users.postLogin(
     val inputCredentials = call.receive<InputCredentials>()
 
     // Return 401 if no user with the corresponding name is found in the user storage
-    val correspondingUser = userStorage.getByUsername(username = inputCredentials.username)
+    val correspondingUser = repository.getUserByUsername(username = inputCredentials.username)
     if (correspondingUser == null) {
         val message = mapOf("meesage" to "There is no the user with the \"${inputCredentials.username}\" username")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)

@@ -1,6 +1,6 @@
 package com.yaroslavzghoba.plugins
 
-import com.yaroslavzghoba.data.UserStorage
+import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.routing.api.postRegister
 import com.yaroslavzghoba.routing.api.v1.users.postLogin
@@ -16,7 +16,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting(
-    userStorage: UserStorage,
+    repository: Repository,
     jwtTokenConfig: JwtTokenConfig,
     jwtTokenService: JwtTokenService,
     hashingService: HashingService,
@@ -27,7 +27,7 @@ fun Application.configureRouting(
         route(path = "/api") {
             authenticate("jwt-authentication", strategy = AuthenticationStrategy.Required) {
                 routingApiV1(
-                    userStorage = userStorage,
+                    repository = repository,
                     hashingService = hashingService,
                     saltConfig = saltConfig,
                     saltGenerator = keyGenerator,
@@ -51,7 +51,7 @@ fun Application.configureRouting(
 }
 
 private fun Route.routingApiV1(
-    userStorage: UserStorage,
+    repository: Repository,
     hashingService: HashingService,
     saltConfig: PasswordSaltConfig,
     saltGenerator: KeyGenerator,
@@ -61,14 +61,14 @@ private fun Route.routingApiV1(
             post(
                 path = "/login",
                 body = RouteHandlersProvider.Api.V1.Users.postLogin(
-                    userStorage = userStorage,
+                    repository = repository,
                     hashingService = hashingService,
                 ),
             )
             post(
                 path = "/register",
                 body = RouteHandlersProvider.Api.V1.Users.postRegister(
-                    userStorage = userStorage,
+                    repository = repository,
                     hashingService = hashingService,
                     saltConfig = saltConfig,
                     saltGenerator = saltGenerator,

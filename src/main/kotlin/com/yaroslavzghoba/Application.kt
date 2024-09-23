@@ -1,7 +1,10 @@
 package com.yaroslavzghoba
 
-import com.yaroslavzghoba.data.FakeUserStorage
-import com.yaroslavzghoba.data.UserSessionStorage
+import com.yaroslavzghoba.data.RepositoryImpl
+import com.yaroslavzghoba.data.fake.FakeCardDao
+import com.yaroslavzghoba.data.fake.FakeCollectionDao
+import com.yaroslavzghoba.data.fake.FakeUserDao
+import com.yaroslavzghoba.data.local.UserSessionStorage
 import com.yaroslavzghoba.plugins.configureAuthentication
 import com.yaroslavzghoba.plugins.configureRouting
 import com.yaroslavzghoba.plugins.configureSerialization
@@ -21,7 +24,8 @@ fun main(args: Array<String>) {
 
 @Suppress("unused")  // Mark the IDE that the function is actually used
 fun Application.module() {
-    val userStorage = FakeUserStorage()
+    val repository =
+        RepositoryImpl(userDao = FakeUserDao(), collectionDao = FakeCollectionDao(), cardDao = FakeCardDao())
     val jwtTokenConfig = JwtTokenConfig(
         secret = environment.config.property("security.jwt.secret").getString(),
         issuer = environment.config.property("security.jwt.issuer").getString(),
@@ -58,7 +62,7 @@ fun Application.module() {
         sessionsConfig = sessionsConfig,
     )
     configureRouting(
-        userStorage = userStorage,
+        repository = repository,
         jwtTokenConfig = jwtTokenConfig,
         jwtTokenService = jwtTokenService,
         hashingService = hashingService,

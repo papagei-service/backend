@@ -1,10 +1,10 @@
-package com.yaroslavzghoba.data
+package com.yaroslavzghoba.data.local
 
 import io.ktor.server.sessions.*
 import io.ktor.util.collections.*
 
 /**
- * Storage for storing active user sessions.
+ * Storage for storing and reading active user sessions.
  */
 class UserSessionStorage : SessionStorage {
 
