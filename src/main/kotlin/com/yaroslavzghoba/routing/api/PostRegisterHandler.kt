@@ -11,6 +11,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
+@Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.Api.postRegister(
     jwtTokenConfig: JwtTokenConfig,
     jwtTokenService: JwtTokenService,

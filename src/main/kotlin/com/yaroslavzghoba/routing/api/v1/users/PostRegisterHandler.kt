@@ -12,6 +12,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
+@Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.Api.V1.Users.postRegister(
     repository: Repository,
     hashingService: HashingService,
