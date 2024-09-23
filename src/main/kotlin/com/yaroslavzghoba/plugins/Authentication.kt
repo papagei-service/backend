@@ -17,14 +17,10 @@ private const val MILLISECONDS_IN_SECOND: Long = 1000
 fun Application.configureAuthentication(
     jwtTokenConfig: JwtTokenConfig,
     sessionsConfig: SessionsConfig,
-    sessionStorage: SessionStorage,
 ) {
     val jwtAuthConfiguration = jwtAuthConfiguration(jwtTokenConfig = jwtTokenConfig)
     val strongJwtAuthConfiguration = strongJwtAuthConfiguration(jwtTokenConfig = jwtTokenConfig)
-    val sessionsConfiguration = sessionsConfiguration<UserSession>(
-        sessionsConfig = sessionsConfig,
-        sessionStorage = sessionStorage,
-    )
+    val sessionsConfiguration = sessionsConfiguration<UserSession>(sessionsConfig = sessionsConfig)
     val sessionAuthConfiguration = sessionAuthConfiguration<UserSession>()
 
     install(plugin = Sessions, configure = sessionsConfiguration)
@@ -37,10 +33,9 @@ fun Application.configureAuthentication(
 
 private inline fun <reified T : Any> sessionsConfiguration(
     sessionsConfig: SessionsConfig,
-    sessionStorage: SessionStorage,
 ): io.ktor.server.sessions.SessionsConfig.() -> Unit = {
 
-    cookie<T>(name = "session", storage = sessionStorage) {
+    cookie<T>(name = "session", storage = sessionsConfig.sessionStorage) {
         cookie.path = "/"
         cookie.httpOnly = true
         cookie.secure = true

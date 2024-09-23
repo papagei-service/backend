@@ -34,7 +34,6 @@ fun Application.module() {
         sessionStorage = UserSessionStorage(),
         lifetimeMs = environment.config.property("security.sessions.lifetime-ms").getString().toLong(),
     )
-    val sessionStorage = UserSessionStorage()
     val hashingService = HashingServiceImpl(
         pepper = environment.config.property("security.hashing.pepper").getString(),
         algorithm = environment.config.property("security.hashing.algorithm").getString(),
@@ -57,7 +56,6 @@ fun Application.module() {
     configureAuthentication(
         jwtTokenConfig = jwtTokenConfig,
         sessionsConfig = sessionsConfig,
-        sessionStorage = sessionStorage,
     )
     configureRouting(
         userStorage = userStorage,

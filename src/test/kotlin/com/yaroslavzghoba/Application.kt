@@ -1,7 +1,6 @@
 package com.yaroslavzghoba
 
 import com.yaroslavzghoba.data.FakeUserStorage
-import com.yaroslavzghoba.data.UserSessionStorage
 import com.yaroslavzghoba.plugins.configureAuthentication
 import com.yaroslavzghoba.plugins.configureRouting
 import com.yaroslavzghoba.plugins.configureSerialization
@@ -12,6 +11,7 @@ import com.yaroslavzghoba.security.jwt.JwtTokenServiceImpl
 import com.yaroslavzghoba.security.sessions.SessionsConfig
 import com.yaroslavzghoba.utils.KeyGeneratorImpl
 import io.ktor.server.application.*
+import io.ktor.server.sessions.*
 
 @Suppress("unused")  // Mark the IDE that the function is actually used
 fun Application.testingModule() {
@@ -25,10 +25,9 @@ fun Application.testingModule() {
     )
     val jwtTokenService = JwtTokenServiceImpl()
     val sessionsConfig = SessionsConfig(
-        sessionStorage = UserSessionStorage(),
+        sessionStorage = SessionStorageMemory(),
         lifetimeMs = environment.config.property("security.sessions.lifetime-ms").getString().toLong(),
     )
-    val sessionStorage = UserSessionStorage()
     val hashingService = HashingServiceImpl(
         pepper = environment.config.property("security.hashing.pepper").getString(),
         algorithm = environment.config.property("security.hashing.algorithm").getString(),
@@ -42,7 +41,6 @@ fun Application.testingModule() {
     configureAuthentication(
         jwtTokenConfig = jwtTokenConfig,
         sessionsConfig = sessionsConfig,
-        sessionStorage = sessionStorage,
     )
     configureRouting(
         userStorage = userStorage,
