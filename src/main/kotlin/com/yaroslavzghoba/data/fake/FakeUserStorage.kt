@@ -1,11 +1,14 @@
 package com.yaroslavzghoba.data.fake
 
-import com.yaroslavzghoba.data.dao.UserDao
+import com.yaroslavzghoba.data.model.UserStorage
 import com.yaroslavzghoba.model.User
 
-class FakeUserDao : UserDao {
+/**
+ * Represents a storage of user accounts in temporary memory.
+ */
+class FakeUserStorage : UserStorage {
 
-    private val users: MutableList<User> = mutableListOf()
+    private val users = mutableListOf<User>()
 
     override suspend fun getByUsername(username: String): User? {
         return users.find { it.username == username }

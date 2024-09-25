@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.yaroslavzghoba"
-version = "0.4.1"
+version = "0.6.0"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -26,6 +26,11 @@ dependencies {
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.server.auth.jwt)
     implementation(libs.ktor.server.sessions)
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.kotlin.datetime)
+    implementation(libs.exposed.dao)
+    implementation(libs.posgresql)
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
 

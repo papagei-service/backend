@@ -1,23 +1,30 @@
 package com.yaroslavzghoba.data.local
 
+import com.yaroslavzghoba.data.local.dao.UserSessionDao
+import com.yaroslavzghoba.data.local.tables.UserSessionsTable
 import io.ktor.server.sessions.*
-import io.ktor.util.collections.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 
 /**
- * Storage for storing and reading active user sessions.
+ * Represents a storage of active user sessions in persistent memory.
  */
 class UserSessionStorage : SessionStorage {
 
-    private val sessions = ConcurrentMap<String, String>()
-
     override suspend fun write(id: String, value: String) {
-        sessions[id] = value
+        UserSessionDao.new(id = id) {
+            this.value = value
+        }
     }
 
     override suspend fun invalidate(id: String) {
-        sessions.remove(id)
+        UserSessionsTable.deleteWhere {
+            UserSessionsTable.id eq id
+        }
     }
 
-    override suspend fun read(id: String): String =
-        sessions[id] ?: throw NoSuchElementException("Session $id not found")
+    override suspend fun read(id: String): String = UserSessionDao
+        .find { UserSessionsTable.id eq id }
+        .firstOrNull()?.value
+        ?: throw NoSuchElementException("Session $id not found")
 }

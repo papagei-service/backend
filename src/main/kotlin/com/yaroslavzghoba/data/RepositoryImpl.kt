@@ -1,75 +1,75 @@
 package com.yaroslavzghoba.data
 
-import com.yaroslavzghoba.data.dao.CardDao
-import com.yaroslavzghoba.data.dao.CollectionDao
-import com.yaroslavzghoba.data.dao.UserDao
+import com.yaroslavzghoba.data.model.CardStorage
+import com.yaroslavzghoba.data.model.CollectionStorage
+import com.yaroslavzghoba.data.model.UserStorage
 import com.yaroslavzghoba.model.Card
 import com.yaroslavzghoba.model.CardCollection
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.model.User
 
 /**
- * Implements methods for storing and reading user data.
+ * Represents a storage of user data on the local disk.
  */
 class RepositoryImpl(
-    private val userDao: UserDao,
-    private val collectionDao: CollectionDao,
-    private val cardDao: CardDao,
+    private val userStorage: UserStorage,
+    private val collectionStorage: CollectionStorage,
+    private val cardStorage: CardStorage,
 ) : Repository {
 
     override suspend fun getUserByUsername(username: String): User? {
-        return userDao.getByUsername(username = username)
+        return userStorage.getByUsername(username = username)
     }
 
     override suspend fun insertUser(user: User) {
-        userDao.insert(user = user)
+        userStorage.insert(user = user)
     }
 
     override suspend fun updateUser(user: User) {
-        userDao.update(user = user)
+        userStorage.update(user = user)
     }
 
     override suspend fun deleteUserByUsername(username: String) {
-        userDao.deleteByUsername(username = username)
+        userStorage.deleteByUsername(username = username)
     }
 
     override suspend fun getCollectionById(id: Long): CardCollection? {
-        return collectionDao.getById(id = id)
+        return collectionStorage.getById(id = id)
     }
 
     override suspend fun getCollectionsByOwnerUsername(ownerUsername: String): List<CardCollection> {
-        return collectionDao.getByOwnerUsername(ownerUsername = ownerUsername)
+        return collectionStorage.getByOwnerUsername(ownerUsername = ownerUsername)
     }
 
     override suspend fun insertCollection(collection: CardCollection) {
-        collectionDao.insert(collection = collection)
+        collectionStorage.insert(collection = collection)
     }
 
     override suspend fun updateCollection(collection: CardCollection) {
-        collectionDao.update(collection = collection)
+        collectionStorage.update(collection = collection)
     }
 
     override suspend fun deleteCollectionById(id: Long) {
-        collectionDao.deleteById(id = id)
+        collectionStorage.deleteById(id = id)
     }
 
     override suspend fun getCardById(id: Long): Card? {
-        return cardDao.getById(id = id)
+        return cardStorage.getById(id = id)
     }
 
     override suspend fun getCardsByCollectionId(id: Long): List<Card> {
-        return cardDao.getByCollectionId(id = id)
+        return cardStorage.getByCollectionId(id = id)
     }
 
     override suspend fun insertCard(card: Card) {
-        return cardDao.insert(card = card)
+        return cardStorage.insert(card = card)
     }
 
     override suspend fun updateCard(card: Card) {
-        cardDao.update(card = card)
+        cardStorage.update(card = card)
     }
 
     override suspend fun deleteCardById(id: Long) {
-        cardDao.deleteById(id = id)
+        cardStorage.deleteById(id = id)
     }
 }

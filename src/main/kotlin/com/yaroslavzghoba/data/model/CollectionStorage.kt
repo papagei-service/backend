@@ -1,15 +1,15 @@
-package com.yaroslavzghoba.data.dao
+package com.yaroslavzghoba.data.model
 
 import com.yaroslavzghoba.model.CardCollection
 
 /**
  * Defines methods for storing and reading card collections.
  */
-interface CollectionDao {
+interface CollectionStorage {
 
     /**
      * Searches for a collection by its [id] in the storage. If the collection was found, the function returns it.
-     * If the user is not found, the method returns `null`.
+     * If the collection is not found, the method returns `null`.
      *
      * @param id A unique collection identifier that is used to search the collection.
      * @return The collection with the corresponding [id] if it was found and `null` if not.

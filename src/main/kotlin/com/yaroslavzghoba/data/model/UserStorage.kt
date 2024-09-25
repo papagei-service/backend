@@ -1,17 +1,17 @@
-package com.yaroslavzghoba.data.dao
+package com.yaroslavzghoba.data.model
 
 import com.yaroslavzghoba.model.User
 
 /**
- * Defines methods for storing and reading user accounts data.
+ * Defines methods for storing and reading user accounts.
  */
-interface UserDao {
+interface UserStorage {
 
     /**
-     * Searches for a user by its [username] in the user storage. If the user was found, the function returns it.
+     * Searches for a user by its [username] in the storage. If the user was found, the function returns it.
      * If the user is not found, the method returns `null`.
      *
-     * @param username A unique user identifier that is used to search the user storage.
+     * @param username A unique user identifier that is used to search.
      * @return The user with the corresponding [username] if it was found and `null` if not.
      */
     suspend fun getByUsername(username: String): User?
@@ -25,9 +25,9 @@ interface UserDao {
     suspend fun insert(user: User)
 
     /**
-     * Try to update a user in the storage.
+     * Try to update the user in the storage.
      *
-     * @param user The user that must be updated to the storage.
+     * @param user The user that must be updated.
      * @throws IllegalArgumentException If a user with the same username is not found.
      */
     suspend fun update(user: User)

@@ -1,11 +1,12 @@
 package com.yaroslavzghoba
 
 import com.yaroslavzghoba.data.RepositoryImpl
-import com.yaroslavzghoba.data.fake.FakeCardDao
-import com.yaroslavzghoba.data.fake.FakeCollectionDao
-import com.yaroslavzghoba.data.fake.FakeUserDao
+import com.yaroslavzghoba.data.local.CardStorageImpl
+import com.yaroslavzghoba.data.local.CollectionStorageImpl
 import com.yaroslavzghoba.data.local.UserSessionStorage
+import com.yaroslavzghoba.data.local.UserStorageImpl
 import com.yaroslavzghoba.plugins.configureAuthentication
+import com.yaroslavzghoba.plugins.configureDatabase
 import com.yaroslavzghoba.plugins.configureRouting
 import com.yaroslavzghoba.plugins.configureSerialization
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
@@ -24,8 +25,11 @@ fun main(args: Array<String>) {
 
 @Suppress("unused")  // Mark the IDE that the function is actually used
 fun Application.module() {
-    val repository =
-        RepositoryImpl(userDao = FakeUserDao(), collectionDao = FakeCollectionDao(), cardDao = FakeCardDao())
+    val repository = RepositoryImpl(
+        userStorage = UserStorageImpl(),
+        collectionStorage = CollectionStorageImpl(),
+        cardStorage = CardStorageImpl(),
+    )
     val jwtTokenConfig = JwtTokenConfig(
         secret = environment.config.property("security.jwt.secret").getString(),
         issuer = environment.config.property("security.jwt.issuer").getString(),
@@ -47,6 +51,11 @@ fun Application.module() {
         maxLength = environment.config.property("security.hashing.salt-max-length").getString().toInt(),
     )
     val keyGenerator = KeyGeneratorImpl()
+    val databaseConfig = com.yaroslavzghoba.utils.DatabaseConfig(
+        url = environment.config.property("database.url").getString(),
+        user = environment.config.property("database.user").getString(),
+        password = environment.config.property("database.password").getString(),
+    )
 
     // Generate strong tokens and save them in a file
     launch {
@@ -70,4 +79,5 @@ fun Application.module() {
         keyGenerator = keyGenerator,
     )
     configureSerialization()
+    configureDatabase(databaseConfig = databaseConfig)
 }

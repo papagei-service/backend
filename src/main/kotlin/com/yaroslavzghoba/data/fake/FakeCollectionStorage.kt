@@ -1,11 +1,14 @@
 package com.yaroslavzghoba.data.fake
 
-import com.yaroslavzghoba.data.dao.CollectionDao
+import com.yaroslavzghoba.data.model.CollectionStorage
 import com.yaroslavzghoba.model.CardCollection
 
-class FakeCollectionDao : CollectionDao {
+/**
+ * Represents a storage of card collections in temporary memory.
+ */
+class FakeCollectionStorage : CollectionStorage {
 
-    private val collections: MutableList<CardCollection> = mutableListOf()
+    private val collections = mutableListOf<CardCollection>()
 
     override suspend fun getById(id: Long): CardCollection? {
         return collections.find { it.id == id }

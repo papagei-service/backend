@@ -1,12 +1,14 @@
-package com.yaroslavzghoba.data.dao
+package com.yaroslavzghoba.data.model
 
 import com.yaroslavzghoba.model.Card
 
-interface CardDao {
+/**
+ * Defines methods for storing and reading cards.
+ */
+interface CardStorage {
 
     /**
-     * Searches for a card by its [id] in the storage. If the card was found, the function returns it.
-     * If the user is not found, the method returns `null`.
+     * Get a card by its [id].
      *
      * @param id The unique identifier of the card by which the search is performed.
      * @return The card with the corresponding identifier or null if not found.

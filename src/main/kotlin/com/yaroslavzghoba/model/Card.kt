@@ -1,5 +1,6 @@
 package com.yaroslavzghoba.model
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -19,14 +20,14 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class Card(
-    @SerialName("id") val id: Long,
+    @SerialName("id") val id: Long?,
     @SerialName("front_title") val frontTitle: String,
     @SerialName("front_description") val frontDescription: String?,
     @SerialName("front_example") val frontExample: String?,
-    @SerialName("back_title") val backTitle: String?,
+    @SerialName("back_title") val backTitle: String,
     @SerialName("back_description") val backDescription: String?,
     @SerialName("back_example") val backExample: String?,
-    @SerialName("next_time_at") val nextTimeAt: String,
+    @SerialName("next_time_at") val nextTimeAt: Instant,
     @SerialName("current_interval_ms") val currentIntervalMs: Long,
     @SerialName("collection_id") val collectionId: Long,
 )

@@ -1,9 +1,9 @@
 package com.yaroslavzghoba
 
 import com.yaroslavzghoba.data.RepositoryImpl
-import com.yaroslavzghoba.data.fake.FakeCardDao
-import com.yaroslavzghoba.data.fake.FakeCollectionDao
-import com.yaroslavzghoba.data.fake.FakeUserDao
+import com.yaroslavzghoba.data.fake.FakeCardStorage
+import com.yaroslavzghoba.data.fake.FakeCollectionStorage
+import com.yaroslavzghoba.data.fake.FakeUserStorage
 import com.yaroslavzghoba.plugins.configureAuthentication
 import com.yaroslavzghoba.plugins.configureRouting
 import com.yaroslavzghoba.plugins.configureSerialization
@@ -18,8 +18,11 @@ import io.ktor.server.sessions.*
 
 @Suppress("unused")  // Mark the IDE that the function is actually used
 fun Application.testingModule() {
-    val repository =
-        RepositoryImpl(userDao = FakeUserDao(), collectionDao = FakeCollectionDao(), cardDao = FakeCardDao())
+    val repository = RepositoryImpl(
+        userStorage = FakeUserStorage(),
+        collectionStorage = FakeCollectionStorage(),
+        cardStorage = FakeCardStorage(),
+    )
     val jwtTokenConfig = JwtTokenConfig(
         secret = environment.config.property("security.jwt.secret").getString(),
         issuer = environment.config.property("security.jwt.issuer").getString(),

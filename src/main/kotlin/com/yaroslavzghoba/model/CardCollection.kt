@@ -17,7 +17,7 @@ import kotlinx.serialization.SerialName
  * @param ownerUsername Unique identifier of the user who owns the collection.
  */
 data class CardCollection(
-    @SerialName("id") val id: Long,
+    @SerialName("id") val id: Long?,
     @SerialName("title") val title: String,
     @SerialName("description") val description: String?,
     @SerialName("subject_type") val subjectType: SubjectType,
