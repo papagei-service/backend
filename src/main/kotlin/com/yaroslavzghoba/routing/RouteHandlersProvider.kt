@@ -5,11 +5,8 @@ package com.yaroslavzghoba.routing
  */
 object RouteHandlersProvider {
 
-    object Api {
+    object V1 {
 
-        object V1 {
-
-            object Users
-        }
+        object Users
     }
 }

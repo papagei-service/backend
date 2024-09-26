@@ -1,4 +1,4 @@
-package com.yaroslavzghoba.routing.api.v1.users
+package com.yaroslavzghoba.routing.v1.users
 
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -8,7 +8,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
 @Suppress("UnusedReceiverParameter")
-fun RouteHandlersProvider.Api.V1.Users.postLogout(
+fun RouteHandlersProvider.V1.Users.postLogout(
 
 ): suspend RoutingContext.() -> Unit = postLogoutHandler@{
     call.sessions.clear<UserSession>()

@@ -1,4 +1,4 @@
-package com.yaroslavzghoba.routing.api.v1.users
+package com.yaroslavzghoba.routing.v1.users
 
 import com.yaroslavzghoba.model.InputCredentials
 import com.yaroslavzghoba.model.Repository
@@ -13,7 +13,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 @Suppress("UnusedReceiverParameter")
-fun RouteHandlersProvider.Api.V1.Users.postRegister(
+fun RouteHandlersProvider.V1.Users.postRegister(
     repository: Repository,
     hashingService: HashingService,
     saltConfig: PasswordSaltConfig,

@@ -2,10 +2,10 @@ package com.yaroslavzghoba.plugins
 
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
-import com.yaroslavzghoba.routing.api.postRegister
-import com.yaroslavzghoba.routing.api.v1.users.postLogin
-import com.yaroslavzghoba.routing.api.v1.users.postLogout
-import com.yaroslavzghoba.routing.api.v1.users.postRegister
+import com.yaroslavzghoba.routing.postRegister
+import com.yaroslavzghoba.routing.v1.users.postLogin
+import com.yaroslavzghoba.routing.v1.users.postLogout
+import com.yaroslavzghoba.routing.v1.users.postRegister
 import com.yaroslavzghoba.security.hashing.HashingService
 import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
@@ -24,27 +24,25 @@ fun Application.configureRouting(
     keyGenerator: KeyGenerator,
 ) {
     routing {
-        route(path = "/api") {
-            authenticate("jwt-authentication", strategy = AuthenticationStrategy.Required) {
-                routingApiV1(
-                    repository = repository,
-                    hashingService = hashingService,
-                    saltConfig = saltConfig,
-                    saltGenerator = keyGenerator,
-                )
-            }
+        authenticate("jwt-authentication", strategy = AuthenticationStrategy.Required) {
+            routingApiV1(
+                repository = repository,
+                hashingService = hashingService,
+                saltConfig = saltConfig,
+                saltGenerator = keyGenerator,
+            )
+        }
 
-            // Register a new, not strong, access token
-            authenticate("strong-jwt-authentication", strategy = AuthenticationStrategy.Required) {
-                authenticate("session-authentication", strategy = AuthenticationStrategy.Optional) {
-                    post(
-                        path = "/register",
-                        body = RouteHandlersProvider.Api.postRegister(
-                            jwtTokenConfig = jwtTokenConfig,
-                            jwtTokenService = jwtTokenService,
-                        )
+        // Register a new, not strong, access token
+        authenticate("strong-jwt-authentication", strategy = AuthenticationStrategy.Required) {
+            authenticate("session-authentication", strategy = AuthenticationStrategy.Optional) {
+                post(
+                    path = "/register",
+                    body = RouteHandlersProvider.postRegister(
+                        jwtTokenConfig = jwtTokenConfig,
+                        jwtTokenService = jwtTokenService,
                     )
-                }
+                )
             }
         }
     }
@@ -60,14 +58,14 @@ private fun Route.routingApiV1(
         route(path = "/users") {
             post(
                 path = "/login",
-                body = RouteHandlersProvider.Api.V1.Users.postLogin(
+                body = RouteHandlersProvider.V1.Users.postLogin(
                     repository = repository,
                     hashingService = hashingService,
                 ),
             )
             post(
                 path = "/register",
-                body = RouteHandlersProvider.Api.V1.Users.postRegister(
+                body = RouteHandlersProvider.V1.Users.postRegister(
                     repository = repository,
                     hashingService = hashingService,
                     saltConfig = saltConfig,
@@ -77,7 +75,7 @@ private fun Route.routingApiV1(
             authenticate("session-authentication", strategy = AuthenticationStrategy.Required) {
                 post(
                     path = "/logout",
-                    body = RouteHandlersProvider.Api.V1.Users.postLogout(),
+                    body = RouteHandlersProvider.V1.Users.postLogout(),
                 )
             }
         }

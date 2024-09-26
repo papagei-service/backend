@@ -1,6 +1,5 @@
-package com.yaroslavzghoba.routing.api
+package com.yaroslavzghoba.routing
 
-import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.jwt.JwtTokenClaim
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenService
@@ -12,7 +11,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
 @Suppress("UnusedReceiverParameter")
-fun RouteHandlersProvider.Api.postRegister(
+fun RouteHandlersProvider.postRegister(
     jwtTokenConfig: JwtTokenConfig,
     jwtTokenService: JwtTokenService,
 ): suspend RoutingContext.() -> Unit = postRegisterHandler@{
