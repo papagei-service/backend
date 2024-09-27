@@ -2,6 +2,8 @@ package com.yaroslavzghoba.model
 
 import com.yaroslavzghoba.security.hashing.HashingService
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * Represent a user of the service.
@@ -10,10 +12,11 @@ import com.yaroslavzghoba.security.hashing.HashingServiceImpl
  * @param hashedPassword The value of the hash of the user's password structure, its [salt] and the papper.
  * @param salt A special code that is added to a user's password when it is hashed.
  */
+@Serializable
 data class User(
-    val username: String,
-    val hashedPassword: String,
-    val salt: String,
+    @SerialName("username") val username: String,
+    @SerialName("hashed_password") val hashedPassword: String,
+    @SerialName("salt") val salt: String,
 ) {
     /**
      * Instance builder of the [User] class. Used when signing up new users in the system

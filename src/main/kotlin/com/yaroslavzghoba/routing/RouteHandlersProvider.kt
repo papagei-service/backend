@@ -8,5 +8,10 @@ object RouteHandlersProvider {
     object V1 {
 
         object Users
+
+        object Collections {
+
+            object Cards
+        }
     }
 }
