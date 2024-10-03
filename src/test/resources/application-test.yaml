@@ -19,3 +19,8 @@ security:
     algorithm: "SHA-512"
     salt-min-length: 32
     salt-max-length: 48
+
+database:
+  url: "jdbc:postgresql://localhost:5432/papagei-test"
+  user: "papagei"
+  password: $DATABASE_PASSWORD

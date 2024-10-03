@@ -5,8 +5,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * The body of a request to insert a card.
+ * Represents the body of a request to insert or update a card.
  *
+ * @param id A unique identifier of the card.
  * @param frontTitle A title placed on the front side of the card.
  * @param frontDescription A description placed on the front side of the card.
  * @param frontExample An example of usage placed on the front side of the card.
@@ -17,7 +18,8 @@ import kotlinx.serialization.Serializable
  * @param currentIntervalMs Current interval between card displays in milliseconds.
  */
 @Serializable
-data class PostCardRequest(
+data class CardRequest(
+    @SerialName("id") val id: Long?,
     @SerialName("front_title") val frontTitle: String,
     @SerialName("front_description") val frontDescription: String?,
     @SerialName("front_example") val frontExample: String?,

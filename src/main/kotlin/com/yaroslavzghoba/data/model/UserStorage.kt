@@ -20,17 +20,26 @@ interface UserStorage {
      * Try to insert a user into the storage.
      *
      * @param user The user that must be inserted to the storage.
+     * @return Inserted user.
+     *
      * @throws IllegalArgumentException if the user with the same username is already exists in the storage.
      */
-    suspend fun insert(user: User)
+    suspend fun insert(user: User): User
 
     /**
      * Try to update the user in the storage.
      *
      * @param user The user that must be updated.
+     * @return Updated user.
+     *
      * @throws IllegalArgumentException If a user with the same username is not found.
      */
-    suspend fun update(user: User)
+    suspend fun update(user: User): User
+
+    /**
+     * Delete all users from the storage.
+     */
+    suspend fun deleteAll()
 
     /**
      * Delete the user from the storage by its username.

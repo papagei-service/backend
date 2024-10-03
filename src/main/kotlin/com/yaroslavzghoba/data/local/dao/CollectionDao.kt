@@ -5,7 +5,6 @@ import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 
-
 class CollectionDao(id: EntityID<Long>) : LongEntity(id = id) {
     companion object : LongEntityClass<CollectionDao>(CollectionsTable)
 
@@ -14,5 +13,5 @@ class CollectionDao(id: EntityID<Long>) : LongEntity(id = id) {
     var subjectType by CollectionsTable.subjectType
     var subjectLanguage by CollectionsTable.subjectLanguage
     var nativeLanguage by CollectionsTable.nativeLanguage
-    var ownerUsername by CollectionsTable.ownerUsername
+    var ownerUsername by UserDao referencedOn CollectionsTable.ownerUsername
 }

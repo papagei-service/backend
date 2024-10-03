@@ -15,5 +15,5 @@ fun CollectionDao.toCardCollection() = CardCollection(
     subjectType = SubjectType.valueOf(this.subjectType),
     subjectLanguage = this.subjectLanguage,
     nativeLanguage = this.nativeLanguage,
-    ownerUsername = this.ownerUsername,
+    ownerUsername = this.ownerUsername.id.value,
 )

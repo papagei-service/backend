@@ -14,6 +14,7 @@ import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenServiceImpl
 import com.yaroslavzghoba.security.sessions.SessionsConfig
+import com.yaroslavzghoba.utils.DbConnectionConfig
 import com.yaroslavzghoba.utils.KeyGeneratorImpl
 import com.yaroslavzghoba.utils.generateAndSaveStrongTokens
 import io.ktor.server.application.*
@@ -51,7 +52,7 @@ fun Application.module() {
         maxLength = environment.config.property("security.hashing.salt-max-length").getString().toInt(),
     )
     val keyGenerator = KeyGeneratorImpl()
-    val databaseConfig = com.yaroslavzghoba.utils.DatabaseConfig(
+    val dbConnectionConfig = DbConnectionConfig(
         url = environment.config.property("database.url").getString(),
         user = environment.config.property("database.user").getString(),
         password = environment.config.property("database.password").getString(),
@@ -60,7 +61,7 @@ fun Application.module() {
     // Generate strong tokens and save them in a file
     launch {
         generateAndSaveStrongTokens(
-            tokensAmount = 10,
+            tokensAmount = 1,
             jwtTokenConfig = jwtTokenConfig,
             jwtTokenService = jwtTokenService,
         )
@@ -79,5 +80,5 @@ fun Application.module() {
         keyGenerator = keyGenerator,
     )
     configureSerialization()
-    configureDatabase(databaseConfig = databaseConfig)
+    configureDatabase(dbConnectionConfig = dbConnectionConfig)
 }

@@ -10,9 +10,10 @@ import org.jetbrains.exposed.sql.Column
 object UsersTable : IdTable<String>(name = "users") {
 
     // It is actually username
-    override val id: Column<EntityID<String>>
-        get() = varchar(name = "username", length = 64).entityId()
-
-    val hashedPassword = varchar("hashed_password", 64)
+    override val id: Column<EntityID<String>> =
+        varchar(name = "username", length = 64).entityId()
+    val hashedPassword = varchar("hashed_password", 128)
     val salt = varchar(name = "salt", length = 64)
+
+    override val primaryKey = PrimaryKey(id)
 }

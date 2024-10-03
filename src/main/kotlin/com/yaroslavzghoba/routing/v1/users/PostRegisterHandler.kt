@@ -48,11 +48,11 @@ fun RouteHandlersProvider.V1.Users.postRegister(
     // Create an account and save it to the storage
     val saltLength = with(saltConfig) { minLength..maxLength }.random()
     val salt = saltGenerator.generate(length = saltLength)
-    val user = User.Builder(inputCredentials = inputCredentials, hashingService = hashingService)
+    val userToInsert = User.Builder(inputCredentials = inputCredentials, hashingService = hashingService)
         .withSalt(salt = salt)
         .build()
-    repository.insertUser(user = user)
+    repository.insertUser(user = userToInsert)
 
     val message = mapOf("message" to "The account was created successfully")
-    call.respond(status = HttpStatusCode.OK, message = message)
+    call.respond(status = HttpStatusCode.Created, message = message)
 }

@@ -2,7 +2,6 @@ package com.yaroslavzghoba.data.local.tables
 
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.id.LongIdTable
-import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 
 /**
@@ -18,14 +17,5 @@ object CardsTable : LongIdTable(name = "cards", columnName = "id") {
     val backExample = text(name = "back_example").nullable()
     val nextTimeAt = timestamp(name = "next_time_at").default(Clock.System.now())
     val currentIntevalMs = long(name = "current_interval_ms")
-    val collectionId = long(name = "collection_id")
-
-    init {
-        foreignKey(
-            collectionId to CollectionsTable.id,
-            onUpdate = ReferenceOption.CASCADE,
-            onDelete = ReferenceOption.CASCADE,
-            name = "collection_id_fk",
-        )
-    }
+    val collectionId = reference(name = "collection_id", foreign = CollectionsTable)
 }

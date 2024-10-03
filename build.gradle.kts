@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.yaroslavzghoba"
-version = "0.8.0"
+version = "0.8.1"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")

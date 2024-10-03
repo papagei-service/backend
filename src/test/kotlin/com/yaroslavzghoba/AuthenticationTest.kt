@@ -19,7 +19,7 @@ class AuthenticationTest {
 
     @Test
     fun `Do not grand access to a resource protected by strong token auth without having any token`() =
-        testConfiguredApplication { client ->
+        testConfiguredApplication { client, _ ->
             val response0 = client.post("/register")
 
             assertEquals(
@@ -30,7 +30,7 @@ class AuthenticationTest {
 
     @Test
     fun `Do not grand access to a resource protected by strong token auth with a pre-generated not strong token`() =
-        testConfiguredApplication { client ->
+        testConfiguredApplication { client, _ ->
             val response0 = client.post("/register") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
@@ -44,7 +44,7 @@ class AuthenticationTest {
 
     @Test
     fun `Grand access to a resource protected by strong token auth with the pre-generated strong token`() =
-        testConfiguredApplication { client ->
+        testConfiguredApplication { client, _ ->
             val response0 = client.post("/register") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(STRONG_TOKEN)
@@ -58,7 +58,7 @@ class AuthenticationTest {
 
     @Test
     fun `Do not grand access to a resource protected by basic token auth without having any token`() =
-        testConfiguredApplication { client ->
+        testConfiguredApplication { client, _ ->
             val response0 = client.post("/v1/users/register") {
                 contentType(ContentType.Application.Json)
             }
@@ -71,7 +71,7 @@ class AuthenticationTest {
 
     @Test
     fun `Grand access to a resource protected by basic token auth with a not strong token`() =
-        testConfiguredApplication { client ->
+        testConfiguredApplication { client, _ ->
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
             val response0 = client.post("/register") {
@@ -87,14 +87,14 @@ class AuthenticationTest {
             }
 
             assertEquals(
-                expected = HttpStatusCode.OK,
+                expected = HttpStatusCode.Created,
                 actual = response1.status,
             )
         }
 
     @Test
     fun `Grand access to a resource protected by basic token auth with a pre-generated strong token`() =
-        testConfiguredApplication { client ->
+        testConfiguredApplication { client, _ ->
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
             val response0 = client.post("/v1/users/register") {
@@ -104,15 +104,15 @@ class AuthenticationTest {
             }
 
             assertEquals(
-                expected = HttpStatusCode.OK,
+                expected = HttpStatusCode.Created,
                 actual = response0.status,
             )
         }
 
     @Test
     fun `Do not grant access to a session-protected resource without having any session`() =
-        testConfiguredApplication { client ->
-            val response0 = client.post("/v1/users/logout") {
+        testConfiguredApplication { client, _ ->
+            val response0 = client.get("/v1/users/") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
@@ -124,7 +124,7 @@ class AuthenticationTest {
         }
 
     @Test
-    fun `Do not login with a non-registed username`() = testConfiguredApplication { client ->
+    fun `Do not login with a non-registed username`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         val response0 = client.post("/v1/users/login") {
@@ -140,7 +140,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `Do not register with a blank username`() = testConfiguredApplication { client ->
+    fun `Do not register with a blank username`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = " ", password = "qwerty")
 
         val response0 = client.post("/v1/users/register") {
@@ -156,7 +156,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `Do not register with a blank password`() = testConfiguredApplication { client ->
+    fun `Do not register with a blank password`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = "admin", password = " ")
 
         val response0 = client.post("/v1/users/register") {
@@ -172,7 +172,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `Register a new user`() = testConfiguredApplication { client ->
+    fun `Register a new user`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         val response0 = client.post("/v1/users/register") {
@@ -182,13 +182,13 @@ class AuthenticationTest {
         }
 
         assertEquals(
-            expected = HttpStatusCode.OK,
+            expected = HttpStatusCode.Created,
             actual = response0.status,
         )
     }
 
     @Test
-    fun `Do not login the existing user with the incorrect password`() = testConfiguredApplication { client ->
+    fun `Do not login the existing user with the incorrect password`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         // Register the new user
@@ -212,7 +212,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `Login the existing user with the correct password`() = testConfiguredApplication { client ->
+    fun `Login the existing user with the correct password`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         // Register the new user
@@ -236,76 +236,78 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `Grant access to the session-protected resource with active session`() = testConfiguredApplication { client ->
-        val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
+    fun `Grant access to the session-protected resource with active session`() =
+        testConfiguredApplication { client, _ ->
+            val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
-        // Register the new user
-        client.post("/v1/users/register") {
-            contentType(ContentType.Application.Json)
-            bearerAuth(NOT_STRONG_TOKEN)
-            setBody(inputCredentials)
+            // Register the new user
+            client.post("/v1/users/register") {
+                contentType(ContentType.Application.Json)
+                bearerAuth(NOT_STRONG_TOKEN)
+                setBody(inputCredentials)
+            }
+
+            // Login the user and extract its cookie
+            val response0 = client.post("/v1/users/login") {
+                contentType(ContentType.Application.Json)
+                bearerAuth(NOT_STRONG_TOKEN)
+                setBody(inputCredentials)
+            }
+            val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+
+            // Get access to the session-protected resource
+            val response1 = client.get("/v1/users/") {
+                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+                bearerAuth(NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.OK,
+                actual = response1.status,
+            )
         }
-
-        // Login the user and extract its cookie
-        val response0 = client.post("/v1/users/login") {
-            contentType(ContentType.Application.Json)
-            bearerAuth(NOT_STRONG_TOKEN)
-            setBody(inputCredentials)
-        }
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
-
-        // Get access to the session-protected resource
-        val response1 = client.post("/v1/users/logout") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
-            bearerAuth(NOT_STRONG_TOKEN)
-        }
-
-        assertEquals(
-            expected = HttpStatusCode.OK,
-            actual = response1.status,
-        )
-    }
 
     @Test
-    fun `Do not grant access to the session-protected resource after logout`() = testConfiguredApplication { client ->
-        val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
+    fun `Do not grant access to the session-protected resource after logout`() =
+        testConfiguredApplication { client, _ ->
+            val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
-        // Register the new user
-        client.post("/v1/users/register") {
-            contentType(ContentType.Application.Json)
-            bearerAuth(NOT_STRONG_TOKEN)
-            setBody(inputCredentials)
+            // Register the new user
+            client.post("/v1/users/register") {
+                contentType(ContentType.Application.Json)
+                bearerAuth(NOT_STRONG_TOKEN)
+                setBody(inputCredentials)
+            }
+
+            // Login the user and extract its cookie
+            val response0 = client.post("/v1/users/login") {
+                contentType(ContentType.Application.Json)
+                bearerAuth(NOT_STRONG_TOKEN)
+                setBody(inputCredentials)
+            }
+            val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+
+            // Close the session on the server's side
+            client.post("/v1/users/logout") {
+                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+                bearerAuth(NOT_STRONG_TOKEN)
+            }
+
+            // Try to get access to the session-protected resource after logout
+            val response1 = client.get("/v1/users/") {
+                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+                bearerAuth(NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.Unauthorized,
+                actual = response1.status,
+            )
         }
-
-        // Login the user and extract its cookie
-        val response0 = client.post("/v1/users/login") {
-            contentType(ContentType.Application.Json)
-            bearerAuth(NOT_STRONG_TOKEN)
-            setBody(inputCredentials)
-        }
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
-
-        // Close the session on the server's side
-        client.post("/v1/users/logout") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
-            bearerAuth(NOT_STRONG_TOKEN)
-        }
-
-        // Try to get access to the session-protected resource after logout
-        val response1 = client.post("/v1/users/logout") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
-            bearerAuth(NOT_STRONG_TOKEN)
-        }
-
-        assertEquals(
-            expected = HttpStatusCode.Unauthorized,
-            actual = response1.status,
-        )
-    }
 
     @Test
     fun `Do not generate a new non-strong access token with only the session without a strong token`() =
-        testConfiguredApplication { client ->
+        testConfiguredApplication { client, _ ->
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
             // Register the new user

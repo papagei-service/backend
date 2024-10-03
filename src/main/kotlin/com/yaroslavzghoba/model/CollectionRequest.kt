@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * The body of a request to insert a card collection.
+ * Represents the body of a request to insert or update a collection.
  *
  * @param title Title of the card collection.
  * @param description Description of the card collection.
@@ -16,7 +16,8 @@ import kotlinx.serialization.Serializable
  * [subjectType] is equal to [SubjectType.FOREIGN_LANGUAGE].
  */
 @Serializable
-data class PostCollectionRequest(
+data class CollectionRequest(
+    @SerialName("id") val id: Long?,
     @SerialName("title") val title: String,
     @SerialName("description") val description: String?,
     @SerialName("subject_type") val subjectType: SubjectType,

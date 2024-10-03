@@ -21,12 +21,16 @@ class RepositoryImpl(
         return userStorage.getByUsername(username = username)
     }
 
-    override suspend fun insertUser(user: User) {
-        userStorage.insert(user = user)
+    override suspend fun insertUser(user: User): User {
+        return userStorage.insert(user = user)
     }
 
-    override suspend fun updateUser(user: User) {
-        userStorage.update(user = user)
+    override suspend fun updateUser(user: User): User {
+        return userStorage.update(user = user)
+    }
+
+    override suspend fun deleteAllUsers() {
+        userStorage.deleteAll()
     }
 
     override suspend fun deleteUserByUsername(username: String) {
@@ -41,12 +45,16 @@ class RepositoryImpl(
         return collectionStorage.getByOwnerUsername(ownerUsername = ownerUsername)
     }
 
-    override suspend fun insertCollection(collection: CardCollection) {
-        collectionStorage.insert(collection = collection)
+    override suspend fun insertCollection(collection: CardCollection): CardCollection {
+        return collectionStorage.insert(collection = collection)
     }
 
-    override suspend fun updateCollection(collection: CardCollection) {
-        collectionStorage.update(collection = collection)
+    override suspend fun updateCollection(collection: CardCollection): CardCollection {
+        return collectionStorage.update(collection = collection)
+    }
+
+    override suspend fun deleteAllCollections() {
+        collectionStorage.deleteAll()
     }
 
     override suspend fun deleteCollectionById(id: Long) {
@@ -61,15 +69,27 @@ class RepositoryImpl(
         return cardStorage.getByCollectionId(id = id)
     }
 
-    override suspend fun insertCard(card: Card) {
+    override suspend fun insertCard(card: Card): Card {
         return cardStorage.insert(card = card)
     }
 
-    override suspend fun updateCard(card: Card) {
-        cardStorage.update(card = card)
+    override suspend fun updateCard(card: Card): Card {
+        return cardStorage.update(card = card)
+    }
+
+    override suspend fun deleteAllCards() {
+        cardStorage.deleteAll()
     }
 
     override suspend fun deleteCardById(id: Long) {
         cardStorage.deleteById(id = id)
+    }
+
+    override suspend fun clear() {
+        // It is important to delete from cards to users
+        // Since the user cannot be deleted while collections refer to him, and those while cards refer to them
+        this.deleteAllCards()
+        this.deleteAllCollections()
+        this.deleteAllUsers()
     }
 }

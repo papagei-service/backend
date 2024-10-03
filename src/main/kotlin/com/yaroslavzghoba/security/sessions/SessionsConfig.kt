@@ -1,6 +1,6 @@
 package com.yaroslavzghoba.security.sessions
 
-import io.ktor.server.sessions.*
+import com.yaroslavzghoba.data.model.PurgeableSessionStorage
 
 /**
  * Represents the configuration of user sessions.
@@ -9,6 +9,6 @@ import io.ktor.server.sessions.*
  * @param lifetimeMs Lifetime of a single session in milliseconds.
  */
 data class SessionsConfig(
-    val sessionStorage: SessionStorage,
+    val sessionStorage: PurgeableSessionStorage,
     val lifetimeMs: Long?,
 )

@@ -16,5 +16,5 @@ class CardDao(id: EntityID<Long>) : LongEntity(id = id) {
     var backExample by CardsTable.backExample
     var nextTimeAt by CardsTable.nextTimeAt
     var currentIntervalMs by CardsTable.currentIntevalMs
-    var collectionId by CardsTable.collectionId
+    var collectionId by CollectionDao referencedOn CardsTable
 }

@@ -1,15 +1,17 @@
 package com.yaroslavzghoba.routing.v1.collections
 
 import com.yaroslavzghoba.mappers.toCardCollection
-import com.yaroslavzghoba.model.PostCollectionRequest
+import com.yaroslavzghoba.model.CollectionRequest
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
 import io.ktor.http.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 
 @Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.V1.Collections.postCollection(
@@ -26,8 +28,8 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
 
     // Return 400 if the request body cannot be converted to a collection
     val body = try {
-        call.receive<PostCollectionRequest>()
-    } catch (exception: ContentTransformationException) {
+        call.receive<CollectionRequest>()
+    } catch (exception: BadRequestException) {
         val message = mapOf("message" to "The request body cannot be converted to a collection")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@postCollectionHandler
@@ -42,8 +44,14 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
     }
 
     // Insert the collection into the storage
-    val collection = body.toCardCollection(id = null, ownerUsername = user.username)
-    repository.insertCollection(collection)
+    val collectionToInsert = body.toCardCollection(ownerUsername = user.username)
+    val insertedCollection = try {
+        repository.insertCollection(collectionToInsert)
+    } catch (exception: ExposedSQLException) {
+        val message = mapOf("message" to "A collection with the corresponding identifier already exists")
+        call.respond(status = HttpStatusCode.BadRequest, message = message)
+        return@postCollectionHandler
+    }
 
-    call.respond(status = HttpStatusCode.Created, message = collection)
+    call.respond(status = HttpStatusCode.Created, message = insertedCollection)
 }

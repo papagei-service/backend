@@ -1,7 +1,7 @@
 package com.yaroslavzghoba.routing.v1.collections
 
 import com.yaroslavzghoba.mappers.toCardCollection
-import com.yaroslavzghoba.model.PutCollectionRequest
+import com.yaroslavzghoba.model.CollectionRequest
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -26,9 +26,16 @@ fun RouteHandlersProvider.V1.Collections.putCollection(
 
     // Return 400 if the request body cannot be converted to a collection
     val body = try {
-        call.receive<PutCollectionRequest>()
+        call.receive<CollectionRequest>()
     } catch (exception: ContentTransformationException) {
-        val message = mapOf("message" to "The request body cannot be converted to a card")
+        val message = mapOf("message" to "The request body cannot be converted to a collection")
+        call.respond(status = HttpStatusCode.BadRequest, message = message)
+        return@putCollectionHandler
+    }
+
+    // Return 400 if the collection identifier is null
+    if (body.id == null) {
+        val message = mapOf("message" to "The identifier of the collection to be updated cannot be null")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@putCollectionHandler
     }
@@ -49,8 +56,8 @@ fun RouteHandlersProvider.V1.Collections.putCollection(
     }
 
     // Insert the collection into the storage
-    val collection = body.toCardCollection(ownerUsername = correspondingCollection.ownerUsername)
-    repository.updateCollection(collection)
+    val collectionToUpdate = body.toCardCollection(ownerUsername = correspondingCollection.ownerUsername)
+    val updatedCollection = repository.updateCollection(collectionToUpdate)
 
-    call.respond(status = HttpStatusCode.OK, message = collection)
+    call.respond(status = HttpStatusCode.OK, message = updatedCollection)
 }

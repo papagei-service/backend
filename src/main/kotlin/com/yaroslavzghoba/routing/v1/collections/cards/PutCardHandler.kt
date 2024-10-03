@@ -1,7 +1,7 @@
 package com.yaroslavzghoba.routing.v1.collections.cards
 
 import com.yaroslavzghoba.mappers.toCard
-import com.yaroslavzghoba.model.PutCardRequest
+import com.yaroslavzghoba.model.CardRequest
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -57,16 +57,23 @@ fun RouteHandlersProvider.V1.Collections.Cards.putCard(
 
     // Return 400 if the request body cannot be converted to a collection
     val body = try {
-        call.receive<PutCardRequest>()
+        call.receive<CardRequest>()
     } catch (exception: ContentTransformationException) {
         val message = mapOf("message" to "The request body cannot be converted to a card")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@putCardHandler
     }
 
-    // Insert the card into the storage
-    val card = body.toCard(collectionId = collectionId)
-    repository.updateCard(card)
+    // Return 400 if the collection identifier is null
+    if (body.id == null) {
+        val message = mapOf("message" to "The identifier of the card to be updated cannot be null")
+        call.respond(status = HttpStatusCode.BadRequest, message = message)
+        return@putCardHandler
+    }
 
-    call.respond(status = HttpStatusCode.OK, message = card)
+    // Insert the card into the storage
+    val cardToUpdate = body.toCard(collectionId = collectionId)
+    val updatedCard = repository.updateCard(cardToUpdate)
+
+    call.respond(status = HttpStatusCode.OK, message = updatedCard)
 }

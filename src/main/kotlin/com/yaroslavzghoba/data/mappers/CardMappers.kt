@@ -17,5 +17,5 @@ fun CardDao.toCard() = Card(
     backExample = this.backExample,
     nextTimeAt = this.nextTimeAt,
     currentIntervalMs = this.currentIntervalMs,
-    collectionId = this.collectionId,
+    collectionId = this.collectionId.id.value,
 )

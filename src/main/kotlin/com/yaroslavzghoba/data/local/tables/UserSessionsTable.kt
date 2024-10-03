@@ -9,8 +9,8 @@ import org.jetbrains.exposed.sql.Column
  */
 object UserSessionsTable : IdTable<String>(name = "sessions") {
 
-    override val id: Column<EntityID<String>>
-        get() = varchar(name = "id", length = 64).entityId()
-
+    override val id: Column<EntityID<String>> = varchar(name = "id", length = 64).entityId()
     val value = text(name = "value")
+
+    override val primaryKey = PrimaryKey(id)
 }

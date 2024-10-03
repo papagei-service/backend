@@ -1,11 +1,19 @@
+-- Drop tables if exists
+DROP TABLE IF EXISTS sessions;
 DROP TABLE IF EXISTS cards;
 DROP TABLE IF EXISTS collections;
 DROP TABLE IF EXISTS users;
 
+-- Define sessions table
+CREATE TABLE sessions (
+    id VARCHAR(64) PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
 -- Define users table
 CREATE TABLE users (
     username VARCHAR(64) PRIMARY KEY,
-    hashed_password VARCHAR(64) NOT NULL,
+    hashed_password VARCHAR(128) NOT NULL,
     salt VARCHAR(64) NOT NULL
 );
 

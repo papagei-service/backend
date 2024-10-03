@@ -13,20 +13,18 @@ class UserBuildingTest {
     private val salt = "89#vaQ1!PG*LqI!8z"
 
     @Test
-    fun `The builder does not distort the data`() = testConfiguredApplication {
-        serverConfig {
-            val pepper = environment.config.property("security.hashing.pepper").getString()
-            val algorithm = environment.config.property("security.hashing.algorithm").getString()
-            val hashingService = HashingServiceImpl(pepper = pepper, algorithm = algorithm)
+    fun `The builder does not distort the data`() = testConfiguredApplication { _, applicationConfig ->
+        val pepper = applicationConfig.property("security.hashing.pepper").getString()
+        val algorithm = applicationConfig.property("security.hashing.algorithm").getString()
+        val hashingService = HashingServiceImpl(pepper = pepper, algorithm = algorithm)
 
-            val buildedUser = User.Builder(inputCredentials = inputCredentials, hashingService = hashingService)
-                .withSalt(salt = salt)
-                .build()
-            val hashedPassword = hashingService
-                .hash(password = inputCredentials.password, salt = salt)
-            val user = User(username = inputCredentials.username, hashedPassword = hashedPassword, salt = salt)
+        val buildedUser = User.Builder(inputCredentials = inputCredentials, hashingService = hashingService)
+            .withSalt(salt = salt)
+            .build()
+        val hashedPassword = hashingService
+            .hash(password = inputCredentials.password, salt = salt)
+        val user = User(username = inputCredentials.username, hashedPassword = hashedPassword, salt = salt)
 
-            assertEquals(user.toString(), buildedUser.toString())
-        }
+        assertEquals(user.toString(), buildedUser.toString())
     }
 }

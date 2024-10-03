@@ -1,7 +1,7 @@
 package com.yaroslavzghoba.routing.v1.collections.cards
 
 import com.yaroslavzghoba.mappers.toCard
-import com.yaroslavzghoba.model.PostCardRequest
+import com.yaroslavzghoba.model.CardRequest
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -10,6 +10,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 
 @Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.V1.Collections.Cards.postCard(
@@ -57,7 +58,7 @@ fun RouteHandlersProvider.V1.Collections.Cards.postCard(
 
     // Return 400 if the request body cannot be converted to a collection
     val body = try {
-        call.receive<PostCardRequest>()
+        call.receive<CardRequest>()
     } catch (exception: ContentTransformationException) {
         val message = mapOf("message" to "The request body cannot be converted to a card")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
@@ -65,8 +66,14 @@ fun RouteHandlersProvider.V1.Collections.Cards.postCard(
     }
 
     // Insert the card into the storage
-    val card = body.toCard(id = null, collectionId = collectionId)
-    repository.insertCard(card)
+    val cardToInsert = body.toCard(collectionId = collectionId)
+    val insertedCard = try {
+        repository.insertCard(cardToInsert)
+    } catch (exception: ExposedSQLException) {
+        val message = mapOf("message" to "A card with the corresponding identifier already exists")
+        call.respond(status = HttpStatusCode.BadRequest, message = message)
+        return@postCardHandler
+    }
 
-    call.respond(status = HttpStatusCode.OK, message = card)
+    call.respond(status = HttpStatusCode.Created, message = insertedCard)
 }

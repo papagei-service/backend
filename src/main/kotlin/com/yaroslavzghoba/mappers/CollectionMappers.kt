@@ -1,15 +1,14 @@
 package com.yaroslavzghoba.mappers
 
-import com.yaroslavzghoba.model.Card
 import com.yaroslavzghoba.model.CardCollection
-import com.yaroslavzghoba.model.PostCollectionRequest
-import com.yaroslavzghoba.model.PutCollectionRequest
+import com.yaroslavzghoba.model.CollectionRequest
 
 /**
- * Converts an instance of the [PostCollectionRequest] class to an instance of the [Card] class.
+ * Converts an instance of the [CollectionRequest] class to an instance of the [CardCollection] class.
  */
-fun PostCollectionRequest.toCardCollection(id: Long?, ownerUsername: String) = CardCollection(
-    id = id,
+@Suppress("unused")
+fun CollectionRequest.toCardCollection(ownerUsername: String) = CardCollection(
+    id = this.id,
     title = this.title,
     description = this.description,
     subjectType = this.subjectType,
@@ -19,14 +18,14 @@ fun PostCollectionRequest.toCardCollection(id: Long?, ownerUsername: String) = C
 )
 
 /**
- * Converts an instance of the [PutCollectionRequest] class to an instance of the [Card] class.
+ * Converts an instance of the [CardCollection] class to an instance of the [CollectionRequest] class.
  */
-fun PutCollectionRequest.toCardCollection(ownerUsername: String) = CardCollection(
+@Suppress("unused")
+fun CardCollection.toCollectionRequest() = CollectionRequest(
     id = this.id,
     title = this.title,
     description = this.description,
     subjectType = this.subjectType,
     subjectLanguage = this.subjectLanguage,
     nativeLanguage = this.nativeLanguage,
-    ownerUsername = ownerUsername,
 )

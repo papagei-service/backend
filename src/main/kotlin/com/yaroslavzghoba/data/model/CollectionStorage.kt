@@ -28,17 +28,27 @@ interface CollectionStorage {
      * Try to insert a collection into the storage.
      *
      * @param collection A card collection to be inserted into the storage.
-     * @throws IllegalArgumentException If there is already a collection with same id in the storage.
+     * @return Inserted collection.
+     *
+     * @throws NoSuchElementException If the owner of the collection is not found in the storage.
      */
-    suspend fun insert(collection: CardCollection)
+    suspend fun insert(collection: CardCollection): CardCollection
 
     /**
      * Try to update the card collection in the storage.
      *
      * @param collection The collection that must be updated.
-     * @throws IllegalArgumentException If a collection with the same id is not found.
+     * @return Updated collection.
+     *
+     * @throws IllegalArgumentException If the identifier of the passed collection is null.
+     * @throws NoSuchElementException If the owner of the collection is not found in the storage.
      */
-    suspend fun update(collection: CardCollection)
+    suspend fun update(collection: CardCollection): CardCollection
+
+    /**
+     * Delete all card collections from the storage.
+     */
+    suspend fun deleteAll()
 
     /**
      * Delete the card collection from the storage by its [id].
