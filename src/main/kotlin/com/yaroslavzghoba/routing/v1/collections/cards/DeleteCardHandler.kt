@@ -60,6 +60,13 @@ fun RouteHandlersProvider.V1.Collections.Cards.deleteCard(
         return@deleteCardHandler
     }
 
+    // Return 400 if the card doesn't belong to the collection
+    if (card.collectionId != collectionId) {
+        val message = mapOf("message" to "The card must belong to the corresponding collection")
+        call.respond(status = HttpStatusCode.BadRequest, message = message)
+        return@deleteCardHandler
+    }
+
     repository.deleteCardById(cardId)
 
     val message = mapOf("message" to "You literally do not need to handle this response")

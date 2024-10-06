@@ -73,7 +73,13 @@ fun RouteHandlersProvider.V1.Collections.Cards.putCard(
 
     // Insert the card into the storage
     val cardToUpdate = body.toCard(collectionId = collectionId)
-    val updatedCard = repository.updateCard(cardToUpdate)
+    val updatedCard = try {
+        repository.updateCard(cardToUpdate)
+    } catch (exception: NoSuchElementException) {
+        val message = mapOf("message" to "Corresponding card is not found in storage")
+        call.respond(status = HttpStatusCode.NotFound, message = message)
+        return@putCardHandler
+    }
 
     call.respond(status = HttpStatusCode.OK, message = updatedCard)
 }

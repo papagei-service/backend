@@ -24,7 +24,7 @@ fun CardRequest.toCard(collectionId: Long) = Card(
  * Converts an instance of the [Card] class to an instance of the [CardRequest] class.
  */
 @Suppress("unused")
-fun Card.toCardRequest() = Card(
+fun Card.toCardRequest() = CardRequest(
     id = this.id,
     frontTitle = this.frontTitle,
     frontDescription = this.frontDescription,
@@ -34,5 +34,4 @@ fun Card.toCardRequest() = Card(
     backExample = this.backExample,
     nextTimeAt = this.nextTimeAt,
     currentIntervalMs = this.currentIntervalMs,
-    collectionId = this.collectionId,
 )
