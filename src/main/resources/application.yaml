@@ -15,7 +15,7 @@ security:
   sessions:
     lifetime-ms: 900000  # 15 min
   hashing:
-    pepper: $PEPPERED_SECRET
+    pepper: $PEPPERED_SECRET_OF_PAPAGEI
     algorithm: "SHA-512"
     salt-min-length: 32
     salt-max-length: 48
@@ -23,4 +23,4 @@ security:
 database:
   url: "jdbc:postgresql://localhost:5432/papagei"
   user: "papagei"
-  password: $DATABASE_PASSWORD
+  password: $PAPAGEI_DATABASE_PASSWORD
