@@ -6,8 +6,8 @@ import com.yaroslavzghoba.model.Card
 /**
  * Converts an instance of the [CardDao] class to an instance of the [Card] class.
  */
-@Suppress("unused")
-fun CardDao.toCard() = Card(
+@Suppress("unused", "nothing_to_inline")
+inline fun CardDao.toCard() = Card(
     id = this.id.value,
     nativeLanguageValue = this.nativeLanguageValue,
     nativeLanguageValueDescription = this.nativeLanguageValueDescription,

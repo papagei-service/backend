@@ -36,7 +36,7 @@ suspend fun generateAndSaveStrongTokens(
     )
 }
 
-private suspend fun generateStrongTokens(
+private suspend inline fun generateStrongTokens(
     tokensAmount: Int,
     jwtTokenConfig: JwtTokenConfig,
     jwtTokenService: JwtTokenService,
@@ -54,7 +54,8 @@ private suspend fun generateStrongTokens(
     }
 }
 
-private fun saveStrongTokensToFile(strongTokens: List<String>, filename: String) {
+@Suppress("nothing_to_inline")
+private inline fun saveStrongTokensToFile(strongTokens: List<String>, filename: String) {
     val content = strongTokens
         .mapIndexed { index, token -> "${index + 1}. $token" }
         .joinToString(

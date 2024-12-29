@@ -6,8 +6,8 @@ import com.yaroslavzghoba.model.CardRequest
 /**
  * Converts an instance of the [CardRequest] class to an instance of the [Card] class.
  */
-@Suppress("unused")
-fun CardRequest.toCard(collectionId: Long) = Card(
+@Suppress("unused", "nothing_to_inline")
+inline fun CardRequest.toCard(collectionId: Long) = Card(
     id = this.id,
     nativeLanguageValue = this.nativeLanguageValue,
     nativeLanguageValueDescription = this.nativeLanguageValueDescription,
@@ -23,8 +23,8 @@ fun CardRequest.toCard(collectionId: Long) = Card(
 /**
  * Converts an instance of the [Card] class to an instance of the [CardRequest] class.
  */
-@Suppress("unused")
-fun Card.toCardRequest() = CardRequest(
+@Suppress("unused", "nothing_to_inline")
+inline fun Card.toCardRequest() = CardRequest(
     id = this.id,
     nativeLanguageValue = this.nativeLanguageValue,
     nativeLanguageValueDescription = this.nativeLanguageValueDescription,

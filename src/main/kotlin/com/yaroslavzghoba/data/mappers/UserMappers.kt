@@ -6,8 +6,8 @@ import com.yaroslavzghoba.model.User
 /**
  * Converts an instance of the [UserDao] class to an instance of the [User] class.
  */
-@Suppress("unused")
-fun UserDao.toUser() = User(
+@Suppress("unused", "nothing_to_inline")
+inline fun UserDao.toUser() = User(
     id = this.id.value,
     username = this.username,
     hashedPassword = this.hashedPassword,

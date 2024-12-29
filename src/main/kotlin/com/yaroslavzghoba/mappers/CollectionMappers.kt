@@ -6,8 +6,8 @@ import com.yaroslavzghoba.model.CardCollectionRequest
 /**
  * Converts an instance of the [CardCollectionRequest] class to an instance of the [CardCollection] class.
  */
-@Suppress("unused")
-fun CardCollectionRequest.toCardCollection(ownerId: Long) = CardCollection(
+@Suppress("unused", "nothing_to_inline")
+inline fun CardCollectionRequest.toCardCollection(ownerId: Long) = CardCollection(
     id = this.id,
     title = this.title,
     description = this.description,
@@ -19,8 +19,8 @@ fun CardCollectionRequest.toCardCollection(ownerId: Long) = CardCollection(
 /**
  * Converts an instance of the [CardCollection] class to an instance of the [CardCollectionRequest] class.
  */
-@Suppress("unused")
-fun CardCollection.toCollectionRequest() = CardCollectionRequest(
+@Suppress("unused", "nothing_to_inline")
+inline fun CardCollection.toCollectionRequest() = CardCollectionRequest(
     id = this.id,
     title = this.title,
     description = this.description,
