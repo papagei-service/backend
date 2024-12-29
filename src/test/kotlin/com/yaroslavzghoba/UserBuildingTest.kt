@@ -18,13 +18,13 @@ class UserBuildingTest {
         val algorithm = applicationConfig.property("security.hashing.algorithm").getString()
         val hashingService = HashingServiceImpl(pepper = pepper, algorithm = algorithm)
 
-        val buildedUser = User.Builder(inputCredentials = inputCredentials, hashingService = hashingService)
+        val builtUser = User.Builder(inputCredentials = inputCredentials, hashingService = hashingService)
             .withSalt(salt = salt)
             .build()
         val hashedPassword = hashingService
             .hash(password = inputCredentials.password, salt = salt)
-        val user = User(username = inputCredentials.username, hashedPassword = hashedPassword, salt = salt)
+        val user = User(id = null, username = inputCredentials.username, hashedPassword = hashedPassword, salt = salt)
 
-        assertEquals(user.toString(), buildedUser.toString())
+        assertEquals(user.toString(), builtUser.toString())
     }
 }

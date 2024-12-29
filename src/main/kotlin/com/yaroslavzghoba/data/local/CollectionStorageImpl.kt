@@ -26,26 +26,25 @@ class CollectionStorageImpl : CollectionStorage {
             .firstOrNull()
     }
 
-    override suspend fun getByOwnerUsername(ownerUsername: String): List<CardCollection> = suspendTransaction {
+    override suspend fun getByOwnerId(ownerId: Long): List<CardCollection> = suspendTransaction {
         CollectionDao
-            .find { CollectionsTable.ownerUsername eq ownerUsername }
+            .find { CollectionsTable.ownerId eq ownerId }
             .map { it.toCardCollection() }
     }
 
     override suspend fun insert(collection: CardCollection): CardCollection = suspendTransaction {
         // Get the owner of the collection
         val user = UserDao
-            .find { UsersTable.id eq collection.ownerUsername }
+            .find { UsersTable.id eq collection.ownerId }
             .firstOrNull()
             ?: throw NoSuchElementException("Collection owner not found in storage")
 
         CollectionDao.new(id = collection.id) {
             title = collection.title
             description = collection.description
-            subjectType = collection.subjectType.name
-            subjectLanguage = collection.subjectLanguage
-            nativeLanguage = collection.nativeLanguage
-            ownerUsername = user
+            nativeLanguageISOCode = collection.nativeLanguageISOCode
+            foreignLanguageISOCode = collection.foreignLanguageISOCode
+            ownerId = user
         }.toCardCollection()
     }
 
@@ -55,16 +54,16 @@ class CollectionStorageImpl : CollectionStorage {
 
         // Get the owner of the collection
         val user = UserDao
-            .find { UsersTable.id eq collection.ownerUsername }
+            .find { UsersTable.id eq collection.ownerId }
             .firstOrNull()
             ?: throw NoSuchElementException("Collection owner not found in storage")
 
         CollectionDao.findByIdAndUpdate(id = collection.id) {
             it.title = collection.title
             it.description = collection.description
-            it.subjectType = collection.subjectType.name
-            it.nativeLanguage = collection.nativeLanguage
-            it.ownerUsername = user
+            it.nativeLanguageISOCode = collection.nativeLanguageISOCode
+            it.foreignLanguageISOCode = collection.foreignLanguageISOCode
+            it.ownerId = user
         }?.toCardCollection()
             ?: throw NoSuchElementException("Corresponding collection not found in storage")
     }

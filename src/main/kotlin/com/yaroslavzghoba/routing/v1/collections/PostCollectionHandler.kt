@@ -1,7 +1,7 @@
 package com.yaroslavzghoba.routing.v1.collections
 
 import com.yaroslavzghoba.mappers.toCardCollection
-import com.yaroslavzghoba.model.CollectionRequest
+import com.yaroslavzghoba.model.CardCollectionRequest
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -28,7 +28,7 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
 
     // Return 400 if the request body cannot be converted to a collection
     val body = try {
-        call.receive<CollectionRequest>()
+        call.receive<CardCollectionRequest>()
     } catch (exception: BadRequestException) {
         val message = mapOf("message" to "The request body cannot be converted to a collection")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
@@ -36,7 +36,7 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
     }
 
     // Return 404 if there is no user corresponding to the session
-    val user = repository.getUserByUsername(username = session.username)
+    val user = repository.getUserById(id = session.userId)
     if (user == null) {
         val message = mapOf("message" to "The user with the corresponding session does not exist")
         call.respond(status = HttpStatusCode.NotFound, message = message)
@@ -44,7 +44,7 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
     }
 
     // Insert the collection into the storage
-    val collectionToInsert = body.toCardCollection(ownerUsername = user.username)
+    val collectionToInsert = body.toCardCollection(ownerId = user.id!!)
     val insertedCollection = try {
         repository.insertCollection(collectionToInsert)
     } catch (exception: ExposedSQLException) {

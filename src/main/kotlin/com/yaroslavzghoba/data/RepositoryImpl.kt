@@ -17,6 +17,10 @@ class RepositoryImpl(
     private val cardStorage: CardStorage,
 ) : Repository {
 
+    override suspend fun getUserById(id: Long): User? {
+        return userStorage.getById(id = id)
+    }
+
     override suspend fun getUserByUsername(username: String): User? {
         return userStorage.getByUsername(username = username)
     }
@@ -33,16 +37,16 @@ class RepositoryImpl(
         userStorage.deleteAll()
     }
 
-    override suspend fun deleteUserByUsername(username: String) {
-        userStorage.deleteByUsername(username = username)
+    override suspend fun deleteUserById(id: Long) {
+        userStorage.deleteById(id = id)
     }
 
     override suspend fun getCollectionById(id: Long): CardCollection? {
         return collectionStorage.getById(id = id)
     }
 
-    override suspend fun getCollectionsByOwnerUsername(ownerUsername: String): List<CardCollection> {
-        return collectionStorage.getByOwnerUsername(ownerUsername = ownerUsername)
+    override suspend fun getCollectionsByOwnerId(ownerId: Long): List<CardCollection> {
+        return collectionStorage.getByOwnerId(ownerId = ownerId)
     }
 
     override suspend fun insertCollection(collection: CardCollection): CardCollection {

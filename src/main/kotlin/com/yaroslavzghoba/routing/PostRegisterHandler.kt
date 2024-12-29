@@ -17,14 +17,14 @@ fun RouteHandlersProvider.postRegister(
 ): suspend RoutingContext.() -> Unit = postRegisterHandler@{
 
     // Get a user's session if specified
-    val username = call.sessions.get<UserSession>()?.username
+    val session = call.sessions.get<UserSession>()
 
     // Generate a JWT token
     val claims = jwtTokenConfig.claims.toMutableList().apply {
         removeIf { it.key in listOf(Constants.STRONG_TOKEN_CLAIM_KEY, Constants.OWNER_TOKEN_CLAIM_KEY) }
         add(JwtTokenClaim(key = Constants.STRONG_TOKEN_CLAIM_KEY, value = true))
-        if (username != null)
-            add(JwtTokenClaim(key = Constants.OWNER_TOKEN_CLAIM_KEY, value = username))
+        if (session != null)
+            add(JwtTokenClaim(key = Constants.OWNER_TOKEN_CLAIM_KEY, value = session.userId))
     }
     val token = jwtTokenService.generate(
         config = jwtTokenConfig.copy(claims = claims)

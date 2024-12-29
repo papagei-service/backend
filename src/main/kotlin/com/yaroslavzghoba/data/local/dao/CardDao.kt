@@ -8,13 +8,13 @@ import org.jetbrains.exposed.dao.id.EntityID
 class CardDao(id: EntityID<Long>) : LongEntity(id = id) {
     companion object : LongEntityClass<CardDao>(CardsTable)
 
-    var frontTitle by CardsTable.frontTitle
-    var frontDescription by CardsTable.frontDescription
-    var frontExample by CardsTable.frontExample
-    var backTitle by CardsTable.backTitle
-    var backDescription by CardsTable.backDescription
-    var backExample by CardsTable.backExample
+    var nativeLanguageValue by CardsTable.nativeLanguageValue
+    var nativeLanguageValueDescription by CardsTable.nativeLanguageValueDescription
+    var nativeLanguageValueExample by CardsTable.nativeLanguageValueExample
+    var foreignLanguageValue by CardsTable.foreignLanguageValue
+    var foreignLanguageValueDescription by CardsTable.foreignLanguageValueDescription
+    var foreignLanguageValueExample by CardsTable.foreignLanguageValueExample
     var nextTimeAt by CardsTable.nextTimeAt
-    var currentIntervalMs by CardsTable.currentIntevalMs
+    var correctAnswersInRow by CardsTable.correctAnswersInRow
     var collectionId by CollectionDao referencedOn CardsTable
 }

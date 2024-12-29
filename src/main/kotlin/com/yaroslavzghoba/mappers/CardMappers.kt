@@ -9,14 +9,14 @@ import com.yaroslavzghoba.model.CardRequest
 @Suppress("unused")
 fun CardRequest.toCard(collectionId: Long) = Card(
     id = this.id,
-    frontTitle = this.frontTitle,
-    frontDescription = this.frontDescription,
-    frontExample = this.frontExample,
-    backTitle = this.backTitle,
-    backDescription = this.backDescription,
-    backExample = this.backExample,
+    nativeLanguageValue = this.nativeLanguageValue,
+    nativeLanguageValueDescription = this.nativeLanguageValueDescription,
+    nativeLanguageValueExample = this.nativeLanguageValueExample,
+    foreignLanguageValue = this.foreignLanguageValue,
+    foreignLanguageValueDescription = this.foreignLanguageValueDescription,
+    foreignLanguageValueExample = this.foreignLanguageValueExample,
     nextTimeAt = this.nextTimeAt,
-    currentIntervalMs = this.currentIntervalMs,
+    correctAnswersInRow = this.correctAnswersInRow,
     collectionId = collectionId,
 )
 
@@ -26,12 +26,12 @@ fun CardRequest.toCard(collectionId: Long) = Card(
 @Suppress("unused")
 fun Card.toCardRequest() = CardRequest(
     id = this.id,
-    frontTitle = this.frontTitle,
-    frontDescription = this.frontDescription,
-    frontExample = this.frontExample,
-    backTitle = this.backTitle,
-    backDescription = this.backDescription,
-    backExample = this.backExample,
+    nativeLanguageValue = this.nativeLanguageValue,
+    nativeLanguageValueDescription = this.nativeLanguageValueDescription,
+    nativeLanguageValueExample = this.nativeLanguageValueExample,
+    foreignLanguageValue = this.foreignLanguageValue,
+    foreignLanguageValueDescription = this.foreignLanguageValueDescription,
+    foreignLanguageValueExample = this.foreignLanguageValueExample,
     nextTimeAt = this.nextTimeAt,
-    currentIntervalMs = this.currentIntervalMs,
+    correctAnswersInRow = this.correctAnswersInRow,
 )

@@ -40,14 +40,14 @@ class CardStorageImpl : CardStorage {
             ?: throw NoSuchElementException("Parent collection is not found in storage")
 
         CardDao.new(id = card.id) {
-            frontTitle = card.frontTitle
-            frontDescription = card.frontDescription
-            frontExample = card.frontExample
-            backTitle = card.backTitle
-            backDescription = card.backDescription
-            backExample = card.backExample
+            nativeLanguageValue = card.nativeLanguageValue
+            nativeLanguageValueDescription = card.nativeLanguageValueDescription
+            nativeLanguageValueExample = card.nativeLanguageValueExample
+            foreignLanguageValue = card.foreignLanguageValue
+            foreignLanguageValueDescription = card.foreignLanguageValueDescription
+            foreignLanguageValueExample = card.foreignLanguageValueExample
             nextTimeAt = card.nextTimeAt
-            currentIntervalMs = card.currentIntervalMs
+            correctAnswersInRow = card.correctAnswersInRow
             collectionId = collection
         }.toCard()
     }
@@ -63,14 +63,14 @@ class CardStorageImpl : CardStorage {
             ?: throw NoSuchElementException("Parent collection is not found in storage")
 
         CardDao.findByIdAndUpdate(id = card.id) {
-            it.frontTitle = card.frontTitle
-            it.frontDescription = card.frontDescription
-            it.frontExample = card.frontExample
-            it.backTitle = card.backTitle
-            it.backDescription = card.backDescription
-            it.backExample = card.backExample
+            it.nativeLanguageValue = card.nativeLanguageValue
+            it.nativeLanguageValueDescription = card.nativeLanguageValueDescription
+            it.nativeLanguageValueExample = card.nativeLanguageValueExample
+            it.foreignLanguageValue = card.foreignLanguageValue
+            it.foreignLanguageValueDescription = card.foreignLanguageValueDescription
+            it.foreignLanguageValueExample = card.foreignLanguageValueExample
             it.nextTimeAt = card.nextTimeAt
-            it.currentIntervalMs = card.currentIntervalMs
+            it.correctAnswersInRow = card.correctAnswersInRow
             it.collectionId = collection
         }?.toCard()
             ?: throw NoSuchElementException("Corresponding card is not found in storage")

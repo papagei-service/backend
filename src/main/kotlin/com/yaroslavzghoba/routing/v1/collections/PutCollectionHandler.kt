@@ -1,7 +1,7 @@
 package com.yaroslavzghoba.routing.v1.collections
 
 import com.yaroslavzghoba.mappers.toCardCollection
-import com.yaroslavzghoba.model.CollectionRequest
+import com.yaroslavzghoba.model.CardCollectionRequest
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -26,7 +26,7 @@ fun RouteHandlersProvider.V1.Collections.putCollection(
 
     // Return 400 if the request body cannot be converted to a collection
     val body = try {
-        call.receive<CollectionRequest>()
+        call.receive<CardCollectionRequest>()
     } catch (exception: ContentTransformationException) {
         val message = mapOf("message" to "The request body cannot be converted to a collection")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
@@ -49,14 +49,14 @@ fun RouteHandlersProvider.V1.Collections.putCollection(
     }
 
     // Return 403 if the corresponding collection is owned by another user
-    if (correspondingCollection.ownerUsername != session.username) {
+    if (correspondingCollection.ownerId != session.userId) {
         val message = mapOf("message" to "You cannot access someone else's collection")
         call.respond(status = HttpStatusCode.Forbidden, message = message)
         return@putCollectionHandler
     }
 
     // Insert the collection into the storage
-    val collectionToUpdate = body.toCardCollection(ownerUsername = correspondingCollection.ownerUsername)
+    val collectionToUpdate = body.toCardCollection(ownerId = correspondingCollection.ownerId)
     val updatedCollection = repository.updateCollection(collectionToUpdate)
 
     call.respond(status = HttpStatusCode.OK, message = updatedCollection)

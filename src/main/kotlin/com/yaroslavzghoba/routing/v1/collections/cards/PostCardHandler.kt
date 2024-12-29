@@ -26,7 +26,7 @@ fun RouteHandlersProvider.V1.Collections.Cards.postCard(
     }
 
     // Return 404 if there is no user corresponding to the session
-    val user = repository.getUserByUsername(username = session.username)
+    val user = repository.getUserById(id = session.userId)
     if (user == null) {
         val message = mapOf("message" to "The user with the corresponding session does not exist")
         call.respond(status = HttpStatusCode.NotFound, message = message)
@@ -50,7 +50,7 @@ fun RouteHandlersProvider.V1.Collections.Cards.postCard(
     }
 
     // Return 403 if the corresponding collection is owned by another user
-    if (collection.ownerUsername != user.username) {
+    if (collection.ownerId != user.id) {
         val message = mapOf("message" to "You cannot access someone else's collection")
         call.respond(status = HttpStatusCode.Forbidden, message = message)
         return@postCardHandler

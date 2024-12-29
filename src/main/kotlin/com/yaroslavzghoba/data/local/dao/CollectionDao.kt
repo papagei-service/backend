@@ -10,8 +10,7 @@ class CollectionDao(id: EntityID<Long>) : LongEntity(id = id) {
 
     var title by CollectionsTable.title
     var description by CollectionsTable.description
-    var subjectType by CollectionsTable.subjectType
-    var subjectLanguage by CollectionsTable.subjectLanguage
-    var nativeLanguage by CollectionsTable.nativeLanguage
-    var ownerUsername by UserDao referencedOn CollectionsTable.ownerUsername
+    var nativeLanguageISOCode by CollectionsTable.nativeLanguageISOCode
+    var foreignLanguageISOCode by CollectionsTable.foreignLanguageISOCode
+    var ownerId by UserDao referencedOn CollectionsTable.ownerId
 }

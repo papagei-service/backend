@@ -23,7 +23,7 @@ fun RouteHandlersProvider.V1.Users.postLogin(
     // Return 401 if no user with the corresponding name is found in the user storage
     val correspondingUser = repository.getUserByUsername(username = inputCredentials.username)
     if (correspondingUser == null) {
-        val message = mapOf("meesage" to "There is no the user with the \"${inputCredentials.username}\" username")
+        val message = mapOf("message" to "There is no the user with the \"${inputCredentials.username}\" username")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
         return@postLoginHandler
     }
@@ -38,7 +38,7 @@ fun RouteHandlersProvider.V1.Users.postLogin(
     }
 
     // Generate a session
-    call.sessions.set(UserSession(username = correspondingUser.username))
+    call.sessions.set(UserSession(userId = correspondingUser.id!!))
 
     val message = mapOf("message" to "Login was successful")
     call.respond(status = HttpStatusCode.OK, message = message)

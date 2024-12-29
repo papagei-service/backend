@@ -22,14 +22,13 @@ fun RouteHandlersProvider.V1.getCollections(
     }
 
     // Return 401 if there is no user corresponding to the session
-    val correspondingUser = repository.getUserByUsername(username = session.username)
+    val correspondingUser = repository.getUserById(id = session.userId)
     if (correspondingUser == null) {
         val message = mapOf("message" to "The user with the corresponding session does not exist")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
         return@getCollectionsHandler
     }
 
-    val collections = repository
-        .getCollectionsByOwnerUsername(ownerUsername = correspondingUser.username)
+    val collections = repository.getCollectionsByOwnerId(ownerId = correspondingUser.id!!)
     call.respond(status = HttpStatusCode.NoContent, message = collections)
 }

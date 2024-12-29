@@ -6,11 +6,20 @@ package com.yaroslavzghoba.model
 interface Repository {
 
     /**
-     * Searches for a user by its [username] in the storage. If the user was found, the function returns it.
-     * If the user is not found, the method returns `null`.
+     * Searches for a user by its [id] in the storage. If the user was found, the function returns it.
+     * If the user is not found, the method returns null.
      *
-     * @param username A unique user identifier that is used to search.
-     * @return The user with the corresponding [username] if it was found and `null` if not.
+     * @param id A unique immutable user identifier that is used to search.
+     * @return The user with the corresponding [id] if it was found and null if not.
+     */
+    suspend fun getUserById(id: Long): User?
+
+    /**
+     * Searches for a user by its [username] in the storage. If the user was found, the function returns it.
+     * If the user is not found, the method returns null.
+     *
+     * @param username A unique mutable user identifier that is used to search.
+     * @return The user with the corresponding [username] if it was found and null if not.
      */
     suspend fun getUserByUsername(username: String): User?
 
@@ -40,11 +49,11 @@ interface Repository {
     suspend fun deleteAllUsers()
 
     /**
-     * Delete the user from the storage by its username.
+     * Delete the user from the storage by its id.
      *
-     * @param username The username of the user to be deleted.
+     * @param id The unique identifier of the user to be deleted.
      */
-    suspend fun deleteUserByUsername(username: String)
+    suspend fun deleteUserById(id: Long)
 
     /**
      * Searches for a collection by its [id] in the storage. If the collection was found, the function returns it.
@@ -56,12 +65,12 @@ interface Repository {
     suspend fun getCollectionById(id: Long): CardCollection?
 
     /**
-     * Get a list of collections owned by the owner with the [ownerUsername] username.
+     * Get a list of collections owned by the owner with the [ownerId] id.
      *
-     * @param ownerUsername The username of a user whose card collections are to be selected.
-     * @return List of card collections owned by user [ownerUsername].
+     * @param ownerId The unique identifier of a user whose card collections are to be selected.
+     * @return List of card collections owned by user with [ownerId] id.
      */
-    suspend fun getCollectionsByOwnerUsername(ownerUsername: String): List<CardCollection>
+    suspend fun getCollectionsByOwnerId(ownerId: Long): List<CardCollection>
 
     /**
      * Try to insert a collection into the storage.

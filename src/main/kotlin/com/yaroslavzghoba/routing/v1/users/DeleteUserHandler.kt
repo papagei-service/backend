@@ -22,14 +22,14 @@ fun RouteHandlersProvider.V1.Users.deleteUser(
     }
 
     // Return 404 if there is no user corresponding to the session
-    val correspondingUser = repository.getUserByUsername(username = session.username)
+    val correspondingUser = repository.getUserById(id = session.userId)
     if (correspondingUser == null) {
         val message = mapOf("message" to "The user with the corresponding session does not exist")
         call.respond(status = HttpStatusCode.NotFound, message = message)
         return@deleteUserHandler
     }
 
-    repository.deleteUserByUsername(username = correspondingUser.username)
+    repository.deleteUserById(id = correspondingUser.id!!)
     val message = mapOf("message" to "You literally do not need to handle this response")
     call.respond(status = HttpStatusCode.NoContent, message = message)
 }

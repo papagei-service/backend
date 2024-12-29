@@ -22,7 +22,7 @@ fun RouteHandlersProvider.V1.Users.getUser(
     }
 
     // Return 401 if there is no user corresponding to the session
-    val correspondingUser = repository.getUserByUsername(username = session.username)
+    val correspondingUser = repository.getUserById(id = session.userId)
     if (correspondingUser == null) {
         val message = mapOf("message" to "The user with the corresponding session does not exist")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)

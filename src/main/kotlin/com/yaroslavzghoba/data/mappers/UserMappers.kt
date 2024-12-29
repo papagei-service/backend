@@ -8,7 +8,8 @@ import com.yaroslavzghoba.model.User
  */
 @Suppress("unused")
 fun UserDao.toUser() = User(
-    username = this.id.value,
+    id = this.id.value,
+    username = this.username,
     hashedPassword = this.hashedPassword,
     salt = this.salt,
 )

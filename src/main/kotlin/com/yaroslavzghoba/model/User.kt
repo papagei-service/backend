@@ -8,12 +8,14 @@ import kotlinx.serialization.Serializable
 /**
  * Represent a user of the service.
  *
- * @param username A unique identifier of the user's account.
- * @param hashedPassword The value of the hash of the user's password structure, its [salt] and the papper.
+ * @param id A unique identifier of the user's account that cannot be changed.
+ * @param username A unique identifier of the user's account that can be changed.
+ * @param hashedPassword The value of the hash of the user's password structure, its [salt] and the paper.
  * @param salt A special code that is added to a user's password when it is hashed.
  */
 @Serializable
 data class User(
+    @SerialName("id") val id: Long?,
     @SerialName("username") val username: String,
     @SerialName("hashed_password") val hashedPassword: String,
     @SerialName("salt") val salt: String,
@@ -46,6 +48,7 @@ data class User(
          * Create and return a user with specified properties.
          */
         fun build() = User(
+            id = null,
             username = inputCredentials.username,
             hashedPassword = hashingService
                 .hash(password = inputCredentials.password, salt = _salt),

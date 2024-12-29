@@ -61,7 +61,7 @@ fun RouteHandlersProvider.V1.Collections.Cards.getCardById(
     }
 
     // Return 403 if the user is not the owner of the collection
-    if (collection.ownerUsername != session.username) {
+    if (collection.ownerId != session.userId) {
         val message = mapOf("message" to "You cannot access someone else's collection")
         call.respond(status = HttpStatusCode.Forbidden, message = message)
         return@getCollectionByIdHandler

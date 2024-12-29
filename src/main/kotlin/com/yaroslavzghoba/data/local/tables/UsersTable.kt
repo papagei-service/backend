@@ -1,19 +1,13 @@
 package com.yaroslavzghoba.data.local.tables
 
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.dao.id.LongIdTable
 
 /**
  * Represents a database table object that stores user accounts.
  */
-object UsersTable : IdTable<String>(name = "users") {
+object UsersTable : LongIdTable(name = "users", columnName = "id") {
 
-    // It is actually username
-    override val id: Column<EntityID<String>> =
-        varchar(name = "username", length = 64).entityId()
-    val hashedPassword = varchar("hashed_password", 128)
+    val username = varchar(name = "username", length = 64)
+    val hashedPassword = varchar(name = "hashed_password", length = 128)
     val salt = varchar(name = "salt", length = 64)
-
-    override val primaryKey = PrimaryKey(id)
 }

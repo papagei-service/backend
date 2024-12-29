@@ -5,7 +5,6 @@ import com.yaroslavzghoba.mappers.toCollectionRequest
 import com.yaroslavzghoba.model.*
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
 import com.yaroslavzghoba.utils.AuthUtils
-import com.yaroslavzghoba.utils.SubjectType
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -13,11 +12,9 @@ import kotlinx.datetime.Clock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.milliseconds
 
 private const val COOKIE_REQUEST_PARAM_NAME = "Cookie"
-private const val COOKIE_RESPONCE_PARAM_NAME = "Set-Cookie"
+private const val COOKIE_RESPONSE_PARAM_NAME = "Set-Cookie"
 private const val NOT_STRONG_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvYXBpIiwiaXNzIjoiL2FwaS9yZWdpc3RlciIsInN0cm9uZyI6ImZhbHNlIiwiaWF0IjoxNzI2ODUyMzk3fQ.8Vfa3gaj7nY0Ov5Om5nJFcEs4RbFLaREc_89Fi2wv4U"
 private val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
@@ -26,24 +23,23 @@ private val user = User.Builder(
     inputCredentials = inputCredentials,
     hashingService = HashingServiceImpl(pepper = "pepper", algorithm = "SHA-512"),
 ).build()
-private val collectionRequest = CollectionRequest(
+private val collectionRequest = CardCollectionRequest(
     id = null,
     title = "English",
     description = "The collection of useful English words and phrases",
-    subjectType = SubjectType.FOREIGN_LANGUAGE,
-    subjectLanguage = "en",
-    nativeLanguage = "ua",
+    nativeLanguageISOCode = "ua",
+    foreignLanguageISOCode = "en",
 )
 private val cardRequest = CardRequest(
     id = null,
-    frontTitle = "to contribute",
-    frontDescription = null,
-    frontExample = "He often contributes to the community",
-    backTitle = "робити внесок",
-    backDescription = null,
-    backExample = null,
+    nativeLanguageValue = "робити внесок",
+    nativeLanguageValueDescription = null,
+    nativeLanguageValueExample = "Він робить внесок у суспільство",
+    foreignLanguageValue = "to contribute",
+    foreignLanguageValueDescription = null,
+    foreignLanguageValueExample = "He often contributes to the community",
+    correctAnswersInRow = 0,
     nextTimeAt = Clock.System.now(),
-    currentIntervalMs = 1.0.hours.inWholeMilliseconds,
 )
 
 class DatabaseTest {
@@ -53,7 +49,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         val response1 = client.post("/v1/collections/") {
             contentType(ContentType.Application.Json)
@@ -73,7 +69,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         val body = collectionRequest
         val response1 = client.post("/v1/collections/") {
@@ -94,7 +90,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
@@ -123,7 +119,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -153,7 +149,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         val body = collectionRequest.copy(id = null)
         val response1 = client.put("/v1/collections/") {
@@ -174,7 +170,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         val body = collectionRequest.copy(id = 0)
         val response1 = client.put("/v1/collections/") {
@@ -195,7 +191,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -209,7 +205,7 @@ class DatabaseTest {
         // Register, login another user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response2 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response2.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies1 = response2.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to update the collection using the another user's session
         val body1 = response1.body<CardCollection>().toCollectionRequest()
@@ -231,7 +227,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -264,7 +260,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to delete not existing collection
         val collectionId = "Hello, Papagei!"  // Not valid identifier
@@ -285,7 +281,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to delete not existing collection
         val collectionId = 0
@@ -306,7 +302,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -320,7 +316,7 @@ class DatabaseTest {
         // Register, login another user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response2 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response2.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies1 = response2.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to update the collection using the another user's session
         val collectionId = response1.body<CardCollection>().id
@@ -341,7 +337,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body = collectionRequest
@@ -371,7 +367,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to insert a new card
         val collectionId = "Hello, Papagei!"  // Not valid identifier
@@ -393,7 +389,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to insert a new card
         val collectionId: Long = 0
@@ -415,7 +411,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
@@ -430,7 +426,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response2 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response2.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies1 = response2.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to insert a new card
         val body1 = cardRequest
@@ -452,7 +448,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
@@ -484,7 +480,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
@@ -516,7 +512,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
@@ -557,7 +553,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to insert a new card
         val collectionId = "Hello, Papagei!"  // Not valid identifier
@@ -579,7 +575,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to insert a new card
         val collectionId: Long = 0
@@ -601,7 +597,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
@@ -616,7 +612,7 @@ class DatabaseTest {
         // Register, login another user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response2 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response2.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies1 = response2.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to update the card
         val response3 = client.put("/v1/collections/$collectionId/cards/") {
@@ -637,7 +633,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -669,7 +665,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
@@ -701,7 +697,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -726,12 +722,11 @@ class DatabaseTest {
         // Register, login another user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response3 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response3.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies1 = response3.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to update the card using the another user's session
         val body2 = insertedCard.copy(
-            nextTimeAt = Clock.System.now() + insertedCard.currentIntervalMs.milliseconds,
-            currentIntervalMs = insertedCard.currentIntervalMs * 2,
+            nativeLanguageValueExample = null,
         ).toCardRequest()
         val response4 = client.put("/v1/collections/$collectionId/cards/") {
             contentType(ContentType.Application.Json)
@@ -751,7 +746,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -775,8 +770,7 @@ class DatabaseTest {
 
         // Update the card
         val body2 = insertedCard.copy(
-            nextTimeAt = Clock.System.now() + insertedCard.currentIntervalMs.milliseconds,
-            currentIntervalMs = insertedCard.currentIntervalMs * 2,
+            foreignLanguageValueExample = null,
         ).toCardRequest()
         val response3 = client.put("/v1/collections/$collectionId/cards/") {
             contentType(ContentType.Application.Json)
@@ -787,8 +781,8 @@ class DatabaseTest {
         val updatedCard = response3.body<Card>()
 
         assertNotEquals(
-            illegal = insertedCard.nextTimeAt,
-            actual = updatedCard.nextTimeAt,
+            illegal = insertedCard.foreignLanguageValueExample,
+            actual = updatedCard.foreignLanguageValueExample,
         )
     }
 
@@ -797,7 +791,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to delete a card
         val collectionId = "Hello, Papagei!"  // Not valid identifier
@@ -818,7 +812,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to delete a card
         val collectionId = 0  // Not valid identifier
@@ -839,7 +833,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -854,7 +848,7 @@ class DatabaseTest {
         // Register, login another user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response2 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response2.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies1 = response2.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Try to delete a card
         val response3 = client.delete("/v1/collections/$collectionId/cards/0") {
@@ -874,7 +868,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -905,7 +899,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -936,7 +930,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
@@ -968,7 +962,7 @@ class DatabaseTest {
             // Register, login a user and extract its cookie
             AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
             val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-            val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+            val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
             // Insert a new collection
             val body0 = collectionRequest
@@ -1017,7 +1011,7 @@ class DatabaseTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest

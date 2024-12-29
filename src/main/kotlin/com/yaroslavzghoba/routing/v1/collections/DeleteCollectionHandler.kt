@@ -38,7 +38,7 @@ fun RouteHandlersProvider.V1.Collections.deleteCollection(
     }
 
     // Return 403 if the corresponding collection is owned by another user
-    if (collection.ownerUsername != session.username) {
+    if (collection.ownerId != session.userId) {
         val message = mapOf("message" to "You cannot access someone else's collection")
         call.respond(status = HttpStatusCode.Forbidden, message = message)
         return@deleteCollectionHandler

@@ -17,17 +17,17 @@ interface CollectionStorage {
     suspend fun getById(id: Long): CardCollection?
 
     /**
-     * Get a list of collections owned by the owner with the [ownerUsername] username.
+     * Get a list of collections owned by the owner with the [ownerId] id.
      *
-     * @param ownerUsername The username of a user whose card collections are to be selected.
-     * @return List of card collections owned by user [ownerUsername].
+     * @param ownerId The id of a user whose collections are to be selected.
+     * @return List of collections owned by user with [ownerId] id.
      */
-    suspend fun getByOwnerUsername(ownerUsername: String): List<CardCollection>
+    suspend fun getByOwnerId(ownerId: Long): List<CardCollection>
 
     /**
      * Try to insert a collection into the storage.
      *
-     * @param collection A card collection to be inserted into the storage.
+     * @param collection A collection to be inserted into the storage.
      * @return Inserted collection.
      *
      * @throws NoSuchElementException If the owner of the collection is not found in the storage.
@@ -35,7 +35,7 @@ interface CollectionStorage {
     suspend fun insert(collection: CardCollection): CardCollection
 
     /**
-     * Try to update the card collection in the storage.
+     * Try to update the collection in the storage.
      *
      * @param collection The collection that must be updated.
      * @return Updated collection.
@@ -46,14 +46,14 @@ interface CollectionStorage {
     suspend fun update(collection: CardCollection): CardCollection
 
     /**
-     * Delete all card collections from the storage.
+     * Delete all collections from the storage.
      */
     suspend fun deleteAll()
 
     /**
-     * Delete the card collection from the storage by its [id].
+     * Delete the collection from the storage by its [id].
      *
-     * @param id The unique identifier of the card collection that must be deleted.
+     * @param id The unique identifier of the collection that must be deleted.
      */
     suspend fun deleteById(id: Long)
 }

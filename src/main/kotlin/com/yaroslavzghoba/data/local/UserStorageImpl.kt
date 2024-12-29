@@ -15,22 +15,34 @@ import org.jetbrains.exposed.sql.deleteWhere
  */
 class UserStorageImpl : UserStorage {
 
+    override suspend fun getById(id: Long): User? = suspendTransaction {
+        UserDao
+            .find { UsersTable.id eq id }
+            .map { it.toUser() }
+            .firstOrNull()
+    }
+
     override suspend fun getByUsername(username: String): User? = suspendTransaction {
         UserDao
-            .find { UsersTable.id eq username }
+            .find { UsersTable.username eq username }
             .map { it.toUser() }
             .firstOrNull()
     }
 
     override suspend fun insert(user: User): User = suspendTransaction {
-        UserDao.new(id = user.username) {
+        UserDao.new(id = user.id) {
+            username = user.username
             hashedPassword = user.hashedPassword
             salt = user.salt
         }.toUser()
     }
 
     override suspend fun update(user: User): User = suspendTransaction {
-        UserDao.findByIdAndUpdate(id = user.username) {
+        if (user.id == null)
+            throw IllegalArgumentException("The identifier of the user to be updated cannot be null")
+
+        UserDao.findByIdAndUpdate(id = user.id) {
+            it.username = user.username
             it.hashedPassword = user.hashedPassword
             it.salt = user.salt
         }?.toUser()
@@ -41,7 +53,7 @@ class UserStorageImpl : UserStorage {
         UsersTable.deleteAll()
     }
 
-    override suspend fun deleteByUsername(username: String): Unit = suspendTransaction {
-        UsersTable.deleteWhere { id eq username }
+    override suspend fun deleteById(id: Long) {
+        UsersTable.deleteWhere { UsersTable.id eq id }
     }
 }

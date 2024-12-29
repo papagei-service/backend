@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 /**
  * Represents a separate user session, which is a user identifier for each HTTP request.
  *
- * @param username Unique string user identifier.
+ * @param userId Unique immutable identifier of the user.
  */
 @Serializable
-data class UserSession(val username: String)
+data class UserSession(val userId: Long)
