@@ -59,7 +59,7 @@ class AuthenticationTest {
     @Test
     fun `Do not grand access to a resource protected by basic token auth without having any token`() =
         testConfiguredApplication { client, _ ->
-            val response0 = client.post("/v1/users/register") {
+            val response0 = client.post("/v1/account/register") {
                 contentType(ContentType.Application.Json)
             }
 
@@ -80,7 +80,7 @@ class AuthenticationTest {
             }
             val basicToken = response0.body<TokenRegistrationResponse>().token
 
-            val response1 = client.post("/v1/users/register") {
+            val response1 = client.post("/v1/account/register") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(basicToken)
                 setBody(inputCredentials)
@@ -97,7 +97,7 @@ class AuthenticationTest {
         testConfiguredApplication { client, _ ->
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
-            val response0 = client.post("/v1/users/register") {
+            val response0 = client.post("/v1/account/register") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(STRONG_TOKEN)
                 setBody(inputCredentials)
@@ -112,7 +112,7 @@ class AuthenticationTest {
     @Test
     fun `Do not grant access to a session-protected resource without having any session`() =
         testConfiguredApplication { client, _ ->
-            val response0 = client.get("/v1/users/") {
+            val response0 = client.get("/v1/account") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
@@ -127,7 +127,7 @@ class AuthenticationTest {
     fun `Do not login with a non-registed username`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
-        val response0 = client.post("/v1/users/login") {
+        val response0 = client.post("/v1/account/login") {
             contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
@@ -143,7 +143,7 @@ class AuthenticationTest {
     fun `Do not register with a blank username`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = " ", password = "qwerty")
 
-        val response0 = client.post("/v1/users/register") {
+        val response0 = client.post("/v1/account/register") {
             contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
@@ -159,7 +159,7 @@ class AuthenticationTest {
     fun `Do not register with a blank password`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = "admin", password = " ")
 
-        val response0 = client.post("/v1/users/register") {
+        val response0 = client.post("/v1/account/register") {
             contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
@@ -175,7 +175,7 @@ class AuthenticationTest {
     fun `Register a new user`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
-        val response0 = client.post("/v1/users/register") {
+        val response0 = client.post("/v1/account/register") {
             contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
@@ -192,14 +192,14 @@ class AuthenticationTest {
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         // Register the new user
-        client.post("/v1/users/register") {
+        client.post("/v1/account/register") {
             contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
         // Login the existing user with modified password
-        val response0 = client.post("/v1/users/login") {
+        val response0 = client.post("/v1/account/login") {
             contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials.copy(password = "password"))
@@ -216,14 +216,14 @@ class AuthenticationTest {
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         // Register the new user
-        client.post("/v1/users/register") {
+        client.post("/v1/account/register") {
             contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
         // Login the existing user
-        val response0 = client.post("/v1/users/login") {
+        val response0 = client.post("/v1/account/login") {
             contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
@@ -241,14 +241,14 @@ class AuthenticationTest {
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
             // Register the new user
-            client.post("/v1/users/register") {
+            client.post("/v1/account/register") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
 
             // Login the user and extract its cookie
-            val response0 = client.post("/v1/users/login") {
+            val response0 = client.post("/v1/account/login") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
@@ -256,7 +256,7 @@ class AuthenticationTest {
             val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
 
             // Get access to the session-protected resource
-            val response1 = client.get("/v1/users/") {
+            val response1 = client.get("/v1/account") {
                 header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
@@ -273,14 +273,14 @@ class AuthenticationTest {
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
             // Register the new user
-            client.post("/v1/users/register") {
+            client.post("/v1/account/register") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
 
             // Login the user and extract its cookie
-            val response0 = client.post("/v1/users/login") {
+            val response0 = client.post("/v1/account/login") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
@@ -288,13 +288,13 @@ class AuthenticationTest {
             val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
 
             // Close the session on the server's side
-            client.post("/v1/users/logout") {
+            client.post("/v1/account/logout") {
                 header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
 
             // Try to get access to the session-protected resource after logout
-            val response1 = client.get("/v1/users/") {
+            val response1 = client.get("/v1/account") {
                 header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
@@ -311,14 +311,14 @@ class AuthenticationTest {
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
             // Register the new user
-            client.post("/v1/users/register") {
+            client.post("/v1/account/register") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
 
             // Login the registed user and extract its cookie
-            val response0 = client.post("/v1/users/login") {
+            val response0 = client.post("/v1/account/login") {
                 contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)

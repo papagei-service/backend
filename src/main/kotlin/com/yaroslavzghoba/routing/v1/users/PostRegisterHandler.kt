@@ -13,7 +13,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 @Suppress("UnusedReceiverParameter")
-fun RouteHandlersProvider.V1.Users.postRegister(
+fun RouteHandlersProvider.V1.Account.postRegister(
     repository: Repository,
     hashingService: HashingService,
     saltConfig: PasswordSaltConfig,

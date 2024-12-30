@@ -59,23 +59,23 @@ private fun Route.routingApiV1(
     saltGenerator: KeyGenerator,
 ) {
     route(path = "/v1") {
-        route(path = "/users") {
+        route(path = "/account") {
             authenticate("session-authentication", strategy = AuthenticationStrategy.Required) {
                 get(
-                    path = "/",
-                    body = RouteHandlersProvider.V1.Users.getUser(repository = repository)
+                    path = "",
+                    body = RouteHandlersProvider.V1.Account.getAccount(repository = repository)
                 )
             }
             post(
                 path = "/login",
-                body = RouteHandlersProvider.V1.Users.postLogin(
+                body = RouteHandlersProvider.V1.Account.postLogin(
                     repository = repository,
                     hashingService = hashingService,
                 ),
             )
             post(
                 path = "/register",
-                body = RouteHandlersProvider.V1.Users.postRegister(
+                body = RouteHandlersProvider.V1.Account.postRegister(
                     repository = repository,
                     hashingService = hashingService,
                     saltConfig = saltConfig,
@@ -85,14 +85,13 @@ private fun Route.routingApiV1(
             authenticate("session-authentication", strategy = AuthenticationStrategy.Required) {
                 post(
                     path = "/logout",
-                    body = RouteHandlersProvider.V1.Users.postLogout(),
+                    body = RouteHandlersProvider.V1.Account.postLogout(),
                 )
 
                 authenticate("strong-jwt-authentication", strategy = AuthenticationStrategy.Required) {
                     delete(
-                        path = "/",
-                        body = RouteHandlersProvider.V1.Users
-                            .deleteUser(repository = repository)
+                        path = "",
+                        body = RouteHandlersProvider.V1.Account.deleteAccount(repository = repository)
                     )
                 }
             }

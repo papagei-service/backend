@@ -9,16 +9,16 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
 @Suppress("UnusedReceiverParameter")
-fun RouteHandlersProvider.V1.Users.deleteUser(
+fun RouteHandlersProvider.V1.Account.deleteAccount(
     repository: Repository,
-): suspend RoutingContext.() -> Unit = deleteUserHandler@{
+): suspend RoutingContext.() -> Unit = deleteAccountHandler@{
     val session = call.sessions.get<UserSession>()
 
     // Return 401 if the user is not authenticated
     if (session == null) {
         val message = mapOf("message" to "You must be authenticated using sessions to get access")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@deleteUserHandler
+        return@deleteAccountHandler
     }
 
     // Return 404 if there is no user corresponding to the session
@@ -26,7 +26,7 @@ fun RouteHandlersProvider.V1.Users.deleteUser(
     if (correspondingUser == null) {
         val message = mapOf("message" to "The user with the corresponding session does not exist")
         call.respond(status = HttpStatusCode.NotFound, message = message)
-        return@deleteUserHandler
+        return@deleteAccountHandler
     }
 
     repository.deleteUserById(id = correspondingUser.id!!)

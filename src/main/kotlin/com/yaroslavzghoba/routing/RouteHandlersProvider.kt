@@ -7,7 +7,7 @@ object RouteHandlersProvider {
 
     object V1 {
 
-        object Users
+        object Account
 
         object Collections {
 

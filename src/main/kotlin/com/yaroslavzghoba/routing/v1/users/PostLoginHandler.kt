@@ -12,7 +12,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
 @Suppress("UnusedReceiverParameter")
-fun RouteHandlersProvider.V1.Users.postLogin(
+fun RouteHandlersProvider.V1.Account.postLogin(
     repository: Repository,
     hashingService: HashingService,
 ): suspend RoutingContext.() -> Unit = postLoginHandler@{

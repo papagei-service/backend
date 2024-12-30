@@ -12,7 +12,7 @@ object AuthUtils {
         inputCredentials: InputCredentials,
         token: String,
     ) {
-        client.post("/v1/users/register") {
+        client.post("/v1/account/register") {
             contentType(ContentType.Application.Json)
             bearerAuth(token)
             setBody(inputCredentials)
@@ -24,7 +24,7 @@ object AuthUtils {
         inputCredentials: InputCredentials,
         token: String,
     ): HttpResponse {
-        return client.post("/v1/users/login") {
+        return client.post("/v1/account/login") {
             contentType(ContentType.Application.Json)
             bearerAuth(token)
             setBody(inputCredentials)
