@@ -7,10 +7,12 @@ import com.yaroslavzghoba.data.local.tables.CollectionsTable
 import com.yaroslavzghoba.data.mappers.toCard
 import com.yaroslavzghoba.data.model.CardStorage
 import com.yaroslavzghoba.model.Card
+import com.yaroslavzghoba.model.CardSorting
+import com.yaroslavzghoba.model.CardSortingColumn
 import com.yaroslavzghoba.utils.suspendTransaction
+import kotlinx.datetime.Instant
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteAll
-import org.jetbrains.exposed.sql.deleteWhere
 
 /**
  * Represents a storage of cards in persistent memory.
@@ -26,9 +28,26 @@ class CardStorageImpl : CardStorage {
             .firstOrNull()
     }
 
-    override suspend fun getByCollectionId(id: Long): List<Card> = suspendTransaction {
+    override suspend fun getByCollectionId(
+        id: Long,
+        sortByFirstPriority: CardSorting?,
+        sortBySecondPriority: CardSorting?,
+        nextTimeBefore: Instant?,
+        limit: Int,
+        offset: Long,
+    ): List<Card> = suspendTransaction {
         CardDao
-            .find { CardsTable.collectionId eq id }
+            .find {
+                val baseCondition = CardsTable.collectionId eq id
+                nextTimeBefore?.let {
+                    baseCondition and (CardsTable.nextTimeAt lessEq it)
+                } ?: baseCondition
+            }
+            .apply {
+                val sorts = listOfNotNull(sortByFirstPriority, sortBySecondPriority)
+                orderBy(*sorts.toTypedArray())
+            }
+            .limit(n = limit, offset = offset)
             .map { it.toCard() }
     }
 
@@ -85,4 +104,35 @@ class CardStorageImpl : CardStorage {
             CardsTable.id eq id
         }
     }
+}
+
+/**
+ * Returns a new [SizedIterable] with the cards sorted according to the [sorting].
+ */
+private fun SizedIterable<CardDao>.orderBy(vararg sorting: CardSorting): SizedIterable<CardDao> {
+    val orders = sorting.map {
+        it.column.toExpression() to it.order.toSqlSortOrder()
+    }
+    return orderBy(*orders.toTypedArray())
+}
+
+/**
+ * Convert a card sort column to an expression with a corresponding column.
+ *
+ * @receiver An enum value of the [CardSortingColumn], representing a column in the table by which cards can be sorted.
+ * @return An expression consisting of the corresponding column.
+ */
+private fun CardSortingColumn.toExpression(): Expression<*> = when (this) {
+    CardSortingColumn.NEXT_TIME_AT -> CardsTable.nextTimeAt
+}
+
+/**
+ * Convert the sort order received from the client to the appropriate sort order that can be used to create SQL queries.
+ *
+ * @receiver Sorting order received from the client.
+ * @return An appropriate sort order that can be used to create SQL queries.
+ */
+private fun com.yaroslavzghoba.model.SortOrder.toSqlSortOrder(): SortOrder = when (this) {
+    com.yaroslavzghoba.model.SortOrder.ASC -> SortOrder.ASC
+    com.yaroslavzghoba.model.SortOrder.DESC -> SortOrder.DESC
 }

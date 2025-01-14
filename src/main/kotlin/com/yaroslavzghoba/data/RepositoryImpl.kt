@@ -3,10 +3,8 @@ package com.yaroslavzghoba.data
 import com.yaroslavzghoba.data.model.CardStorage
 import com.yaroslavzghoba.data.model.CollectionStorage
 import com.yaroslavzghoba.data.model.UserStorage
-import com.yaroslavzghoba.model.Card
-import com.yaroslavzghoba.model.CardCollection
-import com.yaroslavzghoba.model.Repository
-import com.yaroslavzghoba.model.User
+import com.yaroslavzghoba.model.*
+import kotlinx.datetime.Instant
 
 /**
  * Represents a storage of user data on the local disk.
@@ -69,9 +67,21 @@ class RepositoryImpl(
         return cardStorage.getById(id = id)
     }
 
-    override suspend fun getCardsByCollectionId(id: Long): List<Card> {
-        return cardStorage.getByCollectionId(id = id)
-    }
+    override suspend fun getCardsByCollectionId(
+        id: Long,
+        sortByFirstPriority: CardSorting?,
+        sortBySecondPriority: CardSorting?,
+        nextTimeBefore: Instant?,
+        limit: Int,
+        offset: Long,
+    ): List<Card> = cardStorage.getByCollectionId(
+        id = id,
+        sortByFirstPriority = sortByFirstPriority,
+        sortBySecondPriority = sortBySecondPriority,
+        nextTimeBefore = nextTimeBefore,
+        limit = limit,
+        offset = offset,
+    )
 
     override suspend fun insertCard(card: Card): Card {
         return cardStorage.insert(card = card)

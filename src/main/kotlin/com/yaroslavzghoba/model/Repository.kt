@@ -1,5 +1,7 @@
 package com.yaroslavzghoba.model
 
+import kotlinx.datetime.Instant
+
 /**
  * Defines methods for storing and reading user data.
  */
@@ -116,9 +118,23 @@ interface Repository {
      * Get a list of cards that belong to the card collection with an identifier equal to [id].
      *
      * @param id Unique identifier of the collection to which the requested cards belong.
+     * @param sortByFirstPriority Options for the card sort that is performed first.
+     * @param sortBySecondPriority Options for the card sort that is performed at the second stage
+     * on cards with the same values in the column by which the first sort was performed.
+     * @param nextTimeBefore The moment of time ahead of the time of the next repetition of the card.
+     * @param limit The maximal number of cards those will be returned.
+     * @param offset Indicates how many cards should be skipped.
+     *
      * @return A list of cards that belong to the collection of cards with the [id] identifier.
      */
-    suspend fun getCardsByCollectionId(id: Long): List<Card>
+    suspend fun getCardsByCollectionId(
+        id: Long,
+        sortByFirstPriority: CardSorting? = null,
+        sortBySecondPriority: CardSorting? = null,
+        nextTimeBefore: Instant? = null,
+        limit: Int = 20,
+        offset: Long = 0,
+    ): List<Card>
 
     /**
      * Try to insert a card into the storage.

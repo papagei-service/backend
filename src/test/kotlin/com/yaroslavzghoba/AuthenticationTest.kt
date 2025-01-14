@@ -9,7 +9,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 private const val COOKIE_REQUEST_PARAM_NAME = "Cookie"
-private const val COOKIE_RESPONCE_PARAM_NAME = "Set-Cookie"
+private const val COOKIE_RESPONSE_PARAM_NAME = "Set-Cookie"
 private const val STRONG_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvYXBpIiwiaXNzIjoiL2FwaS9yZWdpc3RlciIsInN0cm9uZyI6InRydWUiLCJpYXQiOjE3MjY4NTIzOTd9.WW2fj_gRrGD2I6BklSHIS03Q8hBUMUhHxX7jDIcKs-s"
 private const val NOT_STRONG_TOKEN =
@@ -253,7 +253,7 @@ class AuthenticationTest {
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
-            val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+            val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
             // Get access to the session-protected resource
             val response1 = client.get("/v1/account") {
@@ -285,7 +285,7 @@ class AuthenticationTest {
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
-            val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+            val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
             // Close the session on the server's side
             client.post("/v1/account/logout") {
@@ -323,7 +323,7 @@ class AuthenticationTest {
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
-            val cookies = response0.headers[COOKIE_RESPONCE_PARAM_NAME]  // Contains the user's session
+            val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
             // Try to register a new non-strong access token
             val response1 = client.post("/register") {

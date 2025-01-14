@@ -6,13 +6,17 @@ import com.yaroslavzghoba.model.*
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
 import com.yaroslavzghoba.utils.AuthUtils
 import io.ktor.client.call.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.datetime.Clock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.time.Duration.Companion.minutes
 
+private const val SERVER_HOST = "localhost"
+private const val SERVER_PORT = 443
 private const val COOKIE_REQUEST_PARAM_NAME = "Cookie"
 private const val COOKIE_RESPONSE_PARAM_NAME = "Set-Cookie"
 private const val NOT_STRONG_TOKEN =
@@ -42,7 +46,7 @@ private val cardRequest = CardRequest(
     nextTimeAt = Clock.System.now(),
 )
 
-class DatabaseTest {
+class RoutingTest {
 
     @Test
     fun `Do not insert a new collection if the request body is invalid`() = testConfiguredApplication { client, _ ->
@@ -1045,5 +1049,99 @@ class DatabaseTest {
             actual = response3.status,
         )
     }
+
+    @Test
+    fun `Get the card where the next repetition time has arrived`() = testConfiguredApplication { client, _ ->
+        // Register, login a user and extract its cookie
+        AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
+        val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
+        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+
+        // Insert a new collection
+        val body0 = collectionRequest
+        val response1 = client.post("/v1/collections/") {
+            contentType(ContentType.Application.Json)
+            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            bearerAuth(NOT_STRONG_TOKEN)
+            setBody(body0)
+        }
+        val collectionId = response1.body<CardCollection>().id
+
+        // Insert a new card
+        val body1 = cardRequest
+        val response2 = client.post("/v1/collections/$collectionId/cards/") {
+            contentType(ContentType.Application.Json)
+            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            bearerAuth(NOT_STRONG_TOKEN)
+            setBody(body1)
+        }
+        val insertedCard = response2.body<Card>()
+
+        // Start learning process
+        client.webSocket(
+            method = HttpMethod.Get,
+            host = SERVER_HOST,
+            port = SERVER_PORT,
+            path = "/v1/collections/$collectionId/cards",
+            request = {
+                contentType(ContentType.Application.Json)
+                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                bearerAuth(NOT_STRONG_TOKEN)
+            }
+        ) {
+            val cards: List<Card> = receiveDeserialized()
+            assertEquals(
+                expected = insertedCard.nextTimeAt.toEpochMilliseconds(),
+                actual = cards[0].nextTimeAt.toEpochMilliseconds(),
+            )
+        }
+    }
+
+    @Test
+    fun `Do not get the card where the next repetition time has not arrived`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
+            val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
+            val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+
+            // Insert a new collection
+            val body0 = collectionRequest
+            val response1 = client.post("/v1/collections/") {
+                contentType(ContentType.Application.Json)
+                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                bearerAuth(NOT_STRONG_TOKEN)
+                setBody(body0)
+            }
+            val collectionId = response1.body<CardCollection>().id
+
+            // Insert a new card
+            val body1 = cardRequest.copy(nextTimeAt = Clock.System.now() + 1.minutes)
+            client.post("/v1/collections/$collectionId/cards/") {
+                contentType(ContentType.Application.Json)
+                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                bearerAuth(NOT_STRONG_TOKEN)
+                setBody(body1)
+            }
+
+            // Start learning process
+            client.webSocket(
+                method = HttpMethod.Get,
+                host = SERVER_HOST,
+                port = SERVER_PORT,
+                path = "/v1/collections/$collectionId/cards",
+                request = {
+                    contentType(ContentType.Application.Json)
+                    header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                    bearerAuth(NOT_STRONG_TOKEN)
+                }
+            ) {
+                val cards: List<Card> = receiveDeserialized()
+                assertEquals(
+                    expected = emptyList(),
+                    actual = cards,
+                )
+            }
+        }
 }
 

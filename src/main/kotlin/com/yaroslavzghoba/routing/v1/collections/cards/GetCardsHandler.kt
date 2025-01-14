@@ -1,4 +1,4 @@
-package com.yaroslavzghoba.routing.v1.collections
+package com.yaroslavzghoba.routing.v1.collections.cards
 
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
@@ -9,16 +9,16 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
 @Suppress("UnusedReceiverParameter")
-fun RouteHandlersProvider.V1.Collections.Cards.getCollectionCards(
+fun RouteHandlersProvider.V1.Collections.Cards.getCards(
     repository: Repository,
-): suspend RoutingContext.() -> Unit = getCollectionCardsHandler@{
+): suspend RoutingContext.() -> Unit = getCardsHandler@{
     val session = call.sessions.get<UserSession>()
 
     // Return 401 if the user is not authenticated
     if (session == null) {
         val message = mapOf("message" to "You must be authenticated using sessions to get access")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@getCollectionCardsHandler
+        return@getCardsHandler
     }
 
     // Return 400 if the `collection_id` parameter is not passed or is invalid
@@ -26,7 +26,7 @@ fun RouteHandlersProvider.V1.Collections.Cards.getCollectionCards(
     if (collectionId == null) {
         val message = mapOf("message" to "The \"collection_id\" parameter is not passed or cannot be cast to number")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
-        return@getCollectionCardsHandler
+        return@getCardsHandler
     }
 
     // Return 404 if there is no collection with a corresponding id
@@ -34,14 +34,14 @@ fun RouteHandlersProvider.V1.Collections.Cards.getCollectionCards(
     if (collection == null) {
         val message = mapOf("message" to "There is no collection with \"id\" property equal to \"$collectionId\"")
         call.respond(status = HttpStatusCode.NotFound, message = message)
-        return@getCollectionCardsHandler
+        return@getCardsHandler
     }
 
     // Return 403 if the user is not the owner of the collection
     if (collection.ownerId != session.userId) {
         val message = mapOf("message" to "You cannot access someone else's collection")
         call.respond(status = HttpStatusCode.Forbidden, message = message)
-        return@getCollectionCardsHandler
+        return@getCardsHandler
     }
 
     val cards = repository.getCardsByCollectionId(id = collectionId)

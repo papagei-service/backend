@@ -4,11 +4,7 @@ import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.routing.postRegister
 import com.yaroslavzghoba.routing.v1.collections.*
-import com.yaroslavzghoba.routing.v1.collections.cards.deleteCard
-import com.yaroslavzghoba.routing.v1.collections.cards.getCardById
-import com.yaroslavzghoba.routing.v1.collections.cards.postCard
-import com.yaroslavzghoba.routing.v1.collections.cards.putCard
-import com.yaroslavzghoba.routing.v1.getCollections
+import com.yaroslavzghoba.routing.v1.collections.cards.*
 import com.yaroslavzghoba.routing.v1.users.*
 import com.yaroslavzghoba.security.hashing.HashingService
 import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
@@ -18,6 +14,7 @@ import com.yaroslavzghoba.utils.KeyGenerator
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 
 fun Application.configureRouting(
     repository: Repository,
@@ -61,10 +58,7 @@ private fun Route.routingApiV1(
     route(path = "/v1") {
         route(path = "/account") {
             authenticate("session-authentication", strategy = AuthenticationStrategy.Required) {
-                get(
-                    path = "",
-                    body = RouteHandlersProvider.V1.Account.getAccount(repository = repository)
-                )
+                get(body = RouteHandlersProvider.V1.Account.getAccount(repository = repository))
             }
             post(
                 path = "/login",
@@ -89,16 +83,13 @@ private fun Route.routingApiV1(
                 )
 
                 authenticate("strong-jwt-authentication", strategy = AuthenticationStrategy.Required) {
-                    delete(
-                        path = "",
-                        body = RouteHandlersProvider.V1.Account.deleteAccount(repository = repository)
-                    )
+                    delete(body = RouteHandlersProvider.V1.Account.deleteAccount(repository = repository))
                 }
             }
         }
         authenticate("session-authentication", strategy = AuthenticationStrategy.Required) {
             route(path = "/collections") {
-                get(body = RouteHandlersProvider.V1.getCollections(repository = repository))
+                get(body = RouteHandlersProvider.V1.Collections.getCollections(repository = repository))
                 get(
                     path = "/{collection_id}",
                     body = RouteHandlersProvider.V1.Collections
@@ -120,10 +111,11 @@ private fun Route.routingApiV1(
                         .deleteCollection(repository = repository)
                 )
                 route(path = "/{collection_id}/cards") {
-                    get(
-                        body = RouteHandlersProvider.V1.Collections.Cards
-                            .getCollectionCards(repository = repository)
+                    webSocket(
+                        handler = RouteHandlersProvider.V1.Collections.Cards
+                            .webSocketCards(repository = repository)
                     )
+                    get(body = RouteHandlersProvider.V1.Collections.Cards.getCards(repository = repository))
                     get(
                         path = "/{card_id}",
                         body = RouteHandlersProvider.V1.Collections.Cards

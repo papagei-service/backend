@@ -1,4 +1,4 @@
-package com.yaroslavzghoba.routing.v1
+package com.yaroslavzghoba.routing.v1.collections
 
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
@@ -9,7 +9,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
 @Suppress("UnusedReceiverParameter")
-fun RouteHandlersProvider.V1.getCollections(
+fun RouteHandlersProvider.V1.Collections.getCollections(
     repository: Repository,
 ): suspend RoutingContext.() -> Unit = getCollectionsHandler@{
     val session = call.sessions.get<UserSession>()

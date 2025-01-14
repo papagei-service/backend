@@ -5,10 +5,7 @@ import com.yaroslavzghoba.data.local.CardStorageImpl
 import com.yaroslavzghoba.data.local.CollectionStorageImpl
 import com.yaroslavzghoba.data.local.UserSessionStorage
 import com.yaroslavzghoba.data.local.UserStorageImpl
-import com.yaroslavzghoba.plugins.configureAuthentication
-import com.yaroslavzghoba.plugins.configureDatabase
-import com.yaroslavzghoba.plugins.configureRouting
-import com.yaroslavzghoba.plugins.configureSerialization
+import com.yaroslavzghoba.plugins.*
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
 import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
@@ -71,6 +68,7 @@ fun Application.module() {
         jwtTokenConfig = jwtTokenConfig,
         sessionsConfig = sessionsConfig,
     )
+    configureWebSockets()
     configureRouting(
         repository = repository,
         jwtTokenConfig = jwtTokenConfig,

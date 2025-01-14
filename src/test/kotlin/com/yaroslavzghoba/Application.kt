@@ -7,10 +7,7 @@ import com.yaroslavzghoba.data.local.UserSessionStorage
 import com.yaroslavzghoba.data.local.UserStorageImpl
 import com.yaroslavzghoba.data.model.PurgeableSessionStorage
 import com.yaroslavzghoba.model.Repository
-import com.yaroslavzghoba.plugins.configureAuthentication
-import com.yaroslavzghoba.plugins.configureDatabase
-import com.yaroslavzghoba.plugins.configureRouting
-import com.yaroslavzghoba.plugins.configureSerialization
+import com.yaroslavzghoba.plugins.*
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
 import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
@@ -59,6 +56,7 @@ fun Application.testingModule() {
         jwtTokenConfig = jwtTokenConfig,
         sessionsConfig = sessionsConfig,
     )
+    configureWebSockets()
     configureRouting(
         repository = Repository,
         jwtTokenConfig = jwtTokenConfig,
@@ -72,9 +70,9 @@ fun Application.testingModule() {
 }
 
 /**
- * Delete all rows in all database tables.
+ * Delete all rows in all testing database tables.
  */
-suspend fun clearDatabase() {
+suspend fun clearTestingDatabase() {
     Repository.clear()
     SessionStorage.invalidateAll()
 }
