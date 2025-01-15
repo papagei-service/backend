@@ -32,7 +32,6 @@ class AuthenticationTest {
     fun `Do not grand access to a resource protected by strong token auth with a pre-generated not strong token`() =
         testConfiguredApplication { client, _ ->
             val response0 = client.post("/register") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
 
@@ -46,7 +45,6 @@ class AuthenticationTest {
     fun `Grand access to a resource protected by strong token auth with the pre-generated strong token`() =
         testConfiguredApplication { client, _ ->
             val response0 = client.post("/register") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(STRONG_TOKEN)
             }
 
@@ -59,9 +57,7 @@ class AuthenticationTest {
     @Test
     fun `Do not grand access to a resource protected by basic token auth without having any token`() =
         testConfiguredApplication { client, _ ->
-            val response0 = client.post("/v1/account/register") {
-                contentType(ContentType.Application.Json)
-            }
+            val response0 = client.post("/v1/account/register")
 
             assertEquals(
                 expected = HttpStatusCode.Unauthorized,
@@ -75,13 +71,11 @@ class AuthenticationTest {
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
             val response0 = client.post("/register") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(STRONG_TOKEN)
             }
             val basicToken = response0.body<TokenRegistrationResponse>().token
 
             val response1 = client.post("/v1/account/register") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(basicToken)
                 setBody(inputCredentials)
             }
@@ -98,7 +92,6 @@ class AuthenticationTest {
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
             val response0 = client.post("/v1/account/register") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(STRONG_TOKEN)
                 setBody(inputCredentials)
             }
@@ -113,7 +106,6 @@ class AuthenticationTest {
     fun `Do not grant access to a session-protected resource without having any session`() =
         testConfiguredApplication { client, _ ->
             val response0 = client.get("/v1/account") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
 
@@ -124,11 +116,10 @@ class AuthenticationTest {
         }
 
     @Test
-    fun `Do not login with a non-registed username`() = testConfiguredApplication { client, _ ->
+    fun `Do not login with a non-existing username`() = testConfiguredApplication { client, _ ->
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         val response0 = client.post("/v1/account/login") {
-            contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
@@ -144,7 +135,6 @@ class AuthenticationTest {
         val inputCredentials = InputCredentials(username = " ", password = "qwerty")
 
         val response0 = client.post("/v1/account/register") {
-            contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
@@ -160,7 +150,6 @@ class AuthenticationTest {
         val inputCredentials = InputCredentials(username = "admin", password = " ")
 
         val response0 = client.post("/v1/account/register") {
-            contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
@@ -176,7 +165,6 @@ class AuthenticationTest {
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         val response0 = client.post("/v1/account/register") {
-            contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
@@ -193,14 +181,12 @@ class AuthenticationTest {
 
         // Register the new user
         client.post("/v1/account/register") {
-            contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
         // Login the existing user with modified password
         val response0 = client.post("/v1/account/login") {
-            contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials.copy(password = "password"))
         }
@@ -217,14 +203,12 @@ class AuthenticationTest {
 
         // Register the new user
         client.post("/v1/account/register") {
-            contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
         // Login the existing user
         val response0 = client.post("/v1/account/login") {
-            contentType(ContentType.Application.Json)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
@@ -242,14 +226,12 @@ class AuthenticationTest {
 
             // Register the new user
             client.post("/v1/account/register") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
 
             // Login the user and extract its cookie
             val response0 = client.post("/v1/account/login") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
@@ -274,14 +256,12 @@ class AuthenticationTest {
 
             // Register the new user
             client.post("/v1/account/register") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
 
             // Login the user and extract its cookie
             val response0 = client.post("/v1/account/login") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
@@ -312,14 +292,12 @@ class AuthenticationTest {
 
             // Register the new user
             client.post("/v1/account/register") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
 
             // Login the user and extract its cookie
             val response0 = client.post("/v1/account/login") {
-                contentType(ContentType.Application.Json)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }

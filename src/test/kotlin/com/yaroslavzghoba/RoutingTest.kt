@@ -57,7 +57,6 @@ class RoutingTest {
         val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
 
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(user)  // Set a user instead of a collection
@@ -78,7 +77,6 @@ class RoutingTest {
 
         val body = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body)
@@ -99,7 +97,6 @@ class RoutingTest {
 
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -107,7 +104,6 @@ class RoutingTest {
 
         val body1 = response1.body<CardCollection>().toCollectionRequest()
         val response2 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -129,7 +125,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -137,7 +132,6 @@ class RoutingTest {
 
         // Try to update the collection
         val response1 = client.put("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(user)  // Set a user instead of the existing collection
@@ -158,7 +152,6 @@ class RoutingTest {
 
         val body = collectionRequest.copy(id = null)
         val response1 = client.put("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body)
@@ -179,7 +172,6 @@ class RoutingTest {
 
         val body = collectionRequest.copy(id = 0)
         val response1 = client.put("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body)
@@ -201,7 +193,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -215,7 +206,6 @@ class RoutingTest {
         // Try to update the collection using the another user's session
         val body1 = response1.body<CardCollection>().toCollectionRequest()
         val response3 = client.put("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -237,7 +227,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -247,7 +236,6 @@ class RoutingTest {
         // Update the existing collection
         val body1 = body0.copy(id = insertedCollection.id, description = null)
         val response2 = client.put("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -270,7 +258,6 @@ class RoutingTest {
         // Try to delete not existing collection
         val collectionId = "Hello, Papagei!"  // Not valid identifier
         val response1 = client.delete("/v1/collections/$collectionId") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -291,7 +278,6 @@ class RoutingTest {
         // Try to delete not existing collection
         val collectionId = 0
         val response1 = client.delete("/v1/collections/$collectionId") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -312,7 +298,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -326,7 +311,6 @@ class RoutingTest {
         // Try to update the collection using the another user's session
         val collectionId = response1.body<CardCollection>().id
         val response3 = client.delete("/v1/collections/$collectionId") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -347,7 +331,6 @@ class RoutingTest {
         // Insert a new collection
         val body = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body)
@@ -356,7 +339,6 @@ class RoutingTest {
 
         // Delete the inserted collection
         val response2 = client.delete("/v1/collections/${insertedCollectionId}") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -377,7 +359,6 @@ class RoutingTest {
         // Try to insert a new card
         val collectionId = "Hello, Papagei!"  // Not valid identifier
         val response1 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(cardRequest)
@@ -399,7 +380,6 @@ class RoutingTest {
         // Try to insert a new card
         val collectionId: Long = 0
         val response1 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(cardRequest)
@@ -421,7 +401,6 @@ class RoutingTest {
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -436,7 +415,6 @@ class RoutingTest {
         // Try to insert a new card
         val body1 = cardRequest
         val response3 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -458,7 +436,6 @@ class RoutingTest {
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -468,7 +445,6 @@ class RoutingTest {
         // Try to insert a new card
         val body1 = user  // Set a user instead of card
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -490,7 +466,6 @@ class RoutingTest {
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -500,7 +475,6 @@ class RoutingTest {
         // Insert a new card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -522,7 +496,6 @@ class RoutingTest {
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -532,7 +505,6 @@ class RoutingTest {
         // Insert the card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -541,7 +513,6 @@ class RoutingTest {
         // Try to insert the same card again
         val body2 = response2.body<Card>().toCardRequest()
         val response3 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body2)
@@ -563,7 +534,6 @@ class RoutingTest {
         // Try to insert a new card
         val collectionId = "Hello, Papagei!"  // Not valid identifier
         val response1 = client.put("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(cardRequest)
@@ -585,7 +555,6 @@ class RoutingTest {
         // Try to insert a new card
         val collectionId: Long = 0
         val response1 = client.put("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(cardRequest)
@@ -607,7 +576,6 @@ class RoutingTest {
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -621,7 +589,6 @@ class RoutingTest {
 
         // Try to update the card
         val response3 = client.put("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(cardRequest)
@@ -643,7 +610,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -653,7 +619,6 @@ class RoutingTest {
         // Try to update the card
         val body1 = user  // Set a user instead of card
         val response2 = client.put("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -675,7 +640,6 @@ class RoutingTest {
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -685,7 +649,6 @@ class RoutingTest {
         // Try to update not existing card
         val body1 = cardRequest.copy(id = 0)
         val response2 = client.put("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -707,7 +670,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -717,7 +679,6 @@ class RoutingTest {
         // Insert a new card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -734,7 +695,6 @@ class RoutingTest {
             nativeLanguageValueExample = null,
         ).toCardRequest()
         val response4 = client.put("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body2)
@@ -756,7 +716,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -766,7 +725,6 @@ class RoutingTest {
         // Insert a new card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -778,7 +736,6 @@ class RoutingTest {
             foreignLanguageValueExample = null,
         ).toCardRequest()
         val response3 = client.put("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body2)
@@ -801,7 +758,6 @@ class RoutingTest {
         // Try to delete a card
         val collectionId = "Hello, Papagei!"  // Not valid identifier
         val response1 = client.delete("/v1/collections/$collectionId/cards/0") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -822,7 +778,6 @@ class RoutingTest {
         // Try to delete a card
         val collectionId = 0  // Not valid identifier
         val response1 = client.delete("/v1/collections/$collectionId/cards/0") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -843,7 +798,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -857,7 +811,6 @@ class RoutingTest {
 
         // Try to delete a card
         val response3 = client.delete("/v1/collections/$collectionId/cards/0") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -878,7 +831,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -888,7 +840,6 @@ class RoutingTest {
         // Try to delete not existing collection
         val cardId = "Hello, Papagei!"  // Not valid identifier
         val response2 = client.delete("/v1/collections/$collectionId/cards/$cardId") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -909,7 +860,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -919,7 +869,6 @@ class RoutingTest {
         // Try to delete not existing card
         val cardId = 0
         val response2 = client.delete("/v1/collections/$collectionId/cards/$cardId") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -940,7 +889,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -950,7 +898,6 @@ class RoutingTest {
         // Try to delete a card
         val cardId = 0
         val response2 = client.delete("/v1/collections/$collectionId/cards/$cardId") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -972,7 +919,6 @@ class RoutingTest {
             // Insert a new collection
             val body0 = collectionRequest
             val response1 = client.post("/v1/collections/") {
-                contentType(ContentType.Application.Json)
                 header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(body0)
@@ -981,7 +927,6 @@ class RoutingTest {
 
             // Insert another new collection
             val response2 = client.post("/v1/collections/") {
-                contentType(ContentType.Application.Json)
                 header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(body0)
@@ -991,7 +936,6 @@ class RoutingTest {
             // Insert a new card
             val body1 = cardRequest
             val response3 = client.post("/v1/collections/$collectionId/cards/") {
-                contentType(ContentType.Application.Json)
                 header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(body1)
@@ -1000,7 +944,6 @@ class RoutingTest {
 
             // Try to delete a card
             val response4 = client.delete("/v1/collections/$anotherCollectionId/cards/$cardId") {
-                contentType(ContentType.Application.Json)
                 header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
@@ -1021,7 +964,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -1031,7 +973,6 @@ class RoutingTest {
         // Insert a new card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -1040,7 +981,6 @@ class RoutingTest {
 
         // Delete the inserted collection
         val response3 = client.delete("/v1/collections/$collectionId/cards/$cardId") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
         }
@@ -1061,7 +1001,6 @@ class RoutingTest {
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
@@ -1071,7 +1010,6 @@ class RoutingTest {
         // Insert a new card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            contentType(ContentType.Application.Json)
             header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
@@ -1085,7 +1023,6 @@ class RoutingTest {
             port = SERVER_PORT,
             path = "/v1/collections/$collectionId/cards",
             request = {
-                contentType(ContentType.Application.Json)
                 header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
@@ -1109,7 +1046,6 @@ class RoutingTest {
             // Insert a new collection
             val body0 = collectionRequest
             val response1 = client.post("/v1/collections/") {
-                contentType(ContentType.Application.Json)
                 header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(body0)
@@ -1119,7 +1055,6 @@ class RoutingTest {
             // Insert a new card
             val body1 = cardRequest.copy(nextTimeAt = Clock.System.now() + 1.minutes)
             client.post("/v1/collections/$collectionId/cards/") {
-                contentType(ContentType.Application.Json)
                 header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(body1)
@@ -1132,7 +1067,6 @@ class RoutingTest {
                 port = SERVER_PORT,
                 path = "/v1/collections/$collectionId/cards",
                 request = {
-                    contentType(ContentType.Application.Json)
                     header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
                     bearerAuth(NOT_STRONG_TOKEN)
                 }

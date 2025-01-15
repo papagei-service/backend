@@ -2,8 +2,10 @@ package com.yaroslavzghoba.utils
 
 import com.yaroslavzghoba.clearTestingDatabase
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
@@ -28,6 +30,9 @@ fun testConfiguredApplication(
         }
         install(WebSockets) {
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
+        }
+        defaultRequest {
+            contentType(ContentType.Application.Json)
         }
     }
 
