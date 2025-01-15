@@ -5,6 +5,7 @@ import com.yaroslavzghoba.mappers.toCollectionRequest
 import com.yaroslavzghoba.model.*
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
 import com.yaroslavzghoba.utils.AuthUtils
+import com.yaroslavzghoba.utils.rawCookie
 import com.yaroslavzghoba.utils.testConfiguredApplication
 import io.ktor.client.call.*
 import io.ktor.client.plugins.websocket.*
@@ -18,8 +19,6 @@ import kotlin.time.Duration.Companion.minutes
 
 private const val SERVER_HOST = "localhost"
 private const val SERVER_PORT = 443
-private const val COOKIE_REQUEST_PARAM_NAME = "Cookie"
-private const val COOKIE_RESPONSE_PARAM_NAME = "Set-Cookie"
 private const val NOT_STRONG_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvYXBpIiwiaXNzIjoiL2FwaS9yZWdpc3RlciIsInN0cm9uZyI6ImZhbHNlIiwiaWF0IjoxNzI2ODUyMzk3fQ.8Vfa3gaj7nY0Ov5Om5nJFcEs4RbFLaREc_89Fi2wv4U"
 private val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
@@ -54,10 +53,10 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(user)  // Set a user instead of a collection
         }
@@ -73,11 +72,11 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         val body = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body)
         }
@@ -93,18 +92,18 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
 
         val body1 = response1.body<CardCollection>().toCollectionRequest()
         val response2 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -120,19 +119,19 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
 
         // Try to update the collection
         val response1 = client.put("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(user)  // Set a user instead of the existing collection
         }
@@ -148,11 +147,11 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         val body = collectionRequest.copy(id = null)
         val response1 = client.put("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body)
         }
@@ -168,11 +167,11 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         val body = collectionRequest.copy(id = 0)
         val response1 = client.put("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body)
         }
@@ -188,12 +187,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -201,12 +200,12 @@ class RoutingTest {
         // Register, login another user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response2 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response2.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie1 = response2.rawCookie()  // Contains the user's session
 
         // Try to update the collection using the another user's session
         val body1 = response1.body<CardCollection>().toCollectionRequest()
         val response3 = client.put("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
+            rawCookie(value = rawCookie1)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -222,12 +221,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -236,7 +235,7 @@ class RoutingTest {
         // Update the existing collection
         val body1 = body0.copy(id = insertedCollection.id, description = null)
         val response2 = client.put("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -253,12 +252,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Try to delete not existing collection
         val collectionId = "Hello, Papagei!"  // Not valid identifier
         val response1 = client.delete("/v1/collections/$collectionId") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -273,12 +272,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Try to delete not existing collection
         val collectionId = 0
         val response1 = client.delete("/v1/collections/$collectionId") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -293,12 +292,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -306,12 +305,12 @@ class RoutingTest {
         // Register, login another user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response2 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response2.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie1 = response2.rawCookie()  // Contains the user's session
 
         // Try to update the collection using the another user's session
         val collectionId = response1.body<CardCollection>().id
         val response3 = client.delete("/v1/collections/$collectionId") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
+            rawCookie(value = rawCookie1)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -326,12 +325,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body)
         }
@@ -339,7 +338,7 @@ class RoutingTest {
 
         // Delete the inserted collection
         val response2 = client.delete("/v1/collections/${insertedCollectionId}") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -354,12 +353,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Try to insert a new card
         val collectionId = "Hello, Papagei!"  // Not valid identifier
         val response1 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(cardRequest)
         }
@@ -375,12 +374,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Try to insert a new card
         val collectionId: Long = 0
         val response1 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(cardRequest)
         }
@@ -396,12 +395,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -410,12 +409,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response2 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response2.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie1 = response2.rawCookie()  // Contains the user's session
 
         // Try to insert a new card
         val body1 = cardRequest
         val response3 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
+            rawCookie(value = rawCookie1)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -431,12 +430,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -445,7 +444,7 @@ class RoutingTest {
         // Try to insert a new card
         val body1 = user  // Set a user instead of card
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -461,12 +460,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -475,7 +474,7 @@ class RoutingTest {
         // Insert a new card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -491,12 +490,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -505,7 +504,7 @@ class RoutingTest {
         // Insert the card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -513,7 +512,7 @@ class RoutingTest {
         // Try to insert the same card again
         val body2 = response2.body<Card>().toCardRequest()
         val response3 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body2)
         }
@@ -529,12 +528,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Try to insert a new card
         val collectionId = "Hello, Papagei!"  // Not valid identifier
         val response1 = client.put("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(cardRequest)
         }
@@ -550,12 +549,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Try to insert a new card
         val collectionId: Long = 0
         val response1 = client.put("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(cardRequest)
         }
@@ -571,12 +570,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -585,11 +584,11 @@ class RoutingTest {
         // Register, login another user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response2 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response2.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie1 = response2.rawCookie()  // Contains the user's session
 
         // Try to update the card
         val response3 = client.put("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
+            rawCookie(value = rawCookie1)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(cardRequest)
         }
@@ -605,12 +604,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -619,7 +618,7 @@ class RoutingTest {
         // Try to update the card
         val body1 = user  // Set a user instead of card
         val response2 = client.put("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -635,12 +634,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert the collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -649,7 +648,7 @@ class RoutingTest {
         // Try to update not existing card
         val body1 = cardRequest.copy(id = 0)
         val response2 = client.put("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -665,12 +664,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -679,7 +678,7 @@ class RoutingTest {
         // Insert a new card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -688,14 +687,14 @@ class RoutingTest {
         // Register, login another user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response3 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response3.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie1 = response3.rawCookie()  // Contains the user's session
 
         // Try to update the card using the another user's session
         val body2 = insertedCard.copy(
             nativeLanguageValueExample = null,
         ).toCardRequest()
         val response4 = client.put("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
+            rawCookie(value = rawCookie1)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body2)
         }
@@ -711,12 +710,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -725,7 +724,7 @@ class RoutingTest {
         // Insert a new card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -736,7 +735,7 @@ class RoutingTest {
             foreignLanguageValueExample = null,
         ).toCardRequest()
         val response3 = client.put("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body2)
         }
@@ -753,12 +752,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Try to delete a card
         val collectionId = "Hello, Papagei!"  // Not valid identifier
         val response1 = client.delete("/v1/collections/$collectionId/cards/0") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -773,12 +772,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Try to delete a card
         val collectionId = 0  // Not valid identifier
         val response1 = client.delete("/v1/collections/$collectionId/cards/0") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -793,12 +792,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie0)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -807,11 +806,11 @@ class RoutingTest {
         // Register, login another user and extract its cookie
         AuthUtils.registerUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
         val response2 = AuthUtils.loginUser(client, anotherInputCredentials, NOT_STRONG_TOKEN)
-        val cookies1 = response2.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie1 = response2.rawCookie()  // Contains the user's session
 
         // Try to delete a card
         val response3 = client.delete("/v1/collections/$collectionId/cards/0") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies1)
+            rawCookie(value = rawCookie1)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -826,12 +825,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -840,7 +839,7 @@ class RoutingTest {
         // Try to delete not existing collection
         val cardId = "Hello, Papagei!"  // Not valid identifier
         val response2 = client.delete("/v1/collections/$collectionId/cards/$cardId") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -855,12 +854,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -869,7 +868,7 @@ class RoutingTest {
         // Try to delete not existing card
         val cardId = 0
         val response2 = client.delete("/v1/collections/$collectionId/cards/$cardId") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -884,12 +883,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -898,7 +897,7 @@ class RoutingTest {
         // Try to delete a card
         val cardId = 0
         val response2 = client.delete("/v1/collections/$collectionId/cards/$cardId") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -914,12 +913,12 @@ class RoutingTest {
             // Register, login a user and extract its cookie
             AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
             val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-            val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+            val rawCookie = response0.rawCookie()  // Contains the user's session
 
             // Insert a new collection
             val body0 = collectionRequest
             val response1 = client.post("/v1/collections/") {
-                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                rawCookie(value = rawCookie)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(body0)
             }
@@ -927,7 +926,7 @@ class RoutingTest {
 
             // Insert another new collection
             val response2 = client.post("/v1/collections/") {
-                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                rawCookie(value = rawCookie)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(body0)
             }
@@ -936,7 +935,7 @@ class RoutingTest {
             // Insert a new card
             val body1 = cardRequest
             val response3 = client.post("/v1/collections/$collectionId/cards/") {
-                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                rawCookie(value = rawCookie)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(body1)
             }
@@ -944,7 +943,7 @@ class RoutingTest {
 
             // Try to delete a card
             val response4 = client.delete("/v1/collections/$anotherCollectionId/cards/$cardId") {
-                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                rawCookie(value = rawCookie)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
 
@@ -959,12 +958,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -973,7 +972,7 @@ class RoutingTest {
         // Insert a new card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -981,7 +980,7 @@ class RoutingTest {
 
         // Delete the inserted collection
         val response3 = client.delete("/v1/collections/$collectionId/cards/$cardId") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
         }
 
@@ -996,12 +995,12 @@ class RoutingTest {
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
         val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-        val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+        val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a new collection
         val body0 = collectionRequest
         val response1 = client.post("/v1/collections/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body0)
         }
@@ -1010,7 +1009,7 @@ class RoutingTest {
         // Insert a new card
         val body1 = cardRequest
         val response2 = client.post("/v1/collections/$collectionId/cards/") {
-            header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+            rawCookie(value = rawCookie)
             bearerAuth(NOT_STRONG_TOKEN)
             setBody(body1)
         }
@@ -1023,7 +1022,7 @@ class RoutingTest {
             port = SERVER_PORT,
             path = "/v1/collections/$collectionId/cards",
             request = {
-                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                rawCookie(value = rawCookie)
                 bearerAuth(NOT_STRONG_TOKEN)
             }
         ) {
@@ -1041,12 +1040,12 @@ class RoutingTest {
             // Register, login a user and extract its cookie
             AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
             val response0 = AuthUtils.loginUser(client, inputCredentials, NOT_STRONG_TOKEN)
-            val cookies0 = response0.headers[COOKIE_RESPONSE_PARAM_NAME]  // Contains the user's session
+            val rawCookie = response0.rawCookie()  // Contains the user's session
 
             // Insert a new collection
             val body0 = collectionRequest
             val response1 = client.post("/v1/collections/") {
-                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                rawCookie(value = rawCookie)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(body0)
             }
@@ -1055,7 +1054,7 @@ class RoutingTest {
             // Insert a new card
             val body1 = cardRequest.copy(nextTimeAt = Clock.System.now() + 1.minutes)
             client.post("/v1/collections/$collectionId/cards/") {
-                header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                rawCookie(value = rawCookie)
                 bearerAuth(NOT_STRONG_TOKEN)
                 setBody(body1)
             }
@@ -1067,7 +1066,7 @@ class RoutingTest {
                 port = SERVER_PORT,
                 path = "/v1/collections/$collectionId/cards",
                 request = {
-                    header(key = COOKIE_REQUEST_PARAM_NAME, value = cookies0)
+                    rawCookie(value = rawCookie)
                     bearerAuth(NOT_STRONG_TOKEN)
                 }
             ) {
