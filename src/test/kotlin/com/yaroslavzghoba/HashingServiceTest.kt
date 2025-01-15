@@ -1,6 +1,7 @@
 package com.yaroslavzghoba
 
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
+import com.yaroslavzghoba.utils.testConfiguredApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

@@ -5,6 +5,7 @@ import com.yaroslavzghoba.mappers.toCollectionRequest
 import com.yaroslavzghoba.model.*
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
 import com.yaroslavzghoba.utils.AuthUtils
+import com.yaroslavzghoba.utils.testConfiguredApplication
 import io.ktor.client.call.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*

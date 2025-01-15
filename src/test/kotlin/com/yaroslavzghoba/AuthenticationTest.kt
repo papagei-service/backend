@@ -3,6 +3,7 @@ package com.yaroslavzghoba
 import com.yaroslavzghoba.model.InputCredentials
 import com.yaroslavzghoba.model.TokenRegistrationResponse
 import com.yaroslavzghoba.utils.rawCookie
+import com.yaroslavzghoba.utils.testConfiguredApplication
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*

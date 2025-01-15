@@ -3,6 +3,7 @@ package com.yaroslavzghoba
 import com.yaroslavzghoba.model.InputCredentials
 import com.yaroslavzghoba.model.User
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
+import com.yaroslavzghoba.utils.testConfiguredApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,5 +1,6 @@
-package com.yaroslavzghoba
+package com.yaroslavzghoba.utils
 
+import com.yaroslavzghoba.clearTestingDatabase
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
