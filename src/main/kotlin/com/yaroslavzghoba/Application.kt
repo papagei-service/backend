@@ -79,4 +79,5 @@ fun Application.module() {
     )
     configureSerialization()
     configureDatabase(dbConnectionConfig = dbConnectionConfig)
+    configureStatusPages()
 }
