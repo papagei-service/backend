@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.yaroslavzghoba"
-version = "0.9.2"
+version = "0.9.3"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -40,5 +40,4 @@ dependencies {
     testImplementation(libs.ktor.client.content.negotiation)
     testImplementation(libs.ktor.client.websockets)
     testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.mockk)
 }
