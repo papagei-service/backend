@@ -25,9 +25,8 @@ fun RouteHandlersProvider.V1.Collections.putCollection(
     }
 
     // Return 400 if the request body cannot be converted to a collection
-    val body = try {
-        call.receive<CardCollectionRequest>()
-    } catch (exception: ContentTransformationException) {
+    val body = runCatching { call.receive<CardCollectionRequest>() }.getOrNull()
+    if (body == null) {
         val message = mapOf("message" to "The request body cannot be converted to a collection")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@putCollectionHandler

@@ -6,7 +6,6 @@ import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
 import io.ktor.http.*
-import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -27,9 +26,8 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
     }
 
     // Return 400 if the request body cannot be converted to a collection
-    val body = try {
-        call.receive<CardCollectionRequest>()
-    } catch (exception: BadRequestException) {
+    val body = runCatching { call.receive<CardCollectionRequest>() }.getOrNull()
+    if (body == null) {
         val message = mapOf("message" to "The request body cannot be converted to a collection")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@postCollectionHandler

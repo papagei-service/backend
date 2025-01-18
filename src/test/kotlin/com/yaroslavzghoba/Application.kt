@@ -15,6 +15,7 @@ import com.yaroslavzghoba.security.jwt.JwtTokenServiceImpl
 import com.yaroslavzghoba.security.sessions.SessionsConfig
 import com.yaroslavzghoba.utils.KeyGeneratorImpl
 import io.ktor.server.application.*
+import io.ktor.server.routing.*
 
 private val Repository: Repository = RepositoryImpl(
     userStorage = UserStorageImpl(),
@@ -67,6 +68,14 @@ fun Application.testingModule() {
     )
     configureSerialization()
     configureDatabase(dbConnectionConfig = dbConnectionConfig)
+    configureStatusPages()
+
+    // Necessary to test the functionality of the StatusPages plugin
+    routing {
+        get(path = "/error") {
+            throw Exception()
+        }
+    }
 }
 
 /**

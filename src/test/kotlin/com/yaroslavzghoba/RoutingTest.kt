@@ -49,6 +49,15 @@ private val cardRequest = CardRequest(
 class RoutingTest {
 
     @Test
+    fun `Receive 500 status code during error on server side`() = testConfiguredApplication { client, _ ->
+        val response0 = client.get("/error")
+        assertEquals(
+            expected = HttpStatusCode.InternalServerError,
+            actual = response0.status
+        )
+    }
+
+    @Test
     fun `Do not insert a new collection if the request body is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         AuthUtils.registerUser(client, inputCredentials, NOT_STRONG_TOKEN)
