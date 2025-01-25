@@ -26,7 +26,7 @@ fun Application.configureRouting(
 ) {
     routing {
         authenticate("jwt-authentication", strategy = AuthenticationStrategy.Required) {
-            routingApiV1(
+            routeApiV1(
                 repository = repository,
                 hashingService = hashingService,
                 saltConfig = saltConfig,
@@ -49,7 +49,7 @@ fun Application.configureRouting(
     }
 }
 
-private fun Route.routingApiV1(
+private fun Route.routeApiV1(
     repository: Repository,
     hashingService: HashingService,
     saltConfig: PasswordSaltConfig,
