@@ -47,8 +47,11 @@ fun Application.testingModule() {
         maxLength = environment.config.property("security.hashing.salt-max-length").getString().toInt(),
     )
     val keyGenerator = KeyGeneratorImpl()
+
+    val dbUrlProtocol = environment.config.property("database.url-protocol").getString()
+    val dbUrl = environment.config.property("database.url").getString()
     val dbConnectionConfig = com.yaroslavzghoba.utils.DbConnectionConfig(
-        url = environment.config.property("database.url").getString(),
+        url = "$dbUrlProtocol://$dbUrl",
         user = environment.config.property("database.user").getString(),
         password = environment.config.property("database.password").getString(),
     )

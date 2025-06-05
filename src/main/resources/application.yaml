@@ -21,6 +21,7 @@ security:
     salt-max-length: 48
 
 database:
-  url: "jdbc:postgresql://localhost:5432/papagei-prod"
-  user: "papagei"
+  url-protocol: $DATABASE_URL_PROTOCOL
+  url: $DATABASE_URL
+  user: $USER_DATABASE_USERNAME
   password: $USER_DATABASE_PASSWORD
