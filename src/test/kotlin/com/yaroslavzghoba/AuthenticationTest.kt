@@ -2,6 +2,7 @@ package com.yaroslavzghoba
 
 import com.yaroslavzghoba.model.InputCredentials
 import com.yaroslavzghoba.model.TokenRegistrationResponse
+import com.yaroslavzghoba.utils.AuthUtils
 import com.yaroslavzghoba.utils.rawCookie
 import com.yaroslavzghoba.utils.testConfiguredApplication
 import io.ktor.client.call.*
@@ -9,11 +10,6 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-
-private const val STRONG_TOKEN =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvYXBpIiwiaXNzIjoiL2FwaS9yZWdpc3RlciIsInN0cm9uZyI6InRydWUiLCJpYXQiOjE3MjY4NTIzOTd9.WW2fj_gRrGD2I6BklSHIS03Q8hBUMUhHxX7jDIcKs-s"
-private const val NOT_STRONG_TOKEN =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvYXBpIiwiaXNzIjoiL2FwaS9yZWdpc3RlciIsInN0cm9uZyI6ImZhbHNlIiwiaWF0IjoxNzI2ODUyMzk3fQ.8Vfa3gaj7nY0Ov5Om5nJFcEs4RbFLaREc_89Fi2wv4U"
 
 class AuthenticationTest {
 
@@ -32,7 +28,7 @@ class AuthenticationTest {
     fun `Do not grand access to a resource protected by strong token auth with a pre-generated not strong token`() =
         testConfiguredApplication { client, _ ->
             val response0 = client.post("/register") {
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             }
 
             assertEquals(
@@ -45,7 +41,7 @@ class AuthenticationTest {
     fun `Grand access to a resource protected by strong token auth with the pre-generated strong token`() =
         testConfiguredApplication { client, _ ->
             val response0 = client.post("/register") {
-                bearerAuth(STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.STRONG_TOKEN)
             }
 
             assertEquals(
@@ -71,7 +67,7 @@ class AuthenticationTest {
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
             val response0 = client.post("/register") {
-                bearerAuth(STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.STRONG_TOKEN)
             }
             val basicToken = response0.body<TokenRegistrationResponse>().token
 
@@ -92,7 +88,7 @@ class AuthenticationTest {
             val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
             val response0 = client.post("/v1/account/register") {
-                bearerAuth(STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.STRONG_TOKEN)
                 setBody(inputCredentials)
             }
 
@@ -106,7 +102,7 @@ class AuthenticationTest {
     fun `Do not grant access to a session-protected resource without having any session`() =
         testConfiguredApplication { client, _ ->
             val response0 = client.get("/v1/account") {
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             }
 
             assertEquals(
@@ -120,7 +116,7 @@ class AuthenticationTest {
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         val response0 = client.post("/v1/account/login") {
-            bearerAuth(NOT_STRONG_TOKEN)
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
@@ -135,7 +131,7 @@ class AuthenticationTest {
         val inputCredentials = InputCredentials(username = " ", password = "qwerty")
 
         val response0 = client.post("/v1/account/register") {
-            bearerAuth(NOT_STRONG_TOKEN)
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
@@ -150,7 +146,7 @@ class AuthenticationTest {
         val inputCredentials = InputCredentials(username = "admin", password = " ")
 
         val response0 = client.post("/v1/account/register") {
-            bearerAuth(NOT_STRONG_TOKEN)
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
@@ -165,7 +161,7 @@ class AuthenticationTest {
         val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
 
         val response0 = client.post("/v1/account/register") {
-            bearerAuth(NOT_STRONG_TOKEN)
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
@@ -181,13 +177,13 @@ class AuthenticationTest {
 
         // Register the new user
         client.post("/v1/account/register") {
-            bearerAuth(NOT_STRONG_TOKEN)
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
         // Login the existing user with modified password
         val response0 = client.post("/v1/account/login") {
-            bearerAuth(NOT_STRONG_TOKEN)
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             setBody(inputCredentials.copy(password = "password"))
         }
 
@@ -203,13 +199,13 @@ class AuthenticationTest {
 
         // Register the new user
         client.post("/v1/account/register") {
-            bearerAuth(NOT_STRONG_TOKEN)
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
         // Login the existing user
         val response0 = client.post("/v1/account/login") {
-            bearerAuth(NOT_STRONG_TOKEN)
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             setBody(inputCredentials)
         }
 
@@ -226,13 +222,13 @@ class AuthenticationTest {
 
             // Register the new user
             client.post("/v1/account/register") {
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
 
             // Login the user and extract its cookie
             val response0 = client.post("/v1/account/login") {
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
             val rawCookie = response0.rawCookie()  // Contains the user's session id
@@ -240,7 +236,7 @@ class AuthenticationTest {
             // Get access to the session-protected resource
             val response1 = client.get("/v1/account") {
                 rawCookie(value = rawCookie)
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             }
 
             assertEquals(
@@ -256,13 +252,13 @@ class AuthenticationTest {
 
             // Register the new user
             client.post("/v1/account/register") {
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
 
             // Login the user and extract its cookie
             val response0 = client.post("/v1/account/login") {
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
             val rawCookie = response0.rawCookie()  // Contains the user's session
@@ -270,13 +266,13 @@ class AuthenticationTest {
             // Close the session on the server's side
             client.post("/v1/account/logout") {
                 rawCookie(value = rawCookie)
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             }
 
             // Try to get access to the session-protected resource after logout
             val response1 = client.get("/v1/account") {
                 rawCookie(value = rawCookie)
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             }
 
             assertEquals(
@@ -292,13 +288,13 @@ class AuthenticationTest {
 
             // Register the new user
             client.post("/v1/account/register") {
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
 
             // Login the user and extract its cookie
             val response0 = client.post("/v1/account/login") {
-                bearerAuth(NOT_STRONG_TOKEN)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
                 setBody(inputCredentials)
             }
             val cookies = response0.rawCookie()  // Contains the user's session
