@@ -21,7 +21,7 @@ security:
     salt-max-length: 48
 
 database:
-  url-protocol: $DATABASE_URL_PROTOCOL
-  url: $DATABASE_URL
-  user: $USER_DATABASE_USERNAME
-  password: $USER_DATABASE_PASSWORD
+  protocol: "jdbc:postgresql"
+  host: $PPG_TEST_DB_HOST
+  user: $PPG_TEST_DB_USER
+  password: $PPG_TEST_DB_PASSWORD

@@ -13,6 +13,7 @@ import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenServiceImpl
 import com.yaroslavzghoba.security.sessions.SessionsConfig
+import com.yaroslavzghoba.utils.DbConnectionConfig
 import com.yaroslavzghoba.utils.KeyGeneratorImpl
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
@@ -48,10 +49,10 @@ fun Application.testingModule() {
     )
     val keyGenerator = KeyGeneratorImpl()
 
-    val dbUrlProtocol = environment.config.property("database.url-protocol").getString()
-    val dbUrl = environment.config.property("database.url").getString()
-    val dbConnectionConfig = com.yaroslavzghoba.utils.DbConnectionConfig(
-        url = "$dbUrlProtocol://$dbUrl",
+    val dbProtocol = environment.config.property("database.protocol").getString()
+    val dbHost = environment.config.property("database.host").getString()
+    val dbConnectionConfig = DbConnectionConfig(
+        url = "$dbProtocol://$dbHost",
         user = environment.config.property("database.user").getString(),
         password = environment.config.property("database.password").getString(),
     )

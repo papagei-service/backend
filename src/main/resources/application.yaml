@@ -7,7 +7,7 @@ ktor:
 
 security:
   jwt:
-    secret: $JWT_SECRET_OF_PAPAGEI
+    secret: $PPG_JWT_SECRET
     issuer: "/api/register"
     audience: "/api"
     realm: "Access to the API"
@@ -15,13 +15,13 @@ security:
   sessions:
     lifetime-ms: 900000  # 15 min
   hashing:
-    pepper: $PEPPERED_SECRET_OF_PAPAGEI
+    pepper: $PPG_PEPPER
     algorithm: "SHA-512"
     salt-min-length: 32
     salt-max-length: 48
 
 database:
-  url-protocol: $DATABASE_URL_PROTOCOL
-  url: $DATABASE_URL
-  user: $USER_DATABASE_USERNAME
-  password: $USER_DATABASE_PASSWORD
+  protocol: "jdbc:postgresql"
+  host: $PPG_PROD_DB_HOST
+  user: $PPG_PROD_DB_USER
+  password: $PPG_PROD_DB_PASSWORD
