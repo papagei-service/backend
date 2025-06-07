@@ -22,6 +22,6 @@ security:
 
 database:
   protocol: "jdbc:postgresql"
-  host: $PPG_PROD_DB_HOST
+  host-with-path: $PPG_PROD_DB_HOST_WITH_PATH
   user: $PPG_PROD_DB_USER
   password: $PPG_PROD_DB_PASSWORD

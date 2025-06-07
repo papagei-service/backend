@@ -22,6 +22,6 @@ security:
 
 database:
   protocol: "jdbc:postgresql"
-  host: $PPG_TEST_DB_HOST
+  host-with-path: $PPG_TEST_DB_HOST_WITH_PATH
   user: $PPG_TEST_DB_USER
   password: $PPG_TEST_DB_PASSWORD

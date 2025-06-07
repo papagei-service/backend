@@ -51,9 +51,9 @@ fun Application.module() {
     val keyGenerator = KeyGeneratorImpl()
 
     val dbProtocol = environment.config.property("database.protocol").getString()
-    val dbHost = environment.config.property("database.host").getString()
+    val dbHostWithPath = environment.config.property("database.host-with-path").getString()
     val dbConnectionConfig = DbConnectionConfig(
-        url = "$dbProtocol://$dbHost",
+        url = "$dbProtocol://$dbHostWithPath",
         user = environment.config.property("database.user").getString(),
         password = environment.config.property("database.password").getString(),
     )
