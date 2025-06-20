@@ -25,6 +25,21 @@ interface CollectionStorage {
     suspend fun getByOwnerId(ownerId: Long): List<CardCollection>
 
     /**
+     * Get a list of collections that include the card with an identifier equal to [id].
+     *
+     * @param id The unique identifier of the card that belong to collections.
+     * @param limit The maximal number of collections those will be returned.
+     * @param offset Indicates how many cards should be skipped.
+     *
+     * @return A list of collections that include the corresponding card.
+     */
+    suspend fun getByCardId(
+        id: Long,
+        limit: Int,
+        offset: Long,
+    ): List<CardCollection>
+
+    /**
      * Try to insert a collection into the storage.
      *
      * @param collection A collection to be inserted into the storage.
@@ -56,4 +71,9 @@ interface CollectionStorage {
      * @param id The unique identifier of the collection that must be deleted.
      */
     suspend fun deleteById(id: Long)
+
+    /**
+     * Delete all collections from the storage that owned by the user with an identifier equal to [id].
+     */
+    suspend fun deleteByOwnerId(id: Long)
 }

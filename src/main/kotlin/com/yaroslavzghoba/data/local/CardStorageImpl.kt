@@ -1,8 +1,9 @@
 package com.yaroslavzghoba.data.local
 
 import com.yaroslavzghoba.data.local.dao.CardDao
-import com.yaroslavzghoba.data.local.dao.CollectionDao
+import com.yaroslavzghoba.data.local.dao.UserDao
 import com.yaroslavzghoba.data.local.tables.CardsTable
+import com.yaroslavzghoba.data.local.tables.CollectionsCardsTable
 import com.yaroslavzghoba.data.local.tables.CollectionsTable
 import com.yaroslavzghoba.data.mappers.toCard
 import com.yaroslavzghoba.data.model.CardStorage
@@ -28,7 +29,7 @@ class CardStorageImpl : CardStorage {
             .firstOrNull()
     }
 
-    override suspend fun getByCollectionId(
+    override suspend fun getByOwnerId(
         id: Long,
         sortByFirstPriority: CardSorting?,
         sortBySecondPriority: CardSorting?,
@@ -38,59 +39,82 @@ class CardStorageImpl : CardStorage {
     ): List<Card> = suspendTransaction {
         CardDao
             .find {
-                val baseCondition = CardsTable.collectionId eq id
+                val baseCondition = CardsTable.ownerId eq id
                 nextTimeBefore?.let {
-                    baseCondition and (CardsTable.nextTimeAt lessEq it)
+                    baseCondition and (CardsTable.showNextTimeAt lessEq it)
                 } ?: baseCondition
             }
             .apply {
                 val sorts = listOfNotNull(sortByFirstPriority, sortBySecondPriority)
                 orderBy(*sorts.toTypedArray())
             }
-            .limit(n = limit, offset = offset)
+            .limit(limit).offset(offset)
             .map { it.toCard() }
     }
 
+    override suspend fun getByCollectionId(
+        id: Long,
+        sortByFirstPriority: CardSorting?,
+        sortBySecondPriority: CardSorting?,
+        nextTimeBefore: Instant?,
+        limit: Int,
+        offset: Long
+    ): List<Card> = suspendTransaction {
+        val baseCondition = CollectionsCardsTable.collectionId eq id
+        val query = CardsTable.innerJoin(CollectionsCardsTable)
+            .select(CardsTable.columns)
+            .where {
+                nextTimeBefore?.let {
+                    baseCondition and (CardsTable.showNextTimeAt lessEq it)
+                } ?: baseCondition
+            }
+            .withDistinct()
+
+        CardDao.wrapRows(query)
+            .apply {
+                val sorts = listOfNotNull(sortByFirstPriority, sortBySecondPriority)
+                orderBy(*sorts.toTypedArray())
+            }
+            .limit(limit).offset(offset)
+            .toList().map { it.toCard() }
+    }
+
     override suspend fun insert(card: Card): Card = suspendTransaction {
-        // Get the parent collection of the card
-        val collection = CollectionDao
-            .find { CollectionsTable.id eq card.collectionId }
+        // Get the card owner
+        val owner = UserDao
+            .find { CollectionsTable.id eq card.ownerId }
             .firstOrNull()
-            ?: throw NoSuchElementException("Parent collection is not found in storage")
+            ?: throw NoSuchElementException("The card owner not found in storage")
 
         CardDao.new(id = card.id) {
-            nativeLanguageValue = card.nativeLanguageValue
-            nativeLanguageValueDescription = card.nativeLanguageValueDescription
-            nativeLanguageValueExample = card.nativeLanguageValueExample
-            foreignLanguageValue = card.foreignLanguageValue
-            foreignLanguageValueDescription = card.foreignLanguageValueDescription
-            foreignLanguageValueExample = card.foreignLanguageValueExample
-            nextTimeAt = card.nextTimeAt
+            knownLanguageText = card.knownLanguageText
+            learningLanguageText = card.learningLanguageText
+            notes = card.notes
+            lastAnsweredAt = card.lastAnsweredAt
+            showNextTimeAt = card.showNextTimeAt
             correctAnswersInRow = card.correctAnswersInRow
-            collectionId = collection
+            ownerId = owner
         }.toCard()
     }
 
     override suspend fun update(card: Card): Card = suspendTransaction {
         if (card.id == null)
-            throw IllegalArgumentException("The identifier of the card to be updated cannot be null")
+            throw IllegalArgumentException("The id of the card to be updated cannot be null")
 
-        // Get the parent collection of the card
-        val collection = CollectionDao
-            .find { CollectionsTable.id eq card.collectionId }
+        // Get the card owner
+        val owner = UserDao
+            .find { CollectionsTable.id eq card.ownerId }
             .firstOrNull()
-            ?: throw NoSuchElementException("Parent collection is not found in storage")
+            ?: throw NoSuchElementException("The card owner not found in storage")
 
         CardDao.findByIdAndUpdate(id = card.id) {
-            it.nativeLanguageValue = card.nativeLanguageValue
-            it.nativeLanguageValueDescription = card.nativeLanguageValueDescription
-            it.nativeLanguageValueExample = card.nativeLanguageValueExample
-            it.foreignLanguageValue = card.foreignLanguageValue
-            it.foreignLanguageValueDescription = card.foreignLanguageValueDescription
-            it.foreignLanguageValueExample = card.foreignLanguageValueExample
-            it.nextTimeAt = card.nextTimeAt
+            it.knownLanguageText = card.knownLanguageText
+            it.learningLanguageText = card.learningLanguageText
+            it.notes = card.notes
+            it.lastAnsweredAt = card.lastAnsweredAt
+            it.showNextTimeAt = card.showNextTimeAt
             it.correctAnswersInRow = card.correctAnswersInRow
-            it.collectionId = collection
+            it.ownerId = owner
         }?.toCard()
             ?: throw NoSuchElementException("Corresponding card is not found in storage")
     }
@@ -102,6 +126,12 @@ class CardStorageImpl : CardStorage {
     override suspend fun deleteById(id: Long): Unit = suspendTransaction {
         CardsTable.deleteWhere {
             CardsTable.id eq id
+        }
+    }
+
+    override suspend fun deleteByOwnerId(id: Long) {
+        CardsTable.deleteWhere {
+            CardsTable.ownerId eq id
         }
     }
 }
@@ -123,7 +153,7 @@ private fun SizedIterable<CardDao>.orderBy(vararg sorting: CardSorting): SizedIt
  * @return An expression consisting of the corresponding column.
  */
 private fun CardSortingColumn.toExpression(): Expression<*> = when (this) {
-    CardSortingColumn.NEXT_TIME_AT -> CardsTable.nextTimeAt
+    CardSortingColumn.SHOW_NEXT_TIME_AT -> CardsTable.showNextTimeAt
 }
 
 /**

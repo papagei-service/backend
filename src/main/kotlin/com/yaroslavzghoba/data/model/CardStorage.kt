@@ -18,9 +18,9 @@ interface CardStorage {
     suspend fun getById(id: Long): Card?
 
     /**
-     * Get a list of cards that belong to the card collection with an identifier equal to [id].
+     * Get a list of cards that owned by the user with an identifier equal to [id].
      *
-     * @param id Unique identifier of the collection to which the requested cards belong.
+     * @param id The unique identifier of the user to whom the cards belong.
      * @param sortByFirstPriority Options for the card sort that is performed first.
      * @param sortBySecondPriority Options for the card sort that is performed at the second stage
      * on cards with the same values in the column by which the first sort was performed.
@@ -28,15 +28,35 @@ interface CardStorage {
      * @param limit The maximal number of cards those will be returned.
      * @param offset Indicates how many cards should be skipped.
      *
-     * @return A list of cards that belong to the collection of cards with the [id] identifier.
+     * @return A list of cards that owned by the user with the [id] identifier.
+     */
+    suspend fun getByOwnerId(
+        id: Long,
+        sortByFirstPriority: CardSorting?,
+        sortBySecondPriority: CardSorting?,
+        nextTimeBefore: Instant?,
+        limit: Int,
+        offset: Long,
+    ): List<Card>
+
+    /**
+     * Get a list of cards included in the collection with an identifier equal to [id].
+     *
+     * @param id The unique identifier of the collection that include cards.
+     * @param sortByFirstPriority Options for the card sort that is performed first.
+     * @param sortBySecondPriority Options for the card sort that is performed at the second stage
+     * on cards with the same values in the column by which the first sort was performed.
+     * @param nextTimeBefore The moment of time ahead of the time of the next repetition of the card.
+     * @param limit The maximal number of cards those will be returned.
+     * @param offset Indicates how many cards should be skipped.
      */
     suspend fun getByCollectionId(
         id: Long,
-        sortByFirstPriority: CardSorting? = null,
-        sortBySecondPriority: CardSorting? = null,
-        nextTimeBefore: Instant? = null,
-        limit: Int = 20,
-        offset: Long = 0,
+        sortByFirstPriority: CardSorting?,
+        sortBySecondPriority: CardSorting?,
+        nextTimeBefore: Instant?,
+        limit: Int,
+        offset: Long,
     ): List<Card>
 
     /**
@@ -71,4 +91,9 @@ interface CardStorage {
      * @param id The unique identifier of the card that must be deleted.
      */
     suspend fun deleteById(id: Long)
+
+    /**
+     * Delete all cards from the storage that owned by the user with an identifier equal to [id].
+     */
+    suspend fun deleteByOwnerId(id: Long)
 }

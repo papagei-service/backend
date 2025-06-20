@@ -11,7 +11,7 @@ inline fun CollectionDao.toCardCollection() = CardCollection(
     id = this.id.value,
     title = this.title,
     description = this.description,
-    nativeLanguageISOCode = this.nativeLanguageISOCode,
-    foreignLanguageISOCode = this.foreignLanguageISOCode,
+    knownLanguage = this.knownLanguage,
+    learningLanguage = this.learningLanguage,
     ownerId = this.ownerId.id.value,
 )

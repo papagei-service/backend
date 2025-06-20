@@ -2,6 +2,7 @@ package com.yaroslavzghoba.data
 
 import com.yaroslavzghoba.data.model.CardStorage
 import com.yaroslavzghoba.data.model.CollectionStorage
+import com.yaroslavzghoba.data.model.ExampleStorage
 import com.yaroslavzghoba.data.model.UserStorage
 import com.yaroslavzghoba.model.*
 import kotlinx.datetime.Instant
@@ -13,6 +14,7 @@ class RepositoryImpl(
     private val userStorage: UserStorage,
     private val collectionStorage: CollectionStorage,
     private val cardStorage: CardStorage,
+    private val exampleStorage: ExampleStorage,
 ) : Repository {
 
     override suspend fun getUserById(id: Long): User? {
@@ -47,6 +49,16 @@ class RepositoryImpl(
         return collectionStorage.getByOwnerId(ownerId = ownerId)
     }
 
+    override suspend fun getCollectionsByCardId(
+        id: Long,
+        limit: Int,
+        offset: Long
+    ): List<CardCollection> = collectionStorage.getByCardId(
+        id = id,
+        limit = limit,
+        offset = offset,
+    )
+
     override suspend fun insertCollection(collection: CardCollection): CardCollection {
         return collectionStorage.insert(collection = collection)
     }
@@ -63,9 +75,29 @@ class RepositoryImpl(
         collectionStorage.deleteById(id = id)
     }
 
+    override suspend fun deleteCollectionsByOwnerId(id: Long) {
+        collectionStorage.deleteByOwnerId(id = id)
+    }
+
     override suspend fun getCardById(id: Long): Card? {
         return cardStorage.getById(id = id)
     }
+
+    override suspend fun getCardsByOwnerId(
+        id: Long,
+        sortByFirstPriority: CardSorting?,
+        sortBySecondPriority: CardSorting?,
+        nextTimeBefore: Instant?,
+        limit: Int,
+        offset: Long,
+    ): List<Card> = cardStorage.getByOwnerId(
+        id = id,
+        sortByFirstPriority = sortByFirstPriority,
+        sortBySecondPriority = sortBySecondPriority,
+        nextTimeBefore = nextTimeBefore,
+        limit = limit,
+        offset = offset,
+    )
 
     override suspend fun getCardsByCollectionId(
         id: Long,
@@ -73,7 +105,7 @@ class RepositoryImpl(
         sortBySecondPriority: CardSorting?,
         nextTimeBefore: Instant?,
         limit: Int,
-        offset: Long,
+        offset: Long
     ): List<Card> = cardStorage.getByCollectionId(
         id = id,
         sortByFirstPriority = sortByFirstPriority,
@@ -99,9 +131,49 @@ class RepositoryImpl(
         cardStorage.deleteById(id = id)
     }
 
+    override suspend fun deleteCardsByOwnerId(id: Long) {
+        cardStorage.deleteByOwnerId(id = id)
+    }
+
+    override suspend fun getExampleById(id: Long): Example? {
+        return exampleStorage.getById(id = id)
+    }
+
+    override suspend fun getExamplesByCardId(
+        id: Long,
+        limit: Int,
+        offset: Long,
+    ): List<Example> = exampleStorage.getByCardId(
+        id = id,
+        limit = limit,
+        offset = offset,
+    )
+
+    override suspend fun insertExample(example: Example): Example {
+        return exampleStorage.insert(example = example)
+    }
+
+    override suspend fun updateExample(example: Example): Example {
+        return exampleStorage.update(example = example)
+    }
+
+    override suspend fun deleteAllExamples() {
+        exampleStorage.deleteAll()
+    }
+
+    override suspend fun deleteExampleById(id: Long) {
+        exampleStorage.deleteById(id = id)
+    }
+
+    override suspend fun deleteExampleByCardId(id: Long) {
+        exampleStorage.deleteByCardId(id = id)
+    }
+
     override suspend fun clear() {
-        // It is important to delete from cards to users
-        // Since the user cannot be deleted while collections refer to him, and those while cards refer to them
+        // It is important to delete from examples to users
+        // Since the user cannot be deleted while collections/cards refer to him,
+        // and cards while examples refer to them
+        this.deleteAllExamples()
         this.deleteAllCards()
         this.deleteAllCollections()
         this.deleteAllUsers()

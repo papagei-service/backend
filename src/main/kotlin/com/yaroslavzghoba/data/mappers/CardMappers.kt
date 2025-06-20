@@ -9,13 +9,11 @@ import com.yaroslavzghoba.model.Card
 @Suppress("unused", "nothing_to_inline")
 inline fun CardDao.toCard() = Card(
     id = this.id.value,
-    nativeLanguageValue = this.nativeLanguageValue,
-    nativeLanguageValueDescription = this.nativeLanguageValueDescription,
-    nativeLanguageValueExample = this.nativeLanguageValueExample,
-    foreignLanguageValue = this.foreignLanguageValue,
-    foreignLanguageValueDescription = this.foreignLanguageValueDescription,
-    foreignLanguageValueExample = this.foreignLanguageValueExample,
-    nextTimeAt = this.nextTimeAt,
+    knownLanguageText = this.knownLanguageText,
+    learningLanguageText = this.learningLanguageText,
+    notes = this.notes,
+    lastAnsweredAt = this.lastAnsweredAt,
+    showNextTimeAt = this.showNextTimeAt,
     correctAnswersInRow = this.correctAnswersInRow,
-    collectionId = this.collectionId.id.value,
+    ownerId = this.ownerId.id.value,
 )

@@ -75,6 +75,21 @@ interface Repository {
     suspend fun getCollectionsByOwnerId(ownerId: Long): List<CardCollection>
 
     /**
+     * Get a list of collections that include the card with an identifier equal to [id].
+     *
+     * @param id The unique identifier of the card that belong to collections.
+     * @param limit The maximal number of collections those will be returned.
+     * @param offset Indicates how many cards should be skipped.
+     *
+     * @return A list of collections that include the corresponding card.
+     */
+    suspend fun getCollectionsByCardId(
+        id: Long,
+        limit: Int,
+        offset: Long,
+    ): List<CardCollection>
+
+    /**
      * Try to insert a collection into the storage.
      *
      * @param collection A card collection to be inserted into the storage.
@@ -107,6 +122,11 @@ interface Repository {
     suspend fun deleteCollectionById(id: Long)
 
     /**
+     * Delete all card collections from the storage that owned by the user with an identifier equal to [id].
+     */
+    suspend fun deleteCollectionsByOwnerId(id: Long)
+
+    /**
      * Get a card by its [id].
      *
      * @param id The unique identifier of the card by which the search is performed.
@@ -115,9 +135,9 @@ interface Repository {
     suspend fun getCardById(id: Long): Card?
 
     /**
-     * Get a list of cards that belong to the card collection with an identifier equal to [id].
+     * Get a list of cards that owned by the user with an identifier equal to [id].
      *
-     * @param id Unique identifier of the collection to which the requested cards belong.
+     * @param id Unique identifier of the user that own the requested cards.
      * @param sortByFirstPriority Options for the card sort that is performed first.
      * @param sortBySecondPriority Options for the card sort that is performed at the second stage
      * on cards with the same values in the column by which the first sort was performed.
@@ -125,15 +145,35 @@ interface Repository {
      * @param limit The maximal number of cards those will be returned.
      * @param offset Indicates how many cards should be skipped.
      *
-     * @return A list of cards that belong to the collection of cards with the [id] identifier.
+     * @return A list of cards that owned by the user with the [id] identifier.
      */
-    suspend fun getCardsByCollectionId(
+    suspend fun getCardsByOwnerId(
         id: Long,
         sortByFirstPriority: CardSorting? = null,
         sortBySecondPriority: CardSorting? = null,
         nextTimeBefore: Instant? = null,
         limit: Int = 20,
         offset: Long = 0,
+    ): List<Card>
+
+    /**
+     * Get a list of cards included in the collection with an identifier equal to [id].
+     *
+     * @param id The unique identifier of the collection that include cards.
+     * @param sortByFirstPriority Options for the card sort that is performed first.
+     * @param sortBySecondPriority Options for the card sort that is performed at the second stage
+     * on cards with the same values in the column by which the first sort was performed.
+     * @param nextTimeBefore The moment of time ahead of the time of the next repetition of the card.
+     * @param limit The maximal number of cards those will be returned.
+     * @param offset Indicates how many cards should be skipped.
+     */
+    suspend fun getCardsByCollectionId(
+        id: Long,
+        sortByFirstPriority: CardSorting?,
+        sortBySecondPriority: CardSorting?,
+        nextTimeBefore: Instant?,
+        limit: Int,
+        offset: Long,
     ): List<Card>
 
     /**
@@ -168,6 +208,70 @@ interface Repository {
      * @param id The unique identifier of the card that must be deleted.
      */
     suspend fun deleteCardById(id: Long)
+
+    /**
+     * Delete all cards from the storage that owned by the user with an identifier equal to [id].
+     */
+    suspend fun deleteCardsByOwnerId(id: Long)
+
+    /**
+     * Get an example by its [id].
+     *
+     * @param id The unique identifier of the example by which the search is performed.
+     * @return The example with the corresponding identifiers or null if not found.
+     */
+    suspend fun getExampleById(id: Long): Example?
+
+    /**
+     * Get a list of examples that belong to the card with an identifier equal to [id].
+     *
+     * @param id The unique identifier of the card to which the examples belong.
+     * @param limit The maximal number of examples those will be returned.
+     * @param offset Indicates how many examples should be skipped.
+     *
+     * @return A list of examples that belong to the card with the [id] identifier.
+     */
+    suspend fun getExamplesByCardId(id: Long, limit: Int, offset: Long): List<Example>
+
+    /**
+     * Try to insert an example into the storage.
+     *
+     * @param example An example to be inserted into the storage.
+     * @return Inserted example.
+     *
+     * @throws NoSuchElementException If the card to which the example belongs is not found in the storage.
+     */
+    suspend fun insertExample(example: Example): Example
+
+    /**
+     * Try to update the example in the storage.
+     *
+     * @param example The example that must be updated.
+     * @return Updated example.
+     *
+     * @throws IllegalArgumentException If the identifier of the passed example is null.
+     * @throws NoSuchElementException If the parent card is not found in the storage.
+     */
+    suspend fun updateExample(example: Example): Example
+
+    /**
+     * Delete all examples from the storage.
+     */
+    suspend fun deleteAllExamples()
+
+    /**
+     * Delete the example from the storage by its [id].
+     *
+     * @param id The unique identifier of the example that must be deleted.
+     */
+    suspend fun deleteExampleById(id: Long)
+
+    /**
+     * Delete all examples from the storage that belong to the card with an identifier equal to [id].
+     *
+     * @param id The unique identifier of the card to which examples belong.
+     */
+    suspend fun deleteExampleByCardId(id: Long)
 
     /**
      * Clear all rows in all storage tables.

@@ -8,5 +8,5 @@ enum class CardSortingColumn {
     /**
      * Time of the next repetition.
      */
-    NEXT_TIME_AT,
+    SHOW_NEXT_TIME_AT,
 }

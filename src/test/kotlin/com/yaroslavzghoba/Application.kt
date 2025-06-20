@@ -1,10 +1,7 @@
 package com.yaroslavzghoba
 
 import com.yaroslavzghoba.data.RepositoryImpl
-import com.yaroslavzghoba.data.local.CardStorageImpl
-import com.yaroslavzghoba.data.local.CollectionStorageImpl
-import com.yaroslavzghoba.data.local.UserSessionStorage
-import com.yaroslavzghoba.data.local.UserStorageImpl
+import com.yaroslavzghoba.data.local.*
 import com.yaroslavzghoba.data.model.PurgeableSessionStorage
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.plugins.*
@@ -15,6 +12,7 @@ import com.yaroslavzghoba.security.jwt.JwtTokenServiceImpl
 import com.yaroslavzghoba.security.sessions.SessionsConfig
 import com.yaroslavzghoba.utils.DbConnectionConfig
 import com.yaroslavzghoba.utils.KeyGeneratorImpl
+import com.yaroslavzghoba.utils.connectDatabase
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 
@@ -22,6 +20,7 @@ private val Repository: Repository = RepositoryImpl(
     userStorage = UserStorageImpl(),
     collectionStorage = CollectionStorageImpl(),
     cardStorage = CardStorageImpl(),
+    exampleStorage = ExampleStorageImpl(),
 )
 private val SessionStorage: PurgeableSessionStorage = UserSessionStorage()
 
@@ -71,7 +70,7 @@ fun Application.testingModule() {
         keyGenerator = keyGenerator,
     )
     configureSerialization()
-    configureDatabase(dbConnectionConfig = dbConnectionConfig)
+    connectDatabase(dbConnectionConfig = dbConnectionConfig)
     configureStatusPages()
 
     // Necessary to test the functionality of the StatusPages plugin

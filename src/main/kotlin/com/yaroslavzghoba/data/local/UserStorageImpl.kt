@@ -32,6 +32,7 @@ class UserStorageImpl : UserStorage {
     override suspend fun insert(user: User): User = suspendTransaction {
         UserDao.new(id = user.id) {
             username = user.username
+            displayName = user.displayName
             hashedPassword = user.hashedPassword
             salt = user.salt
         }.toUser()
@@ -43,6 +44,7 @@ class UserStorageImpl : UserStorage {
 
         UserDao.findByIdAndUpdate(id = user.id) {
             it.username = user.username
+            it.displayName = user.displayName
             it.hashedPassword = user.hashedPassword
             it.salt = user.salt
         }?.toUser()

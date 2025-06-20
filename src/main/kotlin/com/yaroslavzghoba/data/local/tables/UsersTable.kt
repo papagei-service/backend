@@ -9,5 +9,6 @@ object UsersTable : LongIdTable(name = "users", columnName = "id") {
 
     val username = varchar(name = "username", length = 64)
     val hashedPassword = varchar(name = "hashed_password", length = 128)
+    val displayName = varchar(name = "display_name", length = 48)
     val salt = varchar(name = "salt", length = 64)
 }

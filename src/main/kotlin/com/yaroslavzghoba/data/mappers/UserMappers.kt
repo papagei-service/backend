@@ -10,6 +10,7 @@ import com.yaroslavzghoba.model.User
 inline fun UserDao.toUser() = User(
     id = this.id.value,
     username = this.username,
+    displayName = this.displayName,
     hashedPassword = this.hashedPassword,
     salt = this.salt,
 )

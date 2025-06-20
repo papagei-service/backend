@@ -7,17 +7,15 @@ import com.yaroslavzghoba.model.CardRequest
  * Converts an instance of the [CardRequest] class to an instance of the [Card] class.
  */
 @Suppress("unused", "nothing_to_inline")
-inline fun CardRequest.toCard(collectionId: Long) = Card(
+inline fun CardRequest.toCard(ownerId: Long) = Card(
     id = this.id,
-    nativeLanguageValue = this.nativeLanguageValue,
-    nativeLanguageValueDescription = this.nativeLanguageValueDescription,
-    nativeLanguageValueExample = this.nativeLanguageValueExample,
-    foreignLanguageValue = this.foreignLanguageValue,
-    foreignLanguageValueDescription = this.foreignLanguageValueDescription,
-    foreignLanguageValueExample = this.foreignLanguageValueExample,
-    nextTimeAt = this.nextTimeAt,
+    knownLanguageText = this.knownLanguageText,
+    learningLanguageText = this.learningLanguageText,
+    notes = this.notes,
+    lastAnsweredAt = this.lastAnsweredAt,
+    showNextTimeAt = this.showNextTimeAt,
     correctAnswersInRow = this.correctAnswersInRow,
-    collectionId = collectionId,
+    ownerId = ownerId,
 )
 
 /**
@@ -26,12 +24,10 @@ inline fun CardRequest.toCard(collectionId: Long) = Card(
 @Suppress("unused", "nothing_to_inline")
 inline fun Card.toCardRequest() = CardRequest(
     id = this.id,
-    nativeLanguageValue = this.nativeLanguageValue,
-    nativeLanguageValueDescription = this.nativeLanguageValueDescription,
-    nativeLanguageValueExample = this.nativeLanguageValueExample,
-    foreignLanguageValue = this.foreignLanguageValue,
-    foreignLanguageValueDescription = this.foreignLanguageValueDescription,
-    foreignLanguageValueExample = this.foreignLanguageValueExample,
-    nextTimeAt = this.nextTimeAt,
+    knownLanguageText = this.knownLanguageText,
+    learningLanguageText = this.learningLanguageText,
+    notes = this.notes,
+    lastAnsweredAt = this.lastAnsweredAt,
+    showNextTimeAt = this.showNextTimeAt,
     correctAnswersInRow = this.correctAnswersInRow,
 )

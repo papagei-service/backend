@@ -9,6 +9,7 @@ class UserDao(id: EntityID<Long>) : LongEntity(id = id) {
     companion object : LongEntityClass<UserDao>(UsersTable)
 
     var username by UsersTable.username
+    var displayName by UsersTable.displayName
     var hashedPassword by UsersTable.hashedPassword
     var salt by UsersTable.salt
 }

@@ -9,13 +9,11 @@ import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
  */
 object CardsTable : LongIdTable(name = "cards", columnName = "id") {
 
-    val nativeLanguageValue = text(name = "native_language_value")
-    val nativeLanguageValueDescription = text(name = "native_language_value_description").nullable()
-    val nativeLanguageValueExample = text(name = "native_language_value_example").nullable()
-    val foreignLanguageValue = text(name = "foreign_language_value")
-    val foreignLanguageValueDescription = text(name = "foreign_language_value_description").nullable()
-    val foreignLanguageValueExample = text(name = "foreign_language_value_example").nullable()
-    val nextTimeAt = timestamp(name = "next_time_at").default(Clock.System.now())
-    val correctAnswersInRow = integer(name = "correct_answers_in_row")
-    val collectionId = reference(name = "collection_id", foreign = CollectionsTable)
+    val knowsLanguageText = text(name = "known_language_text")
+    val learningLanguageText = text(name = "learning_language_text")
+    val notes = text(name = "notes").nullable()
+    val lastAnsweredAt = timestamp(name = "last_answered_at").nullable()
+    val showNextTimeAt = timestamp(name = "show_next_time_at").nullable().default(Clock.System.now())
+    val correctAnswersInRow = integer(name = "correct_answers_in_row").default(0)
+    val ownerId = reference(name = "owner_id", foreign = UsersTable)
 }

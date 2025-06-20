@@ -9,14 +9,14 @@ import kotlinx.serialization.Serializable
  * @param id A unique collection identifier.
  * @param title Title of the card collection.
  * @param description Description of the card collection.
- * @param nativeLanguageISOCode An ISO code of a language the user understands.
- * @param foreignLanguageISOCode An ISO code of a language the user wants to learn.
+ * @param knownLanguage An ISO code of a language the user understands.
+ * @param learningLanguage An ISO code of a language the user wants to learn.
  */
 @Serializable
 data class CardCollectionRequest(
     @SerialName("id") val id: Long?,
     @SerialName("title") val title: String,
     @SerialName("description") val description: String?,
-    @SerialName("native_language_iso_639_1") val nativeLanguageISOCode: String?,
-    @SerialName("foreign_language_iso_639_1") val foreignLanguageISOCode: String?,
+    @SerialName("native_language") val knownLanguage: String?,
+    @SerialName("learning_language") val learningLanguage: String?,
 )

@@ -1,10 +1,7 @@
 package com.yaroslavzghoba
 
 import com.yaroslavzghoba.data.RepositoryImpl
-import com.yaroslavzghoba.data.local.CardStorageImpl
-import com.yaroslavzghoba.data.local.CollectionStorageImpl
-import com.yaroslavzghoba.data.local.UserSessionStorage
-import com.yaroslavzghoba.data.local.UserStorageImpl
+import com.yaroslavzghoba.data.local.*
 import com.yaroslavzghoba.plugins.*
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
 import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
@@ -13,6 +10,7 @@ import com.yaroslavzghoba.security.jwt.JwtTokenServiceImpl
 import com.yaroslavzghoba.security.sessions.SessionsConfig
 import com.yaroslavzghoba.utils.DbConnectionConfig
 import com.yaroslavzghoba.utils.KeyGeneratorImpl
+import com.yaroslavzghoba.utils.connectDatabase
 import com.yaroslavzghoba.utils.generateAndSaveStrongTokens
 import io.ktor.server.application.*
 import kotlinx.coroutines.launch
@@ -27,6 +25,7 @@ fun Application.module() {
         userStorage = UserStorageImpl(),
         collectionStorage = CollectionStorageImpl(),
         cardStorage = CardStorageImpl(),
+        exampleStorage = ExampleStorageImpl(),
     )
     val jwtTokenConfig = JwtTokenConfig(
         secret = environment.config.property("security.jwt.secret").getString(),
@@ -81,6 +80,6 @@ fun Application.module() {
         keyGenerator = keyGenerator,
     )
     configureSerialization()
-    configureDatabase(dbConnectionConfig = dbConnectionConfig)
+    connectDatabase(dbConnectionConfig = dbConnectionConfig)
     configureStatusPages()
 }

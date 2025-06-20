@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
  *
  * @param id A unique identifier of the user's account that cannot be changed.
  * @param username A unique identifier of the user's account that can be changed.
+ * @param displayName A username, but not unique. Intended for display purposes.
  * @param hashedPassword The value of the hash of the user's password structure, its [salt] and the paper.
  * @param salt A special code that is added to a user's password when it is hashed.
  */
@@ -17,19 +18,20 @@ import kotlinx.serialization.Serializable
 data class User(
     @SerialName("id") val id: Long?,
     @SerialName("username") val username: String,
+    @SerialName("display_name") val displayName: String,
     @SerialName("hashed_password") val hashedPassword: String,
     @SerialName("salt") val salt: String,
 ) {
     /**
-     * Instance builder of the [User] class. Used when signing up new users in the system
+     * Instance builder of the [User] class. Used when registering new users in the system.
      *
-     * @param inputCredentials Credentials for further sign in.
+     * @param registrationCredentials Registration credentials provided by the user for registration.
      * @param hashingService Service for password hashing.
      *
      * @sample userBuildingSample
      */
     class Builder(
-        private val inputCredentials: InputCredentials,
+        private val registrationCredentials: RegistrationCredentials,
         private val hashingService: HashingService,
     ) {
         private var _salt: String = ""
@@ -49,9 +51,10 @@ data class User(
          */
         fun build() = User(
             id = null,
-            username = inputCredentials.username,
+            username = registrationCredentials.username,
+            displayName = registrationCredentials.displayName,
             hashedPassword = hashingService
-                .hash(password = inputCredentials.password, salt = _salt),
+                .hash(password = registrationCredentials.password, salt = _salt),
             salt = _salt,
         )
     }
@@ -60,10 +63,12 @@ data class User(
 /**
  * An example of using the [User.Builder] of instances of the [User] class.
  */
+@Suppress("unused")
 private fun userBuildingSample() {
-    val inputCredentials = InputCredentials(username = "admin", password = "qwerty")
+    val registrationCredentials =
+        RegistrationCredentials(username = "admin", displayName = "Admin", password = "qwerty")
     val hashingService = HashingServiceImpl(pepper = "pepper", algorithm = "SHA-512")
-    val user = User.Builder(inputCredentials = inputCredentials, hashingService = hashingService)
+    val user = User.Builder(registrationCredentials = registrationCredentials, hashingService = hashingService)
         .withSalt(salt = "salt")
         .build()
     // Do something really useful with it

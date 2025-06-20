@@ -11,8 +11,8 @@ inline fun CardCollectionRequest.toCardCollection(ownerId: Long) = CardCollectio
     id = this.id,
     title = this.title,
     description = this.description,
-    nativeLanguageISOCode = this.nativeLanguageISOCode,
-    foreignLanguageISOCode = this.foreignLanguageISOCode,
+    knownLanguage = this.knownLanguage,
+    learningLanguage = this.learningLanguage,
     ownerId = ownerId,
 )
 
@@ -24,6 +24,6 @@ inline fun CardCollection.toCollectionRequest() = CardCollectionRequest(
     id = this.id,
     title = this.title,
     description = this.description,
-    nativeLanguageISOCode = this.nativeLanguageISOCode,
-    foreignLanguageISOCode = this.foreignLanguageISOCode,
+    knownLanguage = this.knownLanguage,
+    learningLanguage = this.learningLanguage,
 )
