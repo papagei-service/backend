@@ -29,6 +29,12 @@ fun RouteHandlersProvider.V1.Cards.getCards(
         return@getCardsHandler
     }
 
-    val cards = repository.getCardsByOwnerId(id = correspondingUser.id!!)
+    // Search cards by collection id if it passed
+    val collectionId = call.request.queryParameters["collection_id"]?.toLongOrNull()
+    val cards = if (collectionId != null) {
+        repository.getCardsByCollectionId(id = collectionId, limit = 10, offset = 0)
+    } else {
+        repository.getCardsByOwnerId(id = session.userId)
+    }
     call.respond(status = HttpStatusCode.OK, message = cards)
 }
