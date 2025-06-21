@@ -1,6 +1,7 @@
 package com.yaroslavzghoba.utils
 
-import com.yaroslavzghoba.model.InputCredentials
+import com.yaroslavzghoba.model.LoginCredentials
+import com.yaroslavzghoba.model.RegistrationCredentials
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -8,31 +9,31 @@ import io.ktor.http.*
 
 object AuthUtils {
     const val STRONG_TOKEN =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvYXBpIiwiaXNzIjoiL2FwaS9yZWdpc3RlciIsInN0cm9uZyI6InRydWUiLCJpYXQiOjE3MjY4NTIzOTd9.WW2fj_gRrGD2I6BklSHIS03Q8hBUMUhHxX7jDIcKs-s"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvdjEiLCJpc3MiOiIvdjEvdG9rZW4iLCJzdHJvbmciOiJ0cnVlIiwiaWF0IjoxNzUwNTQwMTg0fQ.3TaS_csDP-nLM6obI84oUw6YzXq7pwB1umyx_ivc-3M"
     const val NOT_STRONG_TOKEN =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvYXBpIiwiaXNzIjoiL2FwaS9yZWdpc3RlciIsInN0cm9uZyI6ImZhbHNlIiwiaWF0IjoxNzI2ODUyMzk3fQ.8Vfa3gaj7nY0Ov5Om5nJFcEs4RbFLaREc_89Fi2wv4U"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvdjEiLCJpc3MiOiIvdjEvdG9rZW4iLCJzdHJvbmciOiJmYWxzZSIsImlhdCI6MTc1MDU0MDE4NH0.fwPG0GsqTVsiL4I9-zu8rC528mQf3tvVqQTXFgpN9Iw"
 
     suspend fun registerUser(
         client: HttpClient,
-        inputCredentials: InputCredentials,
+        registrationCredentials: RegistrationCredentials,
         token: String,
     ) {
         client.post("/v1/account/register") {
             contentType(ContentType.Application.Json)
             bearerAuth(token)
-            setBody(inputCredentials)
+            setBody(registrationCredentials)
         }
     }
 
     suspend fun loginUser(
         client: HttpClient,
-        inputCredentials: InputCredentials,
+        loginCredentials: LoginCredentials,
         token: String,
     ): HttpResponse {
         return client.post("/v1/account/login") {
             contentType(ContentType.Application.Json)
             bearerAuth(token)
-            setBody(inputCredentials)
+            setBody(loginCredentials)
         }
     }
 }

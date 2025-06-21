@@ -1,17 +1,13 @@
 package com.yaroslavzghoba
 
-import com.yaroslavzghoba.model.InputCredentials
 import com.yaroslavzghoba.model.User
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
+import com.yaroslavzghoba.utils.TestData
 import com.yaroslavzghoba.utils.testConfiguredApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class UserBuildingTest {
-
-    private val inputCredentials =
-        InputCredentials(username = "yaroslav", password = "qwerty")
-    private val salt = "89#vaQ1!PG*LqI!8z"
 
     @Test
     fun `The builder does not distort the data`() = testConfiguredApplication { _, applicationConfig ->
@@ -19,12 +15,22 @@ class UserBuildingTest {
         val algorithm = applicationConfig.property("security.hashing.algorithm").getString()
         val hashingService = HashingServiceImpl(pepper = pepper, algorithm = algorithm)
 
-        val builtUser = User.Builder(inputCredentials = inputCredentials, hashingService = hashingService)
+        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val salt = TestData.FIRST_SALT
+        // Building a user using `User` class
+        val builtUser = User.Builder(registrationCredentials = registrationCredentials, hashingService = hashingService)
             .withSalt(salt = salt)
             .build()
+        // Creating a user independently
         val hashedPassword = hashingService
-            .hash(password = inputCredentials.password, salt = salt)
-        val user = User(id = null, username = inputCredentials.username, hashedPassword = hashedPassword, salt = salt)
+            .hash(password = registrationCredentials.password, salt = salt)
+        val user = User(
+            id = null,
+            username = registrationCredentials.username,
+            displayName = registrationCredentials.displayName,
+            hashedPassword = hashedPassword,
+            salt = salt
+        )
 
         assertEquals(user.toString(), builtUser.toString())
     }

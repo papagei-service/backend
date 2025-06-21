@@ -23,7 +23,7 @@ fun RouteHandlersProvider.getToken(
     // Generate a JWT token
     val claims = jwtTokenConfig.claims.toMutableList().apply {
         removeIf { it.key in listOf(Constants.STRONG_TOKEN_CLAIM_KEY, Constants.OWNER_TOKEN_CLAIM_KEY) }
-        add(JwtTokenClaim(key = Constants.STRONG_TOKEN_CLAIM_KEY, value = true))
+        add(JwtTokenClaim(key = Constants.STRONG_TOKEN_CLAIM_KEY, value = false))
         if (session != null)
             add(JwtTokenClaim(key = Constants.OWNER_TOKEN_CLAIM_KEY, value = session.userId))
     }

@@ -1,0 +1,38 @@
+package com.yaroslavzghoba.utils
+
+import com.yaroslavzghoba.security.jwt.JwtTokenClaim
+import com.yaroslavzghoba.security.jwt.JwtTokenConfig
+import com.yaroslavzghoba.security.jwt.JwtTokenService
+import io.ktor.util.logging.KtorSimpleLogger
+
+private val LOGGER = KtorSimpleLogger("com.yaroslavzghoba.utils")
+
+@Suppress("unused")
+fun generateTokens(
+    jwtTokenConfig: JwtTokenConfig,
+    jwtTokenService: JwtTokenService,
+) {
+    val tokens = listOf(true, false).associateWith { strong ->
+        generateToken(
+            strong = strong,
+            jwtTokenConfig = jwtTokenConfig,
+            jwtTokenService = jwtTokenService,
+        )
+    }
+
+    LOGGER.info("Strong token: ${tokens[true]}")
+    LOGGER.info("Not strong token: ${tokens[false]}")
+}
+
+private fun generateToken(
+    strong: Boolean,
+    jwtTokenConfig: JwtTokenConfig,
+    jwtTokenService: JwtTokenService,
+): String {
+    val claims = jwtTokenConfig.claims.toMutableList().apply {
+        removeIf { it.key in listOf(Constants.STRONG_TOKEN_CLAIM_KEY, Constants.OWNER_TOKEN_CLAIM_KEY) }
+        add(JwtTokenClaim(key = Constants.STRONG_TOKEN_CLAIM_KEY, value = strong))
+    }
+    val config = jwtTokenConfig.copy(claims = claims)
+    return jwtTokenService.generate(config = config)
+}

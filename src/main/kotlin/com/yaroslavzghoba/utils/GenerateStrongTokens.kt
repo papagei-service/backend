@@ -3,8 +3,11 @@ package com.yaroslavzghoba.utils
 import com.yaroslavzghoba.security.jwt.JwtTokenClaim
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenService
+import io.ktor.util.logging.KtorSimpleLogger
 import kotlinx.coroutines.delay
 import java.io.File
+
+private val LOGGER = KtorSimpleLogger("com.yaroslavzghoba.utils")
 
 /**
  * Generate the [tokensAmount] number of JWT tokens with the highest permissions and
@@ -34,6 +37,11 @@ suspend fun generateAndSaveStrongTokens(
         strongTokens = strongTokens,
         filename = filename,
     )
+
+    val usePluralForm = tokensAmount == 0 || 1 < tokensAmount
+    val message = "$tokensAmount strong ${if (usePluralForm) "tokens were" else "token was"} generated " +
+            "and saved to the “${filename}” file."
+    LOGGER.info(message)
 }
 
 private suspend inline fun generateStrongTokens(
@@ -60,7 +68,7 @@ private inline fun saveStrongTokensToFile(strongTokens: List<String>, filename: 
         .mapIndexed { index, token -> "${index + 1}. $token" }
         .joinToString(
             separator = "\n",
-            prefix = "# Strong Access Tokens\n\n",
+            prefix = "# \uD83D\uDD11 Strong Access Tokens\n\n",
         )
     File(filename).writeText(content)
 }

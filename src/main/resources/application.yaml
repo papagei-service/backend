@@ -8,8 +8,8 @@ ktor:
 security:
   jwt:
     secret: $PPG_JWT_SECRET
-    issuer: "/register"
-    audience: "/"
+    issuer: "/v1/token"
+    audience: "/v1"
     realm: "Access to the API"
     lifetime-ms: 900000  # 15 min
   sessions:

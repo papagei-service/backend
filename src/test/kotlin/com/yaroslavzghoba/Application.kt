@@ -13,6 +13,7 @@ import com.yaroslavzghoba.security.sessions.SessionsConfig
 import com.yaroslavzghoba.utils.DbConnectionConfig
 import com.yaroslavzghoba.utils.KeyGeneratorImpl
 import com.yaroslavzghoba.utils.connectDatabase
+// import com.yaroslavzghoba.utils.generateTokens
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 
@@ -55,6 +56,12 @@ fun Application.testingModule() {
         user = environment.config.property("database.user").getString(),
         password = environment.config.property("database.password").getString(),
     )
+
+    // Generate test access tokens and print them to console
+    // generateTokens(
+    //     jwtTokenConfig = jwtTokenConfig.copy(lifetimeMs = null),
+    //     jwtTokenService = jwtTokenService,
+    // )
 
     configureAuthentication(
         jwtTokenConfig = jwtTokenConfig,
