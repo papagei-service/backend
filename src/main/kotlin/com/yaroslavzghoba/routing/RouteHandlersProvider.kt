@@ -11,6 +11,11 @@ object RouteHandlersProvider {
 
         object Collections
 
-        object Cards
+        object Cards {
+
+            object Examples
+        }
+
+        object Examples
     }
 }

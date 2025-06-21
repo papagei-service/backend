@@ -2,15 +2,15 @@ package com.yaroslavzghoba.plugins
 
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
-import com.yaroslavzghoba.routing.v1.getToken
-import com.yaroslavzghoba.routing.v1.collections.*
 import com.yaroslavzghoba.routing.v1.account.*
-import com.yaroslavzghoba.routing.v1.cards.deleteCard
-import com.yaroslavzghoba.routing.v1.cards.getCardById
-import com.yaroslavzghoba.routing.v1.cards.getCards
-import com.yaroslavzghoba.routing.v1.cards.postCard
-import com.yaroslavzghoba.routing.v1.cards.putCard
-import com.yaroslavzghoba.routing.v1.cards.webSocketCards
+import com.yaroslavzghoba.routing.v1.cards.*
+import com.yaroslavzghoba.routing.v1.cards.examples.getExamples
+import com.yaroslavzghoba.routing.v1.cards.examples.postExample
+import com.yaroslavzghoba.routing.v1.collections.*
+import com.yaroslavzghoba.routing.v1.examples.deleteExample
+import com.yaroslavzghoba.routing.v1.examples.getExampleById
+import com.yaroslavzghoba.routing.v1.examples.putExample
+import com.yaroslavzghoba.routing.v1.getToken
 import com.yaroslavzghoba.security.hashing.HashingService
 import com.yaroslavzghoba.security.hashing.PasswordSaltConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
@@ -148,6 +148,32 @@ private fun Route.handleRoutingV1(
                 path = "/{card_id}",
                 body = RouteHandlersProvider.V1.Cards
                     .deleteCard(repository = repository)
+            )
+
+            route(path = "/{card_id}/examples") {
+                get(
+                    body = RouteHandlersProvider.V1.Cards.Examples
+                        .getExamples(repository = repository)
+                )
+                post(
+                    body = RouteHandlersProvider.V1.Cards.Examples
+                        .postExample(repository = repository)
+                )
+            }
+        }
+
+        route(path = "/examples") {
+            get(
+                path = "/{example_id}",
+                body = RouteHandlersProvider.V1.Examples.getExampleById(repository = repository),
+            )
+            put(
+                path = "/{example_id}",
+                body = RouteHandlersProvider.V1.Examples.putExample(repository = repository),
+            )
+            delete(
+                path = "/{example_id}",
+                body = RouteHandlersProvider.V1.Examples.deleteExample(repository = repository),
             )
         }
     }
