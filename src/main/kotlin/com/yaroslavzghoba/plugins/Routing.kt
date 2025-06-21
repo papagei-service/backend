@@ -56,7 +56,7 @@ private fun Route.handleRoutingV1(
     // Register a new, not strong, access token
     authenticate("strong-jwt-authentication-v1", strategy = AuthenticationStrategy.Required) {
         authenticate("session-authentication-v1", strategy = AuthenticationStrategy.Optional) {
-            post(
+            get(
                 path = "/token",
                 body = RouteHandlersProvider.getToken(
                     jwtTokenConfig = jwtTokenConfig,
