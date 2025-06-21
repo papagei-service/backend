@@ -1,4 +1,4 @@
-package com.yaroslavzghoba.routing.v1.users
+package com.yaroslavzghoba.routing.v1.account
 
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession

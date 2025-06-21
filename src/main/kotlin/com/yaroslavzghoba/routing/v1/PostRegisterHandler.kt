@@ -1,5 +1,6 @@
-package com.yaroslavzghoba.routing
+package com.yaroslavzghoba.routing.v1
 
+import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.jwt.JwtTokenClaim
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenService
@@ -11,10 +12,10 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
 @Suppress("UnusedReceiverParameter")
-fun RouteHandlersProvider.postRegister(
+fun RouteHandlersProvider.getToken(
     jwtTokenConfig: JwtTokenConfig,
     jwtTokenService: JwtTokenService,
-): suspend RoutingContext.() -> Unit = postRegisterHandler@{
+): suspend RoutingContext.() -> Unit = getTokenHandler@{
 
     // Get a user's session if specified
     val session = call.sessions.get<UserSession>()

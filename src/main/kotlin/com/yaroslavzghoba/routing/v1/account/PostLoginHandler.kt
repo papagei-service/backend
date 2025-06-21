@@ -1,6 +1,6 @@
-package com.yaroslavzghoba.routing.v1.users
+package com.yaroslavzghoba.routing.v1.account
 
-import com.yaroslavzghoba.model.InputCredentials
+import com.yaroslavzghoba.model.LoginCredentials
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.hashing.HashingService
@@ -18,19 +18,19 @@ fun RouteHandlersProvider.V1.Account.postLogin(
 ): suspend RoutingContext.() -> Unit = postLoginHandler@{
 
     // Receive credentials sent by the client
-    val inputCredentials = call.receive<InputCredentials>()
+    val loginCredentials = call.receive<LoginCredentials>()
 
     // Return 401 if no user with the corresponding name is found in the user storage
-    val correspondingUser = repository.getUserByUsername(username = inputCredentials.username)
+    val correspondingUser = repository.getUserByUsername(username = loginCredentials.username)
     if (correspondingUser == null) {
-        val message = mapOf("message" to "There is no the user with the \"${inputCredentials.username}\" username")
+        val message = mapOf("message" to "There is no the user with the \"${loginCredentials.username}\" username")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
         return@postLoginHandler
     }
 
     // Return 401 if the password hash sent by the client does not match the hash of the corresponding user
     val inputPasswordHash = hashingService
-        .hash(password = inputCredentials.password, salt = correspondingUser.salt)
+        .hash(password = loginCredentials.password, salt = correspondingUser.salt)
     if (inputPasswordHash != correspondingUser.hashedPassword) {
         val message = mapOf("message" to "The password is incorrect")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)

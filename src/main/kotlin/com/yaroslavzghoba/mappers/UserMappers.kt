@@ -7,7 +7,7 @@ import com.yaroslavzghoba.model.Account
  * Converts an instance of the [User] class to an instance of the [Account] class.
  */
 @Suppress("unused", "nothing_to_inline")
-inline fun User.toUserResponse() = Account(
+inline fun User.toAccount() = Account(
     id = this.id,
     displayName = this.displayName,
     username = this.username,

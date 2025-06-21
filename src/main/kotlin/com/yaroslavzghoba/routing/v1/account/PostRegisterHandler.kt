@@ -1,6 +1,6 @@
-package com.yaroslavzghoba.routing.v1.users
+package com.yaroslavzghoba.routing.v1.account
 
-import com.yaroslavzghoba.model.InputCredentials
+import com.yaroslavzghoba.model.RegistrationCredentials
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.model.User
 import com.yaroslavzghoba.routing.RouteHandlersProvider
@@ -21,10 +21,10 @@ fun RouteHandlersProvider.V1.Account.postRegister(
 ): suspend RoutingContext.() -> Unit = postRegisterHandler@{
 
     // Receive credentials sent by the client
-    val inputCredentials = call.receive<InputCredentials>()
+    val registrationCredentials = call.receive<RegistrationCredentials>()
 
     // Return 401 if the user with the same username is already exists
-    val correspondingUser = repository.getUserByUsername(username = inputCredentials.username)
+    val correspondingUser = repository.getUserByUsername(username = registrationCredentials.username)
     correspondingUser?.let {
         val message = mapOf("message" to "The user with the \"${it.username}\" username is already exists")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
@@ -32,14 +32,21 @@ fun RouteHandlersProvider.V1.Account.postRegister(
     }
 
     // Return 401 if the input username is blank
-    if (inputCredentials.username.isBlank()) {
+    if (registrationCredentials.username.isBlank()) {
         val message = mapOf("message" to "The username cannot be blank")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
         return@postRegisterHandler
     }
 
+    // Return 401 if the input display name is blank
+    if (registrationCredentials.displayName.isBlank()) {
+        val message = mapOf("message" to "The display name cannot be blank")
+        call.respond(status = HttpStatusCode.Unauthorized, message = message)
+        return@postRegisterHandler
+    }
+
     // Return 401 if the input password is blank
-    if (inputCredentials.password.isBlank()) {
+    if (registrationCredentials.password.isBlank()) {
         val message = mapOf("message" to "The password cannot be blank")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
         return@postRegisterHandler
@@ -48,7 +55,7 @@ fun RouteHandlersProvider.V1.Account.postRegister(
     // Create an account and save it to the storage
     val saltLength = with(saltConfig) { minLength..maxLength }.random()
     val salt = saltGenerator.generate(length = saltLength)
-    val userToInsert = User.Builder(inputCredentials = inputCredentials, hashingService = hashingService)
+    val userToInsert = User.Builder(registrationCredentials = registrationCredentials, hashingService = hashingService)
         .withSalt(salt = salt)
         .build()
     repository.insertUser(user = userToInsert)

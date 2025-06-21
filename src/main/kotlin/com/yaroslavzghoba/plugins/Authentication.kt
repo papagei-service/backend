@@ -25,9 +25,9 @@ fun Application.configureAuthentication(
 
     install(plugin = Sessions, configure = sessionsConfiguration)
     install(plugin = Authentication) {
-        jwt(name = "jwt-authentication", configure = jwtAuthConfiguration)
-        jwt(name = "strong-jwt-authentication", configure = strongJwtAuthConfiguration)
-        session(name = "session-authentication", configure = sessionAuthConfiguration)
+        jwt(name = "jwt-authentication-v1", configure = jwtAuthConfiguration)
+        jwt(name = "strong-jwt-authentication-v1", configure = strongJwtAuthConfiguration)
+        session(name = "session-authentication-v1", configure = sessionAuthConfiguration)
     }
 }
 

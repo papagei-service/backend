@@ -16,7 +16,7 @@ fun RouteHandlersProvider.V1.Collections.deleteCollection(
 
     // Return 401 if the user is not authenticated
     if (session == null) {
-        val message = mapOf("message" to "You must be authenticated using sessions to get access")
+        val message = mapOf("message" to "User session is missing, invalid or expired")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
         return@deleteCollectionHandler
     }

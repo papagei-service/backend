@@ -1,6 +1,5 @@
-package com.yaroslavzghoba.routing.v1.users
+package com.yaroslavzghoba.routing.v1.cards
 
-import com.yaroslavzghoba.mappers.toUserResponse
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -10,16 +9,16 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 
 @Suppress("UnusedReceiverParameter")
-fun RouteHandlersProvider.V1.Account.getAccount(
+fun RouteHandlersProvider.V1.Cards.getCards(
     repository: Repository,
-): suspend RoutingContext.() -> Unit = getAccountHandler@{
+): suspend RoutingContext.() -> Unit = getCardsHandler@{
     val session = call.sessions.get<UserSession>()
 
     // Return 401 if the user is not authenticated
     if (session == null) {
-        val message = mapOf("message" to "You must be authenticated using sessions to get access")
+        val message = mapOf("message" to "User session is missing, invalid or expired")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@getAccountHandler
+        return@getCardsHandler
     }
 
     // Return 401 if there is no user corresponding to the session
@@ -27,9 +26,9 @@ fun RouteHandlersProvider.V1.Account.getAccount(
     if (correspondingUser == null) {
         val message = mapOf("message" to "The user with the corresponding session does not exist")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@getAccountHandler
+        return@getCardsHandler
     }
 
-    val message = correspondingUser.toUserResponse()
-    call.respond(status = HttpStatusCode.OK, message = message)
+    val cards = repository.getCardsByOwnerId(id = correspondingUser.id!!)
+    call.respond(status = HttpStatusCode.OK, message = cards)
 }
