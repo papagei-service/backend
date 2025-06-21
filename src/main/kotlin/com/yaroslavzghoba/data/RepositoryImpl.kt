@@ -123,6 +123,14 @@ class RepositoryImpl(
         return cardStorage.update(card = card)
     }
 
+    override suspend fun addCardToCollection(card: Card, collection: CardCollection): Card {
+        return cardStorage.addToCollection(card = card, collection = collection)
+    }
+
+    override suspend fun removeCardFromCollection(card: Card, collection: CardCollection): Card {
+        return cardStorage.removeFromCollection(card = card, collection = collection)
+    }
+
     override suspend fun deleteAllCards() {
         cardStorage.deleteAll()
     }

@@ -1,6 +1,8 @@
 package com.yaroslavzghoba.data.local
 
 import com.yaroslavzghoba.data.local.dao.CardDao
+import com.yaroslavzghoba.data.local.dao.CollectionCardDao
+import com.yaroslavzghoba.data.local.dao.CollectionDao
 import com.yaroslavzghoba.data.local.dao.UserDao
 import com.yaroslavzghoba.data.local.tables.CardsTable
 import com.yaroslavzghoba.data.local.tables.CollectionsCardsTable
@@ -8,6 +10,7 @@ import com.yaroslavzghoba.data.local.tables.CollectionsTable
 import com.yaroslavzghoba.data.mappers.toCard
 import com.yaroslavzghoba.data.model.CardStorage
 import com.yaroslavzghoba.model.Card
+import com.yaroslavzghoba.model.CardCollection
 import com.yaroslavzghoba.model.CardSorting
 import com.yaroslavzghoba.model.CardSortingColumn
 import com.yaroslavzghoba.utils.suspendTransaction
@@ -117,6 +120,65 @@ class CardStorageImpl : CardStorage {
             it.ownerId = owner
         }?.toCard()
             ?: throw NoSuchElementException("Corresponding card is not found in storage")
+    }
+
+    override suspend fun addToCollection(
+        card: Card,
+        collection: CardCollection
+    ): Card = suspendTransaction {
+        if (card.id == null)
+            throw IllegalArgumentException("The id of the card to be linked with collection cannot be null")
+        if (collection.id == null)
+            throw IllegalArgumentException("The id of the collection to be linked with card cannot be null")
+
+        // Check if the card and the collection exist in the storage
+        val correspondingCard = CardDao
+            .find { CardsTable.id eq card.id }.firstOrNull()
+            ?: throw NoSuchElementException("Corresponding card is not found in storage")
+        val correspondingCollection = CollectionDao
+            .find { CollectionsTable.id eq collection.id }.firstOrNull()
+            ?: throw NoSuchElementException("Corresponding collection is not found in storage")
+
+        // Check if the relationship already exists
+        val relationship = CollectionCardDao
+            .find {
+                (CollectionsCardsTable.cardId eq card.id)
+                    .and { CollectionsCardsTable.collectionId eq collection.id }
+            }
+            .firstOrNull()
+
+        // Return if a relationship already exists
+        if (relationship != null)
+            throw IllegalStateException("The relationship between the card and the collection already exists.")
+
+        CollectionCardDao.new {
+            cardId = correspondingCard
+            collectionId = correspondingCollection
+        }
+        card
+    }
+
+    override suspend fun removeFromCollection(
+        card: Card,
+        collection: CardCollection,
+    ): Card = suspendTransaction {
+        if (card.id == null)
+            throw IllegalArgumentException("The id of the card to be linked with collection cannot be null")
+        if (collection.id == null)
+            throw IllegalArgumentException("The id of the collection to be linked with card cannot be null")
+
+        CollectionCardDao
+            .find {
+                (CollectionsCardsTable.cardId eq card.id)
+                    .and { CollectionsCardsTable.collectionId eq collection.id }
+            }
+            .toList()
+            .forEach { relationship ->
+                CollectionsCardsTable.deleteWhere {
+                    CollectionsCardsTable.id eq relationship.id
+                }
+            }
+        card
     }
 
     override suspend fun deleteAll(): Unit = suspendTransaction {

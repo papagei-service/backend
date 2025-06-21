@@ -1,6 +1,7 @@
 package com.yaroslavzghoba.data.model
 
 import com.yaroslavzghoba.model.Card
+import com.yaroslavzghoba.model.CardCollection
 import com.yaroslavzghoba.model.CardSorting
 import kotlinx.datetime.Instant
 
@@ -76,9 +77,30 @@ interface CardStorage {
      * @return Updated card.
      *
      * @throws IllegalArgumentException If the identifier of the passed card is null.
-     * @throws NoSuchElementException If the parent collection is not found in the storage.
      */
     suspend fun update(card: Card): Card
+
+    /**
+     * Register the card as part of a collection.
+     *
+     * @param card Card to be added to the collection.
+     * @param collection Collection to which the card will be added.
+     *
+     * @throws IllegalArgumentException If the identifier of the passed card or collection is null.
+     * @throws NoSuchElementException If the corresponding card or collection is not found in storage.
+     * @throws IllegalStateException If a relationship between the card and the collection already exists.
+     */
+    suspend fun addToCollection(card: Card, collection: CardCollection): Card
+
+    /**
+     * Break the relationship between cards and collections
+     *
+     * @param card Card to be removed from the collection.
+     * @param collection Collection from which the card will be removed.
+     *
+     * @throws IllegalArgumentException If the identifier of the passed card or collection is null.
+     */
+    suspend fun removeFromCollection(card: Card, collection: CardCollection): Card
 
     /**
      * Delete all cards from the storage.

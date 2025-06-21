@@ -85,8 +85,8 @@ interface Repository {
      */
     suspend fun getCollectionsByCardId(
         id: Long,
-        limit: Int,
-        offset: Long,
+        limit: Int = 20,  // TODO: Move default value to constants
+        offset: Long = 0,  // TODO: Move default value to constants
     ): List<CardCollection>
 
     /**
@@ -152,8 +152,8 @@ interface Repository {
         sortByFirstPriority: CardSorting? = null,
         sortBySecondPriority: CardSorting? = null,
         nextTimeBefore: Instant? = null,
-        limit: Int = 20,
-        offset: Long = 0,
+        limit: Int = 20,  // TODO: Move default value to constants
+        offset: Long = 0,  // TODO: Move default value to constants
     ): List<Card>
 
     /**
@@ -169,11 +169,11 @@ interface Repository {
      */
     suspend fun getCardsByCollectionId(
         id: Long,
-        sortByFirstPriority: CardSorting?,
-        sortBySecondPriority: CardSorting?,
-        nextTimeBefore: Instant?,
-        limit: Int,
-        offset: Long,
+        sortByFirstPriority: CardSorting? = null,
+        sortBySecondPriority: CardSorting? = null,
+        nextTimeBefore: Instant? = null,
+        limit: Int = 20,  // TODO: Move default value to constants
+        offset: Long = 0,  // TODO: Move default value to constants
     ): List<Card>
 
     /**
@@ -196,6 +196,28 @@ interface Repository {
      * @throws NoSuchElementException If the parent collection is not found in the storage.
      */
     suspend fun updateCard(card: Card): Card
+
+    /**
+     * Register the card as part of a collection.
+     *
+     * @param card Card to be added to the collection.
+     * @param collection Collection to which the card will be added.
+     *
+     * @throws IllegalArgumentException If the identifier of the passed card or collection is null.
+     * @throws NoSuchElementException If the corresponding card or collection is not found in storage.
+     * @throws IllegalStateException If a relationship between the card and the collection already exists.
+     */
+    suspend fun addCardToCollection(card: Card, collection: CardCollection): Card
+
+    /**
+     * Break the relationship between cards and collections
+     *
+     * @param card Card to be removed from the collection.
+     * @param collection Collection from which the card will be removed.
+     *
+     * @throws IllegalArgumentException If the identifier of the passed card or collection is null.
+     */
+    suspend fun removeCardFromCollection(card: Card, collection: CardCollection): Card
 
     /**
      * Delete all cards from the storage.
