@@ -55,7 +55,7 @@ class UserStorageImpl : UserStorage {
         UsersTable.deleteAll()
     }
 
-    override suspend fun deleteById(id: Long) {
+    override suspend fun deleteById(id: Long): Unit = suspendTransaction {
         UsersTable.deleteWhere { UsersTable.id eq id }
     }
 }

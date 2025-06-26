@@ -1,14 +1,15 @@
 package com.yaroslavzghoba.mappers
 
 import com.yaroslavzghoba.model.CardCollection
-import com.yaroslavzghoba.model.CardCollectionRequest
+import com.yaroslavzghoba.model.CardCollectionInsertRequest
+import com.yaroslavzghoba.model.CardCollectionUpdateRequest
 
 /**
- * Converts an instance of the [CardCollectionRequest] class to an instance of the [CardCollection] class.
+ * Converts an instance of the [CardCollectionInsertRequest] class to an instance of the [CardCollection] class.
  */
 @Suppress("unused", "nothing_to_inline")
-inline fun CardCollectionRequest.toCardCollection(ownerId: Long) = CardCollection(
-    id = this.id,
+inline fun CardCollectionInsertRequest.toCardCollection(id: Long?, ownerId: Long) = CardCollection(
+    id = id,
     title = this.title,
     description = this.description,
     knownLanguage = this.knownLanguage,
@@ -17,11 +18,58 @@ inline fun CardCollectionRequest.toCardCollection(ownerId: Long) = CardCollectio
 )
 
 /**
- * Converts an instance of the [CardCollection] class to an instance of the [CardCollectionRequest] class.
+ * Converts an instance of the [CardCollectionInsertRequest] class
+ * to an instance of the [CardCollectionUpdateRequest] class.
  */
 @Suppress("unused", "nothing_to_inline")
-inline fun CardCollection.toCollectionRequest() = CardCollectionRequest(
-    id = this.id,
+inline fun CardCollectionInsertRequest.toCardCollectionUpdateRequest() = CardCollectionUpdateRequest(
+    title = this.title,
+    description = this.description,
+    knownLanguage = this.knownLanguage,
+    learningLanguage = this.learningLanguage,
+)
+
+/**
+ * Converts an instance of the [CardCollectionUpdateRequest] class to an instance of the [CardCollection] class.
+ */
+@Suppress("unused", "nothing_to_inline")
+inline fun CardCollectionUpdateRequest.toCardCollection(id: Long?, ownerId: Long) = CardCollection(
+    id = id,
+    title = this.title,
+    description = this.description,
+    knownLanguage = this.knownLanguage,
+    learningLanguage = this.learningLanguage,
+    ownerId = ownerId,
+)
+
+/**
+ * Converts an instance of the [CardCollectionUpdateRequest] class
+ * to an instance of the [CardCollectionInsertRequest] class.
+ */
+@Suppress("unused", "nothing_to_inline")
+inline fun CardCollectionUpdateRequest.toCardCollectionInsertRequest() = CardCollectionInsertRequest(
+    title = this.title,
+    description = this.description,
+    knownLanguage = this.knownLanguage,
+    learningLanguage = this.learningLanguage,
+)
+
+/**
+ * Converts an instance of the [CardCollection] class to an instance of the [CardCollectionInsertRequest] class.
+ */
+@Suppress("unused", "nothing_to_inline")
+inline fun CardCollection.toCollectionInsertRequest() = CardCollectionInsertRequest(
+    title = this.title,
+    description = this.description,
+    knownLanguage = this.knownLanguage,
+    learningLanguage = this.learningLanguage,
+)
+
+/**
+ * Converts an instance of the [CardCollection] class to an instance of the [CardCollectionUpdateRequest] class.
+ */
+@Suppress("unused", "nothing_to_inline")
+inline fun CardCollection.toCollectionUpdateRequest() = CardCollectionUpdateRequest(
     title = this.title,
     description = this.description,
     knownLanguage = this.knownLanguage,

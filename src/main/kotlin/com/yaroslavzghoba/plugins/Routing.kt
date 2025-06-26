@@ -112,7 +112,7 @@ private fun Route.handleRoutingV1(
                     .postCollection(repository = repository)
             )
             put(
-                path = "/",
+                path = "/{collection_id}",
                 body = RouteHandlersProvider.V1.Collections
                     .putCollection(repository = repository)
             )

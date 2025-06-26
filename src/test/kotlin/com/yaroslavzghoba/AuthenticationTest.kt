@@ -132,7 +132,22 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `009= Do not register with a blank username`() = testConfiguredApplication { client, _ ->
+    fun `009= Do not register if the request body is invalid`() = testConfiguredApplication { client, _ ->
+        val loginCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS.toLoginCredentials()
+
+        val response0 = client.post("/v1/account/register") {
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+            setBody(loginCredentials)  // Set a login credentials instead of registration credentials
+        }
+
+        assertEquals(
+            expected = HttpStatusCode.BadRequest,
+            actual = response0.status,
+        )
+    }
+
+    @Test
+    fun `010= Do not register with a blank username`() = testConfiguredApplication { client, _ ->
         val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
             .copy(username = " ")
 
@@ -148,7 +163,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `010= Do not register with a blank password`() = testConfiguredApplication { client, _ ->
+    fun `011= Do not register with a blank password`() = testConfiguredApplication { client, _ ->
         val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
             .copy(password = " ")
 
@@ -164,7 +179,29 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `011= Register a new user`() = testConfiguredApplication { client, _ ->
+    fun `012= Do not register if a username is already taken`() = testConfiguredApplication { client, _ ->
+        val firstRegistrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val secondRegistrationCredentials = TestData.SECOND_REGISTRATION_CREDENTIALS
+            .copy(username = firstRegistrationCredentials.username)
+
+        client.post("/v1/account/register") {
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+            setBody(firstRegistrationCredentials)
+        }
+
+        val response0 = client.post("/v1/account/register") {
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+            setBody(secondRegistrationCredentials)
+        }
+
+        assertEquals(
+            expected = HttpStatusCode.Unauthorized,
+            actual = response0.status,
+        )
+    }
+
+    @Test
+    fun `013= Register a new user`() = testConfiguredApplication { client, _ ->
         val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
 
         val response0 = client.post("/v1/account/register") {
@@ -179,7 +216,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `012= Do not login the existing user with the incorrect password`() = testConfiguredApplication { client, _ ->
+    fun `014= Do not login the existing user with the incorrect password`() = testConfiguredApplication { client, _ ->
         val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
         val wrongLoginCredentials = registrationCredentials.toLoginCredentials()
             .copy(password = TestData.FIRST_REGISTRATION_CREDENTIALS.password + ".")  // Modified password
@@ -203,7 +240,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `013= Login the existing user with the correct password`() = testConfiguredApplication { client, _ ->
+    fun `015= Login the existing user with the correct password`() = testConfiguredApplication { client, _ ->
         val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
         val loginCredentials = registrationCredentials.toLoginCredentials()
 
@@ -226,7 +263,7 @@ class AuthenticationTest {
     }
 
     @Test
-    fun `014= Grant access to the session-protected resource with active session`() =
+    fun `016= Grant access to the session-protected resource with active session`() =
         testConfiguredApplication { client, _ ->
             val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
             val loginCredentials = registrationCredentials.toLoginCredentials()
@@ -257,7 +294,7 @@ class AuthenticationTest {
         }
 
     @Test
-    fun `015= Do not grant access to the session-protected resource after logout`() =
+    fun `017= Do not grant access to the session-protected resource after logout`() =
         testConfiguredApplication { client, _ ->
             val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
             val loginCredentials = registrationCredentials.toLoginCredentials()
@@ -294,7 +331,7 @@ class AuthenticationTest {
         }
 
     @Test
-    fun `016= Do not generate a new not strong token with only the session without a strong token`() =
+    fun `018= Do not generate a new not strong token with only the session without a strong token`() =
         testConfiguredApplication { client, _ ->
             val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
             val loginCredentials = registrationCredentials.toLoginCredentials()
@@ -315,6 +352,42 @@ class AuthenticationTest {
             // Try to register a new non-strong access token
             val response1 = client.get("/v1/token") {
                 rawCookie(value = cookies)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.Unauthorized,
+                actual = response1.status,
+            )
+        }
+
+    @Test
+    fun `019= Do not grant access to the session-protected resource after deleting the account`() =
+        testConfiguredApplication { client, _ ->
+            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val loginCredentials = registrationCredentials.toLoginCredentials()
+
+            // Register the new user
+            client.post("/v1/account/register") {
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+                setBody(registrationCredentials)
+            }
+
+            // Login the user and extract its cookie
+            val response0 = client.post("/v1/account/login") {
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+                setBody(loginCredentials)
+            }
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            client.delete("/v1/account") {
+                rawCookie(value = rawCookie)
+                bearerAuth(token = AuthUtils.STRONG_TOKEN)
+            }
+
+            // Try to get access to the session-protected resource after deleting the account
+            val response1 = client.get("/v1/account") {
+                rawCookie(value = rawCookie)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
             }
 
             assertEquals(

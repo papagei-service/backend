@@ -79,7 +79,7 @@ class CollectionStorageImpl : CollectionStorage {
         CollectionDao.findByIdAndUpdate(id = collection.id) {
             it.title = collection.title
             it.description = collection.description
-            it.knownLanguage = collection.learningLanguage
+            it.knownLanguage = collection.knownLanguage
             it.learningLanguage = collection.learningLanguage
             it.ownerId = user
         }?.toCardCollection()
@@ -96,7 +96,7 @@ class CollectionStorageImpl : CollectionStorage {
         }
     }
 
-    override suspend fun deleteByOwnerId(id: Long) {
+    override suspend fun deleteByOwnerId(id: Long): Unit = suspendTransaction {
         CollectionsTable.deleteWhere {
             CollectionsTable.ownerId eq id
         }

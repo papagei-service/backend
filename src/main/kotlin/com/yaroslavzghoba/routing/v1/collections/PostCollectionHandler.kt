@@ -1,7 +1,7 @@
 package com.yaroslavzghoba.routing.v1.collections
 
 import com.yaroslavzghoba.mappers.toCardCollection
-import com.yaroslavzghoba.model.CardCollectionRequest
+import com.yaroslavzghoba.model.CardCollectionInsertRequest
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -10,7 +10,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
-import org.jetbrains.exposed.exceptions.ExposedSQLException
 
 @Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.V1.Collections.postCollection(
@@ -26,7 +25,7 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
     }
 
     // Return 400 if the request body cannot be converted to a collection
-    val body = runCatching { call.receive<CardCollectionRequest>() }.getOrNull()
+    val body = runCatching { call.receive<CardCollectionInsertRequest>() }.getOrNull()
     if (body == null) {
         val message = mapOf("message" to "The request body cannot be converted to a collection")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
@@ -34,22 +33,16 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
     }
 
     // Return 404 if there is no user corresponding to the session
-    val user = repository.getUserById(id = session.userId)
-    if (user == null) {
+    val correspondingUser = repository.getUserById(id = session.userId)
+    if (correspondingUser == null) {
         val message = mapOf("message" to "The user with the corresponding session does not exist")
         call.respond(status = HttpStatusCode.NotFound, message = message)
         return@postCollectionHandler
     }
 
     // Insert the collection into the storage
-    val collectionToInsert = body.toCardCollection(ownerId = user.id!!)
-    val insertedCollection = try {
-        repository.insertCollection(collectionToInsert)
-    } catch (_: ExposedSQLException) {
-        val message = mapOf("message" to "A collection with the corresponding identifier already exists")
-        call.respond(status = HttpStatusCode.BadRequest, message = message)
-        return@postCollectionHandler
-    }
+    val collectionToInsert = body.toCardCollection(id = null, ownerId = session.userId)
+    val insertedCollection = repository.insertCollection(collectionToInsert)
 
     call.respond(status = HttpStatusCode.Created, message = insertedCollection)
 }

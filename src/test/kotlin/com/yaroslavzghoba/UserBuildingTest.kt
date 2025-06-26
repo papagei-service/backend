@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 class UserBuildingTest {
 
     @Test
-    fun `The builder does not distort the data`() = testConfiguredApplication { _, applicationConfig ->
+    fun `001= The builder does not distort the data`() = testConfiguredApplication { _, applicationConfig ->
         val pepper = applicationConfig.property("security.hashing.pepper").getString()
         val algorithm = applicationConfig.property("security.hashing.algorithm").getString()
         val hashingService = HashingServiceImpl(pepper = pepper, algorithm = algorithm)

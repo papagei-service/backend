@@ -21,12 +21,17 @@ fun RouteHandlersProvider.V1.Account.postRegister(
 ): suspend RoutingContext.() -> Unit = postRegisterHandler@{
 
     // Receive credentials sent by the client
-    val registrationCredentials = call.receive<RegistrationCredentials>()
+    val registrationCredentials = runCatching { call.receive<RegistrationCredentials>() }.getOrNull()
+    if (registrationCredentials == null) {
+        val message = mapOf("message" to "The request body cannot be converted to a registration credentials.")
+        call.respond(status = HttpStatusCode.BadRequest, message = message)
+        return@postRegisterHandler
+    }
 
     // Return 401 if the user with the same username is already exists
     val correspondingUser = repository.getUserByUsername(username = registrationCredentials.username)
-    correspondingUser?.let {
-        val message = mapOf("message" to "The user with the \"${it.username}\" username is already exists")
+    if (correspondingUser != null) {
+        val message = mapOf("message" to "The username \"${correspondingUser.username}\" is already taken.")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)
         return@postRegisterHandler
     }

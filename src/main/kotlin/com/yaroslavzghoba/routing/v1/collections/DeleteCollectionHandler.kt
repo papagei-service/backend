@@ -23,8 +23,8 @@ fun RouteHandlersProvider.V1.Collections.deleteCollection(
 
     // Return 400 if the `collection_id` parameter is not passed or is invalid
     val collectionId = call.parameters["collection_id"]?.toLongOrNull()
-    if (collectionId == null) {
-        val message = mapOf("message" to "The \"collection_id\" parameter is not passed or cannot be cast to number")
+    if (collectionId == null || collectionId <= 0) {
+        val message = mapOf("message" to "The \"collection_id\" parameter must be a positive integer.")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@deleteCollectionHandler
     }

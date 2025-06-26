@@ -9,7 +9,7 @@ import kotlin.test.assertNotEquals
 class HashingServiceTest {
 
     @Test
-    fun `A hash must be of the same length`() = testConfiguredApplication { _, applicationConfig ->
+    fun `001= A hash must be of the same length`() = testConfiguredApplication { _, applicationConfig ->
         val pepper = applicationConfig.property("security.hashing.pepper").getString()
         val algorithm = applicationConfig.property("security.hashing.algorithm").getString()
         val hashingService = HashingServiceImpl(pepper = pepper, algorithm = algorithm)
@@ -20,7 +20,7 @@ class HashingServiceTest {
     }
 
     @Test
-    fun `Returns the same hash for the same input`() = testConfiguredApplication { _, applicationConfig ->
+    fun `002= Returns the same hash for the same input`() = testConfiguredApplication { _, applicationConfig ->
         val pepper = applicationConfig.property("security.hashing.pepper").getString()
         val algorithm = applicationConfig.property("security.hashing.algorithm").getString()
         val hashingService = HashingServiceImpl(pepper = pepper, algorithm = algorithm)
@@ -32,7 +32,7 @@ class HashingServiceTest {
     }
 
     @Test
-    fun `Returns a different hash for different peppers`() = testConfiguredApplication { _, applicationConfig ->
+    fun `003= Returns a different hash for different peppers`() = testConfiguredApplication { _, applicationConfig ->
         val (pepper0, pepper1) = listOf("J?UIR4Q*mYn", "ZP4gYd^sAt2")
         val algorithm = applicationConfig.property("security.hashing.algorithm").getString()
         val hashingService0 = HashingServiceImpl(pepper = pepper0, algorithm = algorithm)
@@ -45,7 +45,7 @@ class HashingServiceTest {
     }
 
     @Test
-    fun `Returns a different hash for different salts`() = testConfiguredApplication { _, applicationConfig ->
+    fun `004= Returns a different hash for different salts`() = testConfiguredApplication { _, applicationConfig ->
         val pepper = applicationConfig.property("security.hashing.pepper").getString()
         val algorithm = applicationConfig.property("security.hashing.algorithm").getString()
         val hashingService = HashingServiceImpl(pepper = pepper, algorithm = algorithm)
@@ -58,7 +58,7 @@ class HashingServiceTest {
     }
 
     @Test
-    fun `Returns a different hash for different passwords`() = testConfiguredApplication { _, applicationConfig ->
+    fun `005= Returns a different hash for different passwords`() = testConfiguredApplication { _, applicationConfig ->
         val pepper = applicationConfig.property("security.hashing.pepper").getString()
         val algorithm = applicationConfig.property("security.hashing.algorithm").getString()
         val hashingService = HashingServiceImpl(pepper = pepper, algorithm = algorithm)
