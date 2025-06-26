@@ -22,17 +22,17 @@ fun RouteHandlersProvider.V1.Cards.deleteCard(
     }
 
     // Return 400 if the `card_id` parameter is not passed or is invalid
-    val card_id = call.parameters["card_id"]?.toLongOrNull()
-    if (card_id == null) {
-        val message = mapOf("message" to "The \"card_id\" parameter is not passed or cannot be cast to number")
+    val cardId = call.parameters["card_id"]?.toLongOrNull()
+    if (cardId == null || cardId <= 0) {
+        val message = mapOf("message" to "The \"card_id\" parameter must be a positive integer.")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@deleteCardHandler
     }
 
     // Return 404 if there is no card with a corresponding id in the storage
-    val card = repository.getCardById(id = card_id)
+    val card = repository.getCardById(id = cardId)
     if (card == null) {
-        val message = mapOf("message" to "There is no card with \"id\" property equal to \"$card_id\"")
+        val message = mapOf("message" to "There is no card with \"id\" property equal to \"$cardId\"")
         call.respond(status = HttpStatusCode.NotFound, message = message)
         return@deleteCardHandler
     }
@@ -44,7 +44,7 @@ fun RouteHandlersProvider.V1.Cards.deleteCard(
         return@deleteCardHandler
     }
 
-    repository.deleteCollectionById(id = card_id)
+    repository.deleteCardById(id = cardId)
 
     val message = mapOf("message" to "You literally do not need to handle this response")
     call.respond(status = HttpStatusCode.NoContent, message = message)

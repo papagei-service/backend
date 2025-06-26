@@ -32,20 +32,19 @@ fun RouteHandlersProvider.V1.Collections.putCollection(
         return@putCollectionHandler
     }
 
-    // Return 401 if there is no user corresponding to the session
-    val correspondingUser = repository.getUserById(id = session.userId)
-    if (correspondingUser == null) {
-        val message = mapOf("message" to "The user with the corresponding session does not exist")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@putCollectionHandler
-    }
-
-
     // Return 400 if the `collection_id` parameter is not passed or is invalid
     val collectionId = call.parameters["collection_id"]?.toLongOrNull()
     if (collectionId == null || collectionId <= 0) {
         val message = mapOf("message" to "The \"collection_id\" parameter must be a positive integer.")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
+        return@putCollectionHandler
+    }
+
+    // Return 401 if there is no user corresponding to the session
+    val correspondingUser = repository.getUserById(id = session.userId)
+    if (correspondingUser == null) {
+        val message = mapOf("message" to "The user with the corresponding session does not exist")
+        call.respond(status = HttpStatusCode.Unauthorized, message = message)
         return@putCollectionHandler
     }
 
@@ -65,7 +64,8 @@ fun RouteHandlersProvider.V1.Collections.putCollection(
     }
 
     // Insert the collection into the storage
-    val collectionToUpdate = body.toCardCollection(id = collectionId, ownerId = correspondingCollection.ownerId)
+    val collectionToUpdate = body
+        .toCardCollection(id = correspondingCollection.id, ownerId = correspondingCollection.ownerId)
     val updatedCollection = repository.updateCollection(collectionToUpdate)
 
     call.respond(status = HttpStatusCode.OK, message = updatedCollection)

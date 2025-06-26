@@ -7,6 +7,7 @@ import com.yaroslavzghoba.data.local.dao.UserDao
 import com.yaroslavzghoba.data.local.tables.CardsTable
 import com.yaroslavzghoba.data.local.tables.CollectionsCardsTable
 import com.yaroslavzghoba.data.local.tables.CollectionsTable
+import com.yaroslavzghoba.data.local.tables.UsersTable
 import com.yaroslavzghoba.data.mappers.toCard
 import com.yaroslavzghoba.data.model.CardStorage
 import com.yaroslavzghoba.model.Card
@@ -85,7 +86,7 @@ class CardStorageImpl : CardStorage {
     override suspend fun insert(card: Card): Card = suspendTransaction {
         // Get the card owner
         val owner = UserDao
-            .find { CollectionsTable.id eq card.ownerId }
+            .find { UsersTable.id eq card.ownerId }
             .firstOrNull()
             ?: throw NoSuchElementException("The card owner not found in storage")
 
@@ -106,7 +107,7 @@ class CardStorageImpl : CardStorage {
 
         // Get the card owner
         val owner = UserDao
-            .find { CollectionsTable.id eq card.ownerId }
+            .find { UsersTable.id eq card.ownerId }
             .firstOrNull()
             ?: throw NoSuchElementException("The card owner not found in storage")
 

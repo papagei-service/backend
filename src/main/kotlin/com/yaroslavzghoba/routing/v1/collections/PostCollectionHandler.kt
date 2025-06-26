@@ -42,7 +42,7 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
 
     // Insert the collection into the storage
     val collectionToInsert = body.toCardCollection(id = null, ownerId = session.userId)
-    val insertedCollection = repository.insertCollection(collectionToInsert)
+    val insertedCollection = repository.insertCollection(collection = collectionToInsert)
 
     call.respond(status = HttpStatusCode.Created, message = insertedCollection)
 }

@@ -140,7 +140,7 @@ private fun Route.handleRoutingV1(
                     .postCard(repository = repository)
             )
             put(
-                path = "/",
+                path = "/{card_id}",
                 body = RouteHandlersProvider.V1.Cards
                     .putCard(repository = repository)
             )

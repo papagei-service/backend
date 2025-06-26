@@ -1,14 +1,15 @@
 package com.yaroslavzghoba.mappers
 
 import com.yaroslavzghoba.model.Card
-import com.yaroslavzghoba.model.CardRequest
+import com.yaroslavzghoba.model.CardInsertRequest
+import com.yaroslavzghoba.model.CardUpdateRequest
 
 /**
- * Converts an instance of the [CardRequest] class to an instance of the [Card] class.
+ * Converts an instance of the [CardInsertRequest] class to an instance of the [Card] class.
  */
 @Suppress("unused", "nothing_to_inline")
-inline fun CardRequest.toCard(ownerId: Long) = Card(
-    id = this.id,
+inline fun CardInsertRequest.toCard(id: Long?, ownerId: Long) = Card(
+    id = id,
     knownLanguageText = this.knownLanguageText,
     learningLanguageText = this.learningLanguageText,
     notes = this.notes,
@@ -19,11 +20,64 @@ inline fun CardRequest.toCard(ownerId: Long) = Card(
 )
 
 /**
- * Converts an instance of the [Card] class to an instance of the [CardRequest] class.
+ * Converts an instance of the [CardInsertRequest] class to an instance of the [CardUpdateRequest] class.
  */
 @Suppress("unused", "nothing_to_inline")
-inline fun Card.toCardRequest() = CardRequest(
-    id = this.id,
+inline fun CardInsertRequest.toCardUpdateRequest() = CardUpdateRequest(
+    knownLanguageText = this.knownLanguageText,
+    learningLanguageText = this.learningLanguageText,
+    notes = this.notes,
+    lastAnsweredAt = this.lastAnsweredAt,
+    showNextTimeAt = this.showNextTimeAt,
+    correctAnswersInRow = this.correctAnswersInRow,
+)
+
+/**
+ * Converts an instance of the [CardUpdateRequest] class to an instance of the [Card] class.
+ */
+@Suppress("unused", "nothing_to_inline")
+inline fun CardUpdateRequest.toCard(id: Long?, ownerId: Long) = Card(
+    id = id,
+    knownLanguageText = this.knownLanguageText,
+    learningLanguageText = this.learningLanguageText,
+    notes = this.notes,
+    lastAnsweredAt = this.lastAnsweredAt,
+    showNextTimeAt = this.showNextTimeAt,
+    correctAnswersInRow = this.correctAnswersInRow,
+    ownerId = ownerId,
+)
+
+/**
+ * Converts an instance of the [CardUpdateRequest] class to an instance of the [CardInsertRequest] class.
+ */
+@Suppress("unused", "nothing_to_inline")
+inline fun CardUpdateRequest.toCardInsertRequest() = CardInsertRequest(
+    knownLanguageText = this.knownLanguageText,
+    learningLanguageText = this.learningLanguageText,
+    notes = this.notes,
+    lastAnsweredAt = this.lastAnsweredAt,
+    showNextTimeAt = this.showNextTimeAt,
+    correctAnswersInRow = this.correctAnswersInRow,
+)
+
+/**
+ * Converts an instance of the [Card] class to an instance of the [CardInsertRequest] class.
+ */
+@Suppress("unused", "nothing_to_inline")
+inline fun Card.toCardInsertRequest() = CardInsertRequest(
+    knownLanguageText = this.knownLanguageText,
+    learningLanguageText = this.learningLanguageText,
+    notes = this.notes,
+    lastAnsweredAt = this.lastAnsweredAt,
+    showNextTimeAt = this.showNextTimeAt,
+    correctAnswersInRow = this.correctAnswersInRow,
+)
+
+/**
+ * Converts an instance of the [Card] class to an instance of the [CardUpdateRequest] class.
+ */
+@Suppress("unused", "nothing_to_inline")
+inline fun Card.toCardUpdateRequest() = CardUpdateRequest(
     knownLanguageText = this.knownLanguageText,
     learningLanguageText = this.learningLanguageText,
     notes = this.notes,

@@ -1,7 +1,7 @@
 package com.yaroslavzghoba.utils
 
 import com.yaroslavzghoba.model.CardCollectionInsertRequest
-import com.yaroslavzghoba.model.CardRequest
+import com.yaroslavzghoba.model.CardInsertRequest
 import com.yaroslavzghoba.model.RegistrationCredentials
 
 @Suppress("unused")
@@ -37,8 +37,7 @@ object TestData {
         learningLanguage = "ja",
     )
 
-    val FIRST_CARD_REQUEST = CardRequest(
-        id = null,
+    val FIRST_CARD_REQUEST = CardInsertRequest(
         knownLanguageText = "Bonjour",
         learningLanguageText = "Hola",
         notes = "Salutation type",
@@ -46,20 +45,18 @@ object TestData {
         showNextTimeAt = null,
         correctAnswersInRow = 0,
     )
-    val SECOND_CARD_REQUEST = CardRequest(
-        id = 102L,
+    val SECOND_CARD_REQUEST = CardInsertRequest(
         knownLanguageText = "Дякую",
         learningLanguageText = "Danke schön",
-        notes = null,
+        notes = "",
         lastAnsweredAt = null,
         showNextTimeAt = null,
         correctAnswersInRow = 0
     )
-    val THIRD_CARD_REQUEST = CardRequest(
-        id = null,
+    val THIRD_CARD_REQUEST = CardInsertRequest(
         knownLanguageText = "a cat",
         learningLanguageText = "猫 (Neko)",
-        notes = null,
+        notes = "",
         lastAnsweredAt = null,
         showNextTimeAt = null,
         correctAnswersInRow = 0
