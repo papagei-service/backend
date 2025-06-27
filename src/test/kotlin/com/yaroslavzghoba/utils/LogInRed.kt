@@ -1,9 +1,10 @@
 package com.yaroslavzghoba.utils
 
 /**
- * Logs the given [message] and the line separator in red color to the standard output stream.
+ * Adds special codes to the string that tell the console that the message should be printed in red.
  *
- * @param message The message that must be logged.
+ * @receiver Message to which special codes must be added.
+ * @return Message with special codes.
  */
-@Suppress("unused")  // Mark the IDE that the function is actually used
-fun logInRed(message: Any?) = println("\u001b[31m$message\u001b[0m")
+@Suppress("unused")
+fun String.toRed() = "\u001b[31m$this\u001b[0m"

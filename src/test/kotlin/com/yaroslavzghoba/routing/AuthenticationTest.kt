@@ -1,4 +1,4 @@
-package com.yaroslavzghoba
+package com.yaroslavzghoba.routing
 
 import com.yaroslavzghoba.mappers.toLoginCredentials
 import com.yaroslavzghoba.model.TokenResponse

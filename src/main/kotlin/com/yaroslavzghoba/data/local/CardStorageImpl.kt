@@ -45,7 +45,7 @@ class CardStorageImpl : CardStorage {
             .find {
                 val baseCondition = CardsTable.ownerId eq id
                 nextTimeBefore?.let {
-                    baseCondition and (CardsTable.showNextTimeAt lessEq it)
+                    baseCondition and (CardsTable.showNextTimeAt neq null) and (CardsTable.showNextTimeAt lessEq it)
                 } ?: baseCondition
             }
             .apply {
@@ -69,7 +69,7 @@ class CardStorageImpl : CardStorage {
             .select(CardsTable.columns)
             .where {
                 nextTimeBefore?.let {
-                    baseCondition and (CardsTable.showNextTimeAt lessEq it)
+                    baseCondition and (CardsTable.showNextTimeAt neq null) and (CardsTable.showNextTimeAt lessEq it)
                 } ?: baseCondition
             }
             .withDistinct()
