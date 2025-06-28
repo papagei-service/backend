@@ -8,14 +8,10 @@ import com.yaroslavzghoba.utils.AuthUtils
 import com.yaroslavzghoba.utils.TestData
 import com.yaroslavzghoba.utils.rawCookie
 import com.yaroslavzghoba.utils.testConfiguredApplication
-import io.ktor.client.call.body
-import io.ktor.client.request.bearerAuth
-import io.ktor.client.request.delete
-import io.ktor.client.request.post
-import io.ktor.client.request.put
-import io.ktor.client.request.setBody
-import io.ktor.http.HttpStatusCode
-import io.ktor.util.logging.KtorSimpleLogger
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.util.logging.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -76,7 +72,7 @@ class CollectionsRoutingTest {
             .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie = response0.rawCookie()  // Contains the user's session
 
-        val response1 =  client.put("/v1/collections/1") {
+        val response1 = client.put("/v1/collections/1") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
             setBody(registrationCredentials)  // Set a registration credentials instead of a collection

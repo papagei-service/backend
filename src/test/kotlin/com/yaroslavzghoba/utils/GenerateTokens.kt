@@ -5,7 +5,7 @@ import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenService
 import io.ktor.util.logging.KtorSimpleLogger
 
-private val LOGGER = KtorSimpleLogger("com.yaroslavzghoba.utils")
+private val LOGGER = KtorSimpleLogger(::generateTokens.javaClass.packageName)
 
 @Suppress("unused")
 fun generateTokens(
