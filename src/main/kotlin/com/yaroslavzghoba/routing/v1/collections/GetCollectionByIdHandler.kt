@@ -14,17 +14,10 @@ fun RouteHandlersProvider.V1.Collections.getCollectionById(
 ): suspend RoutingContext.() -> Unit = getCollectionByIdHandler@{
     val session = call.sessions.get<UserSession>()
 
-    // Return 401 if the user is not authenticated
-    if (session == null) {
-        val message = mapOf("message" to "User session is missing, invalid or expired")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@getCollectionByIdHandler
-    }
-
     // Return 400 if the `collection_id` parameter is not passed or is invalid
     val collectionId = call.parameters["collection_id"]?.toLongOrNull()
-    if (collectionId == null) {
-        val message = mapOf("message" to "The \"collection_id\" parameter is not passed or cannot be cast to number")
+    if (collectionId == null || collectionId < 0) {
+        val message = mapOf("message" to "The \"collection_id\" parameter must be a positive integer.")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@getCollectionByIdHandler
     }
@@ -38,7 +31,7 @@ fun RouteHandlersProvider.V1.Collections.getCollectionById(
     }
 
     // Return 403 if the user is not the owner of the collection
-    if (collection.ownerId != session.userId) {
+    if (collection.ownerId != session!!.userId) {
         val message = mapOf("message" to "You cannot access someone else's collection")
         call.respond(status = HttpStatusCode.Forbidden, message = message)
         return@getCollectionByIdHandler

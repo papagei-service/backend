@@ -14,27 +14,22 @@ fun RouteHandlersProvider.V1.Cards.getCards(
 ): suspend RoutingContext.() -> Unit = getCardsHandler@{
     val session = call.sessions.get<UserSession>()
 
-    // Return 401 if the user is not authenticated
-    if (session == null) {
-        val message = mapOf("message" to "User session is missing, invalid or expired")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@getCardsHandler
+    // Get the optional parameter "collection_id" if passed and return 400 if it is invalid
+    val collectionId: Long? = call.request.queryParameters["collection_id"]?.let { param ->
+        param.toLongOrNull()?.takeIf { it > 0 } ?: run {
+            call.respond(
+                status = HttpStatusCode.BadRequest,
+                message = "The passed query parameter \"collection_id\" must be a positive integer.",
+            )
+            return@getCardsHandler
+        }
     }
 
-    // Return 401 if there is no user corresponding to the session
-    val correspondingUser = repository.getUserById(id = session.userId)
-    if (correspondingUser == null) {
-        val message = mapOf("message" to "The user with the corresponding session does not exist")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@getCardsHandler
-    }
-
-    // Search cards by collection id if it passed
-    val collectionId = call.request.queryParameters["collection_id"]?.toLongOrNull()
+    // Search cards by collection id if it passed or by owner.
     val cards = if (collectionId != null) {
         repository.getCardsByCollectionId(id = collectionId, limit = 10, offset = 0)
     } else {
-        repository.getCardsByOwnerId(id = session.userId)
+        repository.getCardsByOwnerId(id = session!!.userId)
     }
     call.respond(status = HttpStatusCode.OK, message = cards)
 }

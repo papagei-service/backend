@@ -17,13 +17,6 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
 ): suspend RoutingContext.() -> Unit = postCollectionHandler@{
     val session = call.sessions.get<UserSession>()
 
-    // Return 401 if the user is not authenticated
-    if (session == null) {
-        val message = mapOf("message" to "User session is missing, invalid or expired")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@postCollectionHandler
-    }
-
     // Return 400 if the request body cannot be converted to a collection
     val body = runCatching { call.receive<CardCollectionInsertRequest>() }.getOrNull()
     if (body == null) {
@@ -32,16 +25,8 @@ fun RouteHandlersProvider.V1.Collections.postCollection(
         return@postCollectionHandler
     }
 
-    // Return 404 if there is no user corresponding to the session
-    val correspondingUser = repository.getUserById(id = session.userId)
-    if (correspondingUser == null) {
-        val message = mapOf("message" to "The user with the corresponding session does not exist")
-        call.respond(status = HttpStatusCode.NotFound, message = message)
-        return@postCollectionHandler
-    }
-
     // Insert the collection into the storage
-    val collectionToInsert = body.toCardCollection(id = null, ownerId = session.userId)
+    val collectionToInsert = body.toCardCollection(id = null, ownerId = session!!.userId)
     val insertedCollection = repository.insertCollection(collection = collectionToInsert)
 
     call.respond(status = HttpStatusCode.Created, message = insertedCollection)

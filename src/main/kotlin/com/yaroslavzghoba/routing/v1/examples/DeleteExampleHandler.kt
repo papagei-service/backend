@@ -31,8 +31,8 @@ fun RouteHandlersProvider.V1.Examples.deleteExample(
 
     // Return 400 if the `example_id` parameter is not passed or is invalid
     val exampleId = call.parameters["example_id"]?.toLongOrNull()
-    if (exampleId == null) {
-        val message = mapOf("message" to "The \"example_id\" parameter is not passed or cannot be cast to number")
+    if (exampleId == null || exampleId < 0) {
+        val message = mapOf("message" to "The \"example_id\" parameter must be a positive integer.")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@deleteExampleHandler
     }

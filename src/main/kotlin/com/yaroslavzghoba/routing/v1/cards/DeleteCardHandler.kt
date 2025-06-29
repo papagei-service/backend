@@ -14,13 +14,6 @@ fun RouteHandlersProvider.V1.Cards.deleteCard(
 ): suspend RoutingContext.() -> Unit = deleteCardHandler@{
     val session = call.sessions.get<UserSession>()
 
-    // Return 401 if the user is not authenticated
-    if (session == null) {
-        val message = mapOf("message" to "User session is missing, invalid or expired")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@deleteCardHandler
-    }
-
     // Return 400 if the `card_id` parameter is not passed or is invalid
     val cardId = call.parameters["card_id"]?.toLongOrNull()
     if (cardId == null || cardId <= 0) {
@@ -38,7 +31,7 @@ fun RouteHandlersProvider.V1.Cards.deleteCard(
     }
 
     // Return 403 if the corresponding card is owned by another user
-    if (card.ownerId != session.userId) {
+    if (card.ownerId != session!!.userId) {
         val message = mapOf("message" to "You cannot access someone else's card")
         call.respond(status = HttpStatusCode.Forbidden, message = message)
         return@deleteCardHandler

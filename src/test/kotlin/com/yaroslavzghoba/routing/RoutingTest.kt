@@ -1,4 +1,4 @@
-package com.yaroslavzghoba
+package com.yaroslavzghoba.routing
 
 import com.yaroslavzghoba.utils.testConfiguredApplication
 import io.ktor.client.request.*
@@ -12,9 +12,8 @@ class RoutingTest {
     fun `001= Receive 500 status code during error on server side`() = testConfiguredApplication { client, _ ->
         val response0 = client.get("/error")
         assertEquals(
-            expected = HttpStatusCode.InternalServerError,
+            expected = HttpStatusCode.Companion.InternalServerError,
             actual = response0.status
         )
     }
 }
-

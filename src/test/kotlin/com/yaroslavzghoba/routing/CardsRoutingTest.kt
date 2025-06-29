@@ -14,6 +14,7 @@ import io.ktor.http.*
 import io.ktor.util.logging.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @Suppress("unused")
 private val LOGGER = KtorSimpleLogger(CardsRoutingTest::class.java.name)
@@ -304,4 +305,169 @@ class CardsRoutingTest {
             actual = response2.status,
         )
     }
+
+    @Test
+    fun `012= Do not grant access to the card if the id parameter is invalid`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            // Try to get access to a card using invalid id
+            val response1 = client.get("/v1/cards/-1") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.BadRequest,
+                actual = response1.status,
+            )
+        }
+
+    @Test
+    fun `013= Do not grant access to the card if it was not found in the storage`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            // Try to get access to a card in empty storage
+            val response1 = client.get("/v1/card/1") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.NotFound,
+                actual = response1.status,
+            )
+        }
+
+    @Test
+    fun `014= Do not grant access to the card if it owned by another user`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a first user and extract its cookie
+            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie0 = response0.rawCookie()  // Contains the user's session
+
+            // Create a card on behalf of the first user
+            val cardInsertRequest = TestData.FIRST_CARD_REQUEST
+            val cardId = client.post("/v1/cards/") {
+                rawCookie(value = rawCookie0)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(cardInsertRequest)
+            }.body<Card>().id
+
+            // Register, login another user and extract its cookie
+            val registrationCredentials1 = TestData.SECOND_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials1, AuthUtils.NOT_STRONG_TOKEN)
+            val response1 = AuthUtils
+                .loginUser(client, registrationCredentials1.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie1 = response1.rawCookie()  // Contains the user's session
+
+            // Try to get access to the card created by the first user on behalf of the second user
+            val response2 = client.get("/v1/cards/$cardId") {
+                rawCookie(value = rawCookie1)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.Forbidden,
+                actual = response2.status,
+            )
+        }
+
+    @Test
+    fun `015= Grant access to the card by its id`() = testConfiguredApplication { client, _ ->
+        // Register, login a user and extract its cookie
+        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+        val response0 = AuthUtils
+            .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+        val rawCookie = response0.rawCookie()  // Contains the user's session
+
+        // Insert a card that will be updated and extract its ID
+        val cardInsertRequest = TestData.FIRST_CARD_REQUEST
+        val insertedCard = client.post("/v1/cards/") {
+            rawCookie(value = rawCookie)
+            bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            setBody(cardInsertRequest)
+        }.body<Card>()
+        val cardId = insertedCard.id!!
+
+        val receivedCollection = client.get("/v1/cards/$cardId") {
+            rawCookie(value = rawCookie)
+            bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+        }.body<Card>()
+
+        assertEquals(
+            expected = insertedCard,
+            actual = receivedCollection,
+        )
+    }
+
+    @Test
+    fun `016= Grant access to the user's cards`() = testConfiguredApplication { client, _ ->
+        // Register, login a user and extract its cookie
+        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+        val response0 = AuthUtils
+            .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+        val rawCookie = response0.rawCookie()  // Contains the user's session
+
+        // Insert cards that will be received
+        val insertedCollections = listOf(
+            TestData.FIRST_CARD_REQUEST,
+            TestData.SECOND_CARD_REQUEST,
+            TestData.THIRD_CARD_REQUEST,
+        ).map { cardInsertRequest ->
+            client.post("/v1/cards/") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(cardInsertRequest)
+            }.body<Card>()
+        }
+
+        val receivedCards = client.get("/v1/cards") {
+            rawCookie(value = rawCookie)
+            bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+        }.body<List<Card>>()
+
+        assertTrue {
+            insertedCollections == receivedCards
+        }
+    }
+
+    @Test
+    fun `017= Do not grant access to the cards if the collection id query parameter is invalid`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            val response1 = client.get("/v1/cards?collection_id=-1") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.BadRequest,
+                actual = response1.status,
+            )
+        }
+
+    // TODO: Add test `018= Grant access to the cards by collection id`
 }
