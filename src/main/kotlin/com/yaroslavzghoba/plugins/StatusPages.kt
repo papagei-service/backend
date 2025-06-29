@@ -4,7 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
-import io.ktor.util.logging.KtorSimpleLogger
+import io.ktor.util.logging.*
 
 private val LOGGER = KtorSimpleLogger("com.yaroslavzghoba.plugins")
 

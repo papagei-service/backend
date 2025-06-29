@@ -2,10 +2,11 @@ package com.yaroslavzghoba.utils
 
 import com.yaroslavzghoba.model.CardCollectionInsertRequest
 import com.yaroslavzghoba.model.CardInsertRequest
+import com.yaroslavzghoba.model.ExampleInsertRequest
 import com.yaroslavzghoba.model.RegistrationCredentials
 
 @Suppress("unused")
-object TestData {
+object MockData {
 
     val FIRST_REGISTRATION_CREDENTIALS =
         RegistrationCredentials(username = "admin", displayName = "Admin", password = "qwerty")
@@ -60,5 +61,18 @@ object TestData {
         lastAnsweredAt = null,
         showNextTimeAt = null,
         correctAnswersInRow = 0
+    )
+
+    val FIRST_EXAMPLE_REQUEST = ExampleInsertRequest(
+        knownLanguageText = "I'm going to the store.",
+        learningLanguageText = "Ich gehe zum Laden."
+    )
+    val SECOND_EXAMPLE_REQUEST = ExampleInsertRequest(
+        knownLanguageText = "Чи можеш ти мені допомогти з цим завданням?",
+        learningLanguageText = "¿Puedes ayudarme con esta tarea?"
+    )
+    val THIRD_EXAMPLE_REQUEST = ExampleInsertRequest(
+        knownLanguageText = "إنها تمطر بغزارة اليوم.",
+        learningLanguageText = "Il pleut fortement aujourd'hui."
     )
 }

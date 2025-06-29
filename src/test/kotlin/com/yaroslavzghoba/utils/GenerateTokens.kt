@@ -3,7 +3,7 @@ package com.yaroslavzghoba.utils
 import com.yaroslavzghoba.security.jwt.JwtTokenClaim
 import com.yaroslavzghoba.security.jwt.JwtTokenConfig
 import com.yaroslavzghoba.security.jwt.JwtTokenService
-import io.ktor.util.logging.KtorSimpleLogger
+import io.ktor.util.logging.*
 
 private val LOGGER = KtorSimpleLogger(::generateTokens.javaClass.packageName)
 

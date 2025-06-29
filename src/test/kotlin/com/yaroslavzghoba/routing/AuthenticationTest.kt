@@ -4,13 +4,13 @@ import com.yaroslavzghoba.mappers.toLoginCredentials
 import com.yaroslavzghoba.model.Account
 import com.yaroslavzghoba.model.TokenResponse
 import com.yaroslavzghoba.utils.AuthUtils
-import com.yaroslavzghoba.utils.TestData
+import com.yaroslavzghoba.utils.MockData
 import com.yaroslavzghoba.utils.rawCookie
 import com.yaroslavzghoba.utils.testConfiguredApplication
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.util.logging.KtorSimpleLogger
+import io.ktor.util.logging.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -71,7 +71,7 @@ class AuthenticationTest {
     @Test
     fun `005= Grand access to a resource protected by not strong token auth with a not strong token`() =
         testConfiguredApplication { client, _ ->
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
 
             val response0 = client.get("/v1/token") {
                 bearerAuth(token = AuthUtils.STRONG_TOKEN)
@@ -92,7 +92,7 @@ class AuthenticationTest {
     @Test
     fun `006= Grand access to a resource protected by not strong token auth with a strong token`() =
         testConfiguredApplication { client, _ ->
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
 
             val response0 = client.post("/v1/account/register") {
                 bearerAuth(token = AuthUtils.STRONG_TOKEN)
@@ -120,7 +120,7 @@ class AuthenticationTest {
 
     @Test
     fun `008= Do not login with a non-existing username`() = testConfiguredApplication { client, _ ->
-        val loginCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS.toLoginCredentials()
+        val loginCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS.toLoginCredentials()
 
         val response0 = client.post("/v1/account/login") {
             bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
@@ -135,7 +135,7 @@ class AuthenticationTest {
 
     @Test
     fun `009= Do not register if the request body is invalid`() = testConfiguredApplication { client, _ ->
-        val loginCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS.toLoginCredentials()
+        val loginCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS.toLoginCredentials()
 
         val response0 = client.post("/v1/account/register") {
             bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
@@ -150,7 +150,7 @@ class AuthenticationTest {
 
     @Test
     fun `010= Do not register with a blank username`() = testConfiguredApplication { client, _ ->
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             .copy(username = " ")
 
         val response0 = client.post("/v1/account/register") {
@@ -166,7 +166,7 @@ class AuthenticationTest {
 
     @Test
     fun `012= Do not register with a blank display name`() = testConfiguredApplication { client, _ ->
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             .copy(displayName = " ")
 
         val response0 = client.post("/v1/account/register") {
@@ -182,7 +182,7 @@ class AuthenticationTest {
 
     @Test
     fun `012= Do not register with a blank password`() = testConfiguredApplication { client, _ ->
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             .copy(password = " ")
 
         val response0 = client.post("/v1/account/register") {
@@ -198,8 +198,8 @@ class AuthenticationTest {
 
     @Test
     fun `013= Do not register if a username is already taken`() = testConfiguredApplication { client, _ ->
-        val firstRegistrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
-        val secondRegistrationCredentials = TestData.SECOND_REGISTRATION_CREDENTIALS
+        val firstRegistrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
+        val secondRegistrationCredentials = MockData.SECOND_REGISTRATION_CREDENTIALS
             .copy(username = firstRegistrationCredentials.username)
 
         client.post("/v1/account/register") {
@@ -220,7 +220,7 @@ class AuthenticationTest {
 
     @Test
     fun `014= Register a new user`() = testConfiguredApplication { client, _ ->
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
 
         val response0 = client.post("/v1/account/register") {
             bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
@@ -235,9 +235,9 @@ class AuthenticationTest {
 
     @Test
     fun `015= Do not login the existing user with the incorrect password`() = testConfiguredApplication { client, _ ->
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         val wrongLoginCredentials = registrationCredentials.toLoginCredentials()
-            .copy(password = TestData.FIRST_REGISTRATION_CREDENTIALS.password + ".")  // Modified password
+            .copy(password = MockData.FIRST_REGISTRATION_CREDENTIALS.password + ".")  // Modified password
 
         // Register the new user
         client.post("/v1/account/register") {
@@ -259,7 +259,7 @@ class AuthenticationTest {
 
     @Test
     fun `016= Login the existing user with the correct password`() = testConfiguredApplication { client, _ ->
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         val loginCredentials = registrationCredentials.toLoginCredentials()
 
         // Register the new user
@@ -283,7 +283,7 @@ class AuthenticationTest {
     @Test
     fun `017= Grant access to the session-protected resource with active session`() =
         testConfiguredApplication { client, _ ->
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             val loginCredentials = registrationCredentials.toLoginCredentials()
 
             // Register the new user
@@ -314,7 +314,7 @@ class AuthenticationTest {
     @Test
     fun `018= Do not grant access to the session-protected resource after logout`() =
         testConfiguredApplication { client, _ ->
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             val loginCredentials = registrationCredentials.toLoginCredentials()
 
             // Register the new user
@@ -351,7 +351,7 @@ class AuthenticationTest {
     @Test
     fun `019= Do not generate a new not strong token with only the session without a strong token`() =
         testConfiguredApplication { client, _ ->
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             val loginCredentials = registrationCredentials.toLoginCredentials()
 
             // Register the new user
@@ -381,7 +381,7 @@ class AuthenticationTest {
     @Test
     fun `020= Do not grant access to the session-protected resource after deleting the account`() =
         testConfiguredApplication { client, _ ->
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             val loginCredentials = registrationCredentials.toLoginCredentials()
 
             // Register the new user
@@ -416,7 +416,7 @@ class AuthenticationTest {
 
     @Test
     fun `021= Grant access to the account details`() = testConfiguredApplication { client, _ ->
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         val loginCredentials = registrationCredentials.toLoginCredentials()
 
         // Register the new user

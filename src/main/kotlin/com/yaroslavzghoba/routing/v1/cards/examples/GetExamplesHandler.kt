@@ -12,26 +12,11 @@ import io.ktor.server.sessions.*
 fun RouteHandlersProvider.V1.Cards.Examples.getExamples(
     repository: Repository,
 ): suspend RoutingContext.() -> Unit = getExamplesHandle@{
-    val session = call.sessions.get<UserSession>()
-
-    // Return 401 if the user is not authenticated
-    if (session == null) {
-        val message = mapOf("message" to "User session is missing, invalid or expired")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@getExamplesHandle
-    }
-
-    // Return 401 if there is no user corresponding to the session
-    val correspondingUser = repository.getUserById(id = session.userId)
-    if (correspondingUser == null) {
-        val message = mapOf("message" to "The user with the corresponding session does not exist")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@getExamplesHandle
-    }
+    val session = call.sessions.get<UserSession>()!!
 
     // Return 400 if the `card_id` parameter is not passed or is invalid
     val cardId = call.parameters["card_id"]?.toLongOrNull()
-    if (cardId == null) {
+    if (cardId == null || cardId < 0) {
         val message = mapOf("message" to "The \"card_id\" parameter is not passed or cannot be cast to number")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@getExamplesHandle

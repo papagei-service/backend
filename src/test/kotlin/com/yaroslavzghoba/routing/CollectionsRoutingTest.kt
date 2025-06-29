@@ -5,7 +5,7 @@ import com.yaroslavzghoba.mappers.toCardCollectionUpdateRequest
 import com.yaroslavzghoba.mappers.toLoginCredentials
 import com.yaroslavzghoba.model.CardCollection
 import com.yaroslavzghoba.utils.AuthUtils
-import com.yaroslavzghoba.utils.TestData
+import com.yaroslavzghoba.utils.MockData
 import com.yaroslavzghoba.utils.rawCookie
 import com.yaroslavzghoba.utils.testConfiguredApplication
 import io.ktor.client.call.*
@@ -25,7 +25,7 @@ class CollectionsRoutingTest {
     fun `001= Do not insert a new collection if the request body is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -46,7 +46,7 @@ class CollectionsRoutingTest {
     @Test
     fun `002= Insert a new collection`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -55,7 +55,7 @@ class CollectionsRoutingTest {
         val response1 = client.post("/v1/collections/") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
-            setBody(TestData.FIRST_COLLECTION_INSERT_REQUEST)
+            setBody(MockData.FIRST_COLLECTION_INSERT_REQUEST)
         }
 
         assertEquals(
@@ -67,7 +67,7 @@ class CollectionsRoutingTest {
     @Test
     fun `003= Do not update the collection if the request body is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -88,13 +88,13 @@ class CollectionsRoutingTest {
     @Test
     fun `004= Do not update the collection if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie = response0.rawCookie()  // Contains the user's session
 
-        val collectionUpdateRequest = TestData.FIRST_COLLECTION_INSERT_REQUEST.toCardCollectionUpdateRequest()
+        val collectionUpdateRequest = MockData.FIRST_COLLECTION_INSERT_REQUEST.toCardCollectionUpdateRequest()
         val response1 = client.put("/v1/collections/-1") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -111,13 +111,13 @@ class CollectionsRoutingTest {
     fun `005= Do not update the collection if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
             val rawCookie = response0.rawCookie()  // Contains the user's session
 
-            val collectionUpdateRequest = TestData.FIRST_COLLECTION_INSERT_REQUEST.toCardCollectionUpdateRequest()
+            val collectionUpdateRequest = MockData.FIRST_COLLECTION_INSERT_REQUEST.toCardCollectionUpdateRequest()
             val response1 = client.put("/v1/collections/1") {
                 rawCookie(value = rawCookie)
                 bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -133,14 +133,14 @@ class CollectionsRoutingTest {
     @Test
     fun `006= Do not update the collection if it owned by another user`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
         // Create a collection on behalf of the first user
-        val collectionInsertRequest = TestData.FIRST_COLLECTION_INSERT_REQUEST
+        val collectionInsertRequest = MockData.FIRST_COLLECTION_INSERT_REQUEST
         val collectionId = client.post("/v1/collections/") {
             rawCookie(value = rawCookie0)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -148,7 +148,7 @@ class CollectionsRoutingTest {
         }.body<CardCollection>().id
 
         // Register, login another user and extract its cookie
-        val registrationCredentials1 = TestData.SECOND_REGISTRATION_CREDENTIALS
+        val registrationCredentials1 = MockData.SECOND_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials1, AuthUtils.NOT_STRONG_TOKEN)
         val response1 = AuthUtils
             .loginUser(client, registrationCredentials1.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -171,14 +171,14 @@ class CollectionsRoutingTest {
     @Test
     fun `007= Update the collection`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a collection that will be updated and extract its ID
-        val collectionInsertRequest = TestData.FIRST_COLLECTION_INSERT_REQUEST
+        val collectionInsertRequest = MockData.FIRST_COLLECTION_INSERT_REQUEST
         val insertedCollection = client.post("/v1/collections/") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -186,7 +186,7 @@ class CollectionsRoutingTest {
         }.body<CardCollection>()
 
         // Update the collection
-        val collectionUpdateRequest = TestData.SECOND_COLLECTION_INSERT_REQUEST.toCardCollectionUpdateRequest()
+        val collectionUpdateRequest = MockData.SECOND_COLLECTION_INSERT_REQUEST.toCardCollectionUpdateRequest()
         val response2 = client.put("/v1/collections/${insertedCollection.id}") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -203,7 +203,7 @@ class CollectionsRoutingTest {
     @Test
     fun `008= Do not delete the collection if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -224,7 +224,7 @@ class CollectionsRoutingTest {
     fun `009= Do not delete the collection if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -244,14 +244,14 @@ class CollectionsRoutingTest {
     @Test
     fun `010= Do not delete the collection if it owned by another user`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
         // Create a collection on behalf of the first user
-        val collectionInsertRequest = TestData.FIRST_COLLECTION_INSERT_REQUEST
+        val collectionInsertRequest = MockData.FIRST_COLLECTION_INSERT_REQUEST
         val collectionId = client.post("/v1/collections/") {
             rawCookie(value = rawCookie0)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -259,7 +259,7 @@ class CollectionsRoutingTest {
         }.body<CardCollection>().id
 
         // Register, login another user and extract its cookie
-        val registrationCredentials1 = TestData.SECOND_REGISTRATION_CREDENTIALS
+        val registrationCredentials1 = MockData.SECOND_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials1, AuthUtils.NOT_STRONG_TOKEN)
         val response1 = AuthUtils
             .loginUser(client, registrationCredentials1.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -280,14 +280,14 @@ class CollectionsRoutingTest {
     @Test
     fun `011= Delete the collection`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a collection that will be updated and extract its ID
-        val collectionInsertRequest = TestData.FIRST_COLLECTION_INSERT_REQUEST
+        val collectionInsertRequest = MockData.FIRST_COLLECTION_INSERT_REQUEST
         val insertedCollection = client.post("/v1/collections/") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -310,7 +310,7 @@ class CollectionsRoutingTest {
     fun `012= Do not grant access to the collection if the id parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -332,7 +332,7 @@ class CollectionsRoutingTest {
     fun `013= Do not grant access to the collection if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -354,14 +354,14 @@ class CollectionsRoutingTest {
     fun `014= Do not grant access to the collection if it owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a first user and extract its cookie
-            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
             val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
             // Create a collection on behalf of the first user
-            val collectionInsertRequest = TestData.FIRST_COLLECTION_INSERT_REQUEST
+            val collectionInsertRequest = MockData.FIRST_COLLECTION_INSERT_REQUEST
             val collectionId = client.post("/v1/collections/") {
                 rawCookie(value = rawCookie0)
                 bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -369,7 +369,7 @@ class CollectionsRoutingTest {
             }.body<CardCollection>().id
 
             // Register, login another user and extract its cookie
-            val registrationCredentials1 = TestData.SECOND_REGISTRATION_CREDENTIALS
+            val registrationCredentials1 = MockData.SECOND_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials1, AuthUtils.NOT_STRONG_TOKEN)
             val response1 = AuthUtils
                 .loginUser(client, registrationCredentials1.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -390,14 +390,14 @@ class CollectionsRoutingTest {
     @Test
     fun `015= Grant access to the collection by its id`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a collection that will be updated and extract its ID
-        val collectionInsertRequest = TestData.FIRST_COLLECTION_INSERT_REQUEST
+        val collectionInsertRequest = MockData.FIRST_COLLECTION_INSERT_REQUEST
         val insertedCollection = client.post("/v1/collections/") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -419,7 +419,7 @@ class CollectionsRoutingTest {
     @Test
     fun `016= Grant access to the user's collections`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -427,9 +427,9 @@ class CollectionsRoutingTest {
 
         // Insert collections that will be received
         val insertedCollections = listOf(
-            TestData.FIRST_COLLECTION_INSERT_REQUEST,
-            TestData.SECOND_COLLECTION_INSERT_REQUEST,
-            TestData.THIRD_COLLECTION_INSERT_REQUEST,
+            MockData.FIRST_COLLECTION_INSERT_REQUEST,
+            MockData.SECOND_COLLECTION_INSERT_REQUEST,
+            MockData.THIRD_COLLECTION_INSERT_REQUEST,
         ).map { collectionInsertRequest ->
             client.post("/v1/collections/") {
                 rawCookie(value = rawCookie)
@@ -452,7 +452,7 @@ class CollectionsRoutingTest {
     fun `017= Do not grant access to the collections if the card id query parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)

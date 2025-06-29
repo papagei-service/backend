@@ -1,7 +1,7 @@
 package com.yaroslavzghoba.routing.v1.cards.examples
 
 import com.yaroslavzghoba.mappers.toExample
-import com.yaroslavzghoba.model.ExampleToInsertRequest
+import com.yaroslavzghoba.model.ExampleInsertRequest
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -15,25 +15,10 @@ import io.ktor.server.sessions.*
 fun RouteHandlersProvider.V1.Cards.Examples.postExample(
     repository: Repository,
 ): suspend RoutingContext.() -> Unit = postExampleHandler@{
-    val session = call.sessions.get<UserSession>()
-
-    // Return 401 if the user is not authenticated
-    if (session == null) {
-        val message = mapOf("message" to "User session is missing, invalid or expired")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@postExampleHandler
-    }
-
-    // Return 401 if there is no user corresponding to the session
-    val correspondingUser = repository.getUserById(id = session.userId)
-    if (correspondingUser == null) {
-        val message = mapOf("message" to "The user with the corresponding session does not exist")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@postExampleHandler
-    }
+    val session = call.sessions.get<UserSession>()!!
 
     // Return 400 if the request body cannot be converted to an example
-    val body = runCatching { call.receive<ExampleToInsertRequest>() }.getOrNull()
+    val body = runCatching { call.receive<ExampleInsertRequest>() }.getOrNull()
     if (body == null) {
         val message = mapOf("message" to "The request body cannot be converted to an example")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
@@ -42,8 +27,8 @@ fun RouteHandlersProvider.V1.Cards.Examples.postExample(
 
     // Return 400 if the `card_id` parameter is not passed or is invalid
     val cardId = call.parameters["card_id"]?.toLongOrNull()
-    if (cardId == null) {
-        val message = mapOf("message" to "The \"card_id\" parameter is not passed or cannot be cast to number")
+    if (cardId == null || cardId < 0) {
+        val message = mapOf("message" to "The \"card_id\" parameter must be a positive integer.")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@postExampleHandler
     }

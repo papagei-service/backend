@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  * @param learningLanguageText Example of usage in a language the user want to learn.
  */
 @Serializable
-data class ExampleToUpdateRequest(
+data class ExampleUpdateRequest(
     @SerialName("known_language_text") val knownLanguageText: String,
     @SerialName("learning_language_text") val learningLanguageText: String,
     @SerialName("card_id") val cardId: Long,

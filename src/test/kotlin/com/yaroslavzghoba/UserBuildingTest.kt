@@ -2,7 +2,7 @@ package com.yaroslavzghoba
 
 import com.yaroslavzghoba.model.User
 import com.yaroslavzghoba.security.hashing.HashingServiceImpl
-import com.yaroslavzghoba.utils.TestData
+import com.yaroslavzghoba.utils.MockData
 import com.yaroslavzghoba.utils.testConfiguredApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,8 +15,8 @@ class UserBuildingTest {
         val algorithm = applicationConfig.property("security.hashing.algorithm").getString()
         val hashingService = HashingServiceImpl(pepper = pepper, algorithm = algorithm)
 
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
-        val salt = TestData.FIRST_SALT
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
+        val salt = MockData.FIRST_SALT
         // Building a user using `User` class
         val builtUser = User.Builder(registrationCredentials = registrationCredentials, hashingService = hashingService)
             .withSalt(salt = salt)

@@ -5,7 +5,7 @@ import com.yaroslavzghoba.mappers.toCardUpdateRequest
 import com.yaroslavzghoba.mappers.toLoginCredentials
 import com.yaroslavzghoba.model.Card
 import com.yaroslavzghoba.utils.AuthUtils
-import com.yaroslavzghoba.utils.TestData
+import com.yaroslavzghoba.utils.MockData
 import com.yaroslavzghoba.utils.rawCookie
 import com.yaroslavzghoba.utils.testConfiguredApplication
 import io.ktor.client.call.*
@@ -25,7 +25,7 @@ class CardsRoutingTest {
     fun `001= Do not insert a new card if the request body is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -34,7 +34,7 @@ class CardsRoutingTest {
             val response1 = client.post("/v1/cards/") {
                 rawCookie(value = rawCookie)
                 bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
-                setBody(registrationCredentials)  // Set a registration credentials instead of a collection
+                setBody(registrationCredentials)  // Set a registration credentials instead of an example
             }
 
             assertEquals(
@@ -46,7 +46,7 @@ class CardsRoutingTest {
     @Test
     fun `002= Insert a new card`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -55,7 +55,7 @@ class CardsRoutingTest {
         val response1 = client.post("/v1/cards/") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
-            setBody(TestData.FIRST_CARD_REQUEST)
+            setBody(MockData.FIRST_CARD_REQUEST)
         }
 
         assertEquals(
@@ -67,7 +67,7 @@ class CardsRoutingTest {
     @Test
     fun `003= Do not update the card if the request body is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -88,13 +88,13 @@ class CardsRoutingTest {
     @Test
     fun `004= Do not update the card if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie = response0.rawCookie()  // Contains the user's session
 
-        val cardUpdateRequest = TestData.FIRST_CARD_REQUEST.toCardUpdateRequest()
+        val cardUpdateRequest = MockData.FIRST_CARD_REQUEST.toCardUpdateRequest()
         val response1 = client.put("/v1/cards/-1") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -111,13 +111,13 @@ class CardsRoutingTest {
     fun `005= Do not update the card if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
             val rawCookie = response0.rawCookie()  // Contains the user's session
 
-            val cardUpdateRequest = TestData.FIRST_CARD_REQUEST.toCardUpdateRequest()
+            val cardUpdateRequest = MockData.FIRST_CARD_REQUEST.toCardUpdateRequest()
             val response1 = client.put("/v1/cards/1") {
                 rawCookie(value = rawCookie)
                 bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -133,14 +133,14 @@ class CardsRoutingTest {
     @Test
     fun `006= Do not update the card if it owned by another user`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
         // Create a card on behalf of the first user
-        val cardInsertRequest = TestData.FIRST_CARD_REQUEST
+        val cardInsertRequest = MockData.FIRST_CARD_REQUEST
         val cardId = client.post("/v1/cards/") {
             rawCookie(value = rawCookie0)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -148,7 +148,7 @@ class CardsRoutingTest {
         }.body<Card>().id
 
         // Register, login another user and extract its cookie
-        val registrationCredentials1 = TestData.SECOND_REGISTRATION_CREDENTIALS
+        val registrationCredentials1 = MockData.SECOND_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials1, AuthUtils.NOT_STRONG_TOKEN)
         val response1 = AuthUtils
             .loginUser(client, registrationCredentials1.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -171,14 +171,14 @@ class CardsRoutingTest {
     @Test
     fun `007= Update the card`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a card that will be updated and extract its ID
-        val cardInsertRequest = TestData.FIRST_CARD_REQUEST
+        val cardInsertRequest = MockData.FIRST_CARD_REQUEST
         val insertedCard = client.post("/v1/cards/") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -186,7 +186,7 @@ class CardsRoutingTest {
         }.body<Card>()
 
         // Update the card
-        val cardUpdateRequest = TestData.SECOND_CARD_REQUEST.toCardUpdateRequest()
+        val cardUpdateRequest = MockData.SECOND_CARD_REQUEST.toCardUpdateRequest()
         val response2 = client.put("/v1/cards/${insertedCard.id}") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -203,7 +203,7 @@ class CardsRoutingTest {
     @Test
     fun `008= Do not delete the card if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -224,7 +224,7 @@ class CardsRoutingTest {
     fun `009= Do not delete the card if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -244,14 +244,14 @@ class CardsRoutingTest {
     @Test
     fun `010= Do not delete the card if it owned by another user`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
         // Create a card on behalf of the first user
-        val cardInsertRequest = TestData.FIRST_CARD_REQUEST
+        val cardInsertRequest = MockData.FIRST_CARD_REQUEST
         val cardId = client.post("/v1/cards/") {
             rawCookie(value = rawCookie0)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -259,7 +259,7 @@ class CardsRoutingTest {
         }.body<Card>().id
 
         // Register, login another user and extract its cookie
-        val registrationCredentials1 = TestData.SECOND_REGISTRATION_CREDENTIALS
+        val registrationCredentials1 = MockData.SECOND_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials1, AuthUtils.NOT_STRONG_TOKEN)
         val response1 = AuthUtils
             .loginUser(client, registrationCredentials1.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -280,21 +280,21 @@ class CardsRoutingTest {
     @Test
     fun `011= Delete the card`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a card that will be deleted and extract its ID
-        val cardInsertRequest = TestData.FIRST_CARD_REQUEST
+        val cardInsertRequest = MockData.FIRST_CARD_REQUEST
         val insertedCard = client.post("/v1/cards/") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
             setBody(cardInsertRequest)
         }.body<Card>()
 
-        // Delete the collection
+        // Delete the card
         val response2 = client.delete("/v1/cards/${insertedCard.id}") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -310,7 +310,7 @@ class CardsRoutingTest {
     fun `012= Do not grant access to the card if the id parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -332,7 +332,7 @@ class CardsRoutingTest {
     fun `013= Do not grant access to the card if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -354,14 +354,14 @@ class CardsRoutingTest {
     fun `014= Do not grant access to the card if it owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a first user and extract its cookie
-            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
             val rawCookie0 = response0.rawCookie()  // Contains the user's session
 
             // Create a card on behalf of the first user
-            val cardInsertRequest = TestData.FIRST_CARD_REQUEST
+            val cardInsertRequest = MockData.FIRST_CARD_REQUEST
             val cardId = client.post("/v1/cards/") {
                 rawCookie(value = rawCookie0)
                 bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -369,7 +369,7 @@ class CardsRoutingTest {
             }.body<Card>().id
 
             // Register, login another user and extract its cookie
-            val registrationCredentials1 = TestData.SECOND_REGISTRATION_CREDENTIALS
+            val registrationCredentials1 = MockData.SECOND_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials1, AuthUtils.NOT_STRONG_TOKEN)
             val response1 = AuthUtils
                 .loginUser(client, registrationCredentials1.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
@@ -390,14 +390,14 @@ class CardsRoutingTest {
     @Test
     fun `015= Grant access to the card by its id`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert a card that will be updated and extract its ID
-        val cardInsertRequest = TestData.FIRST_CARD_REQUEST
+        val cardInsertRequest = MockData.FIRST_CARD_REQUEST
         val insertedCard = client.post("/v1/cards/") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
@@ -405,31 +405,31 @@ class CardsRoutingTest {
         }.body<Card>()
         val cardId = insertedCard.id!!
 
-        val receivedCollection = client.get("/v1/cards/$cardId") {
+        val receivedCard = client.get("/v1/cards/$cardId") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
         }.body<Card>()
 
         assertEquals(
             expected = insertedCard,
-            actual = receivedCollection,
+            actual = receivedCard,
         )
     }
 
     @Test
     fun `016= Grant access to the user's cards`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
-        val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
         val response0 = AuthUtils
             .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
         val rawCookie = response0.rawCookie()  // Contains the user's session
 
         // Insert cards that will be received
-        val insertedCollections = listOf(
-            TestData.FIRST_CARD_REQUEST,
-            TestData.SECOND_CARD_REQUEST,
-            TestData.THIRD_CARD_REQUEST,
+        val insertedCards = listOf(
+            MockData.FIRST_CARD_REQUEST,
+            MockData.SECOND_CARD_REQUEST,
+            MockData.THIRD_CARD_REQUEST,
         ).map { cardInsertRequest ->
             client.post("/v1/cards/") {
                 rawCookie(value = rawCookie)
@@ -444,7 +444,7 @@ class CardsRoutingTest {
         }.body<List<Card>>()
 
         assertTrue {
-            insertedCollections == receivedCards
+            insertedCards == receivedCards
         }
     }
 
@@ -452,7 +452,7 @@ class CardsRoutingTest {
     fun `017= Do not grant access to the cards if the collection id query parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
-            val registrationCredentials0 = TestData.FIRST_REGISTRATION_CREDENTIALS
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
             AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
             val response0 = AuthUtils
                 .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
