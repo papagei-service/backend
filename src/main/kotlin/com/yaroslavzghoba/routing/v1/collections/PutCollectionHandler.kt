@@ -17,13 +17,6 @@ fun RouteHandlersProvider.V1.Collections.putCollection(
 ): suspend RoutingContext.() -> Unit = putCollectionHandler@{
     val session = call.sessions.get<UserSession>()
 
-    // Return 401 if the user is not authenticated
-    if (session == null) {
-        val message = mapOf("message" to "User session is missing, invalid or expired")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@putCollectionHandler
-    }
-
     // Return 400 if the request body cannot be converted to a collection
     val body = runCatching { call.receive<CardCollectionUpdateRequest>() }.getOrNull()
     if (body == null) {
@@ -40,14 +33,6 @@ fun RouteHandlersProvider.V1.Collections.putCollection(
         return@putCollectionHandler
     }
 
-    // Return 401 if there is no user corresponding to the session
-    val correspondingUser = repository.getUserById(id = session.userId)
-    if (correspondingUser == null) {
-        val message = mapOf("message" to "The user with the corresponding session does not exist")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@putCollectionHandler
-    }
-
     // Return 404 if there is no collection with a corresponding id in the storage
     val correspondingCollection = repository.getCollectionById(id = collectionId)
     if (correspondingCollection == null) {
@@ -57,7 +42,7 @@ fun RouteHandlersProvider.V1.Collections.putCollection(
     }
 
     // Return 403 if the corresponding collection is owned by another user
-    if (correspondingCollection.ownerId != session.userId) {
+    if (correspondingCollection.ownerId != session!!.userId) {
         val message = mapOf("message" to "You cannot access someone else's collection")
         call.respond(status = HttpStatusCode.Forbidden, message = message)
         return@putCollectionHandler

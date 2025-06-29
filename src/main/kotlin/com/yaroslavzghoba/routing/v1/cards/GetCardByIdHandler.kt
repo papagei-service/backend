@@ -14,17 +14,10 @@ fun RouteHandlersProvider.V1.Cards.getCardById(
 ): suspend RoutingContext.() -> Unit = getCardByIdHandler@{
     val session = call.sessions.get<UserSession>()
 
-    // Return 401 if the user is not authenticated
-    if (session == null) {
-        val message = mapOf("message" to "User session is missing, invalid or expired")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@getCardByIdHandler
-    }
-
     // Return 400 if the `card_id` parameter is not passed or is invalid
     val cardId = call.parameters["card_id"]?.toLongOrNull()
-    if (cardId == null) {
-        val message = mapOf("message" to "The \"card_id\" parameter is not passed or cannot be cast to number")
+    if (cardId == null || cardId < 0) {
+        val message = mapOf("message" to "The \"card_id\" parameter must be a positive integer.")
         call.respond(status = HttpStatusCode.BadRequest, message = message)
         return@getCardByIdHandler
     }
@@ -38,7 +31,7 @@ fun RouteHandlersProvider.V1.Cards.getCardById(
     }
 
     // Return 403 if the user is not the owner of the card
-    if (card.ownerId != session.userId) {
+    if (card.ownerId != session!!.userId) {
         val message = mapOf("message" to "You cannot access someone else's card")
         call.respond(status = HttpStatusCode.Forbidden, message = message)
         return@getCardByIdHandler

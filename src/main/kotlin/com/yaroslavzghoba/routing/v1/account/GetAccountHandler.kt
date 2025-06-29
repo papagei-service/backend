@@ -15,15 +15,8 @@ fun RouteHandlersProvider.V1.Account.getAccount(
 ): suspend RoutingContext.() -> Unit = getAccountHandler@{
     val session = call.sessions.get<UserSession>()
 
-    // Return 401 if the user is not authenticated
-    if (session == null) {
-        val message = mapOf("message" to "User session is missing, invalid or expired")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@getAccountHandler
-    }
-
     // Return 401 if there is no user corresponding to the session
-    val correspondingUser = repository.getUserById(id = session.userId)
+    val correspondingUser = repository.getUserById(id = session!!.userId)
     if (correspondingUser == null) {
         val message = mapOf("message" to "The user with the corresponding session does not exist")
         call.respond(status = HttpStatusCode.Unauthorized, message = message)

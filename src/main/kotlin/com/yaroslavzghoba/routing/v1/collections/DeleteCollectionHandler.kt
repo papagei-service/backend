@@ -14,13 +14,6 @@ fun RouteHandlersProvider.V1.Collections.deleteCollection(
 ): suspend RoutingContext.() -> Unit = deleteCollectionHandler@{
     val session = call.sessions.get<UserSession>()
 
-    // Return 401 if the user is not authenticated
-    if (session == null) {
-        val message = mapOf("message" to "User session is missing, invalid or expired")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
-        return@deleteCollectionHandler
-    }
-
     // Return 400 if the `collection_id` parameter is not passed or is invalid
     val collectionId = call.parameters["collection_id"]?.toLongOrNull()
     if (collectionId == null || collectionId <= 0) {
@@ -38,7 +31,7 @@ fun RouteHandlersProvider.V1.Collections.deleteCollection(
     }
 
     // Return 403 if the corresponding collection is owned by another user
-    if (collection.ownerId != session.userId) {
+    if (collection.ownerId != session!!.userId) {
         val message = mapOf("message" to "You cannot access someone else's collection")
         call.respond(status = HttpStatusCode.Forbidden, message = message)
         return@deleteCollectionHandler
