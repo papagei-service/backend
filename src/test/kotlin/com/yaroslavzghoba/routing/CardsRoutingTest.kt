@@ -339,7 +339,7 @@ class CardsRoutingTest {
             val rawCookie = response0.rawCookie()  // Contains the user's session
 
             // Try to get access to a card in empty storage
-            val response1 = client.get("/v1/card/1") {
+            val response1 = client.get("/v1/cards/1") {
                 rawCookie(value = rawCookie)
                 bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
             }
