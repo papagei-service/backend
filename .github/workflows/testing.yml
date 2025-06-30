@@ -16,7 +16,7 @@ jobs:
           repository: "papagei-service/database"
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile
+        run: docker build . --file Dockerfile --tag papagei-db
 
       - name: Run a container based on the image
         run: docker run -d \
