@@ -19,7 +19,8 @@ jobs:
         run: docker build . --file Dockerfile --tag papagei-db
 
       - name: Run a container based on the image
-        run: docker run -d \
+        run: |
+          docker run -d \
           --name papagei-test-db \
           -p 9002:5432 \
           -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
