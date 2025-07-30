@@ -52,4 +52,4 @@ jobs:
           PPG_TEST_DB_HOST_WITH_PATH: ${{ secrets.PPG_TEST_DB_HOST_WITH_PATH }}
           PPG_TEST_DB_USER: ${{ secrets.PPG_TEST_DB_USER }}
           PPG_TEST_DB_PASSWORD: ${{ secrets.PPG_TEST_DB_PASSWORD }}
-        run: ./gradlew build && ./gradlew koverHtmlReport
+        run: ./gradlew build && ./gradlew koverHtmlReport && pwd && ls
