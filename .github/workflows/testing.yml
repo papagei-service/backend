@@ -2,9 +2,9 @@ name: Testing
 
 on:
   push:
-    branches: [ "**" ]  # TODO: Replace with "main"
+    branches: [ "main" ]
   pull_request:
-    branches: [ "**" ]  # TODO: Replace with "main"
+    branches: [ "main" ]
 
 jobs:
   test:
@@ -49,7 +49,7 @@ jobs:
 
       - name: Build and test with Gradle
         env:
-          PPG_TEST_DB_HOST_WITH_PATH: ${{ secrets.PPG_TEST_DB_USER }}
+          PPG_TEST_DB_HOST_WITH_PATH: ${{ secrets.PPG_TEST_DB_HOST_WITH_PATH }}
           PPG_TEST_DB_USER: ${{ secrets.PPG_TEST_DB_USER }}
           PPG_TEST_DB_PASSWORD: ${{ secrets.PPG_TEST_DB_PASSWORD }}
         run: ./gradlew build --no-daemon
