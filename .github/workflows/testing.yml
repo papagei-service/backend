@@ -49,7 +49,7 @@ jobs:
 
       - name: Build and test with Gradle
         env:
-          PPG_TEST_DB_HOST_WITH_PATH: ${{ secrets.PPG_TEST_DB_HOST_WITH_PATH }}
+          PPG_TEST_DB_HOST_WITH_PATH: ${{ secrets.PPG_TEST_DB_USER }}
           PPG_TEST_DB_USER: ${{ secrets.PPG_TEST_DB_USER }}
           PPG_TEST_DB_PASSWORD: ${{ secrets.PPG_TEST_DB_PASSWORD }}
-        run: ./gradlew build && ./gradlew koverHtmlReport && pwd && ls
+        run: ./gradlew build --no-daemon
