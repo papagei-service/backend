@@ -1,0 +1,41 @@
+name: Check version
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the current repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - run: ls
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Extract the current code version
+        run: ./gradlew printVersion > current-version.txt 
+          && echo "The current version: $(cat current-version.txt)"
+
+      - run: ls
+
+      - name: Checkout the previous commit
+        run: git checkout HEAD^
+
+      - run: ls
+
+      - name: Save the previous code version
+        run: ./gradlew printVersion > previous-version.txt 
+          && echo "The previous version: $(cat previous-version.txt)"
+
+      - name: Check if the current version is greater
+        run: |
+          chmod +x ./github/workflows/utils/compare-versions.sh
+          ./github/workflows/utils/compare-versions $(cat ./current-version.txt) $(cat ./previous-version.txt)
