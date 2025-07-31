@@ -22,6 +22,7 @@ jobs:
 
       - name: Extract the current code version
         run: | 
+          ./gradlew printVersion
           ./gradlew printVersion --quiet > current-version.txt \
             && echo "The current version: $(cat current-version.txt)"
 
