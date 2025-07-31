@@ -22,7 +22,7 @@ jobs:
 
       - name: Extract the current code version
         run: | 
-          ./gradlew printVersion > current-version.txt \
+          ./gradlew printVersion --quiet > current-version.txt \
             && echo "The current version: $(cat current-version.txt)"
 
       - run: ls
@@ -34,7 +34,7 @@ jobs:
 
       - name: Save the previous code version
         run: |
-          ./gradlew printVersion > previous-version.txt \ 
+          ./gradlew printVersion --quiet > previous-version.txt \ 
             && echo "The previous version: $(cat previous-version.txt)"
 
       - name: Check if the current version is greater
