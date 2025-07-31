@@ -17,11 +17,9 @@ jobs:
 
       - run: ls
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Extract the current code version
-        run: | 
+        run: |
+          chmod +x gradlew
           ./gradlew printVersion
           ./gradlew printVersion --quiet > current-version.txt \
             && echo "The current version: $(cat current-version.txt)"
@@ -35,6 +33,7 @@ jobs:
 
       - name: Save the previous code version
         run: |
+          chmod +x gradlew
           ./gradlew printVersion --quiet > previous-version.txt \ 
             && echo "The previous version: $(cat previous-version.txt)"
 
