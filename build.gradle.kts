@@ -6,7 +6,14 @@ plugins {
 }
 
 group = "com.yaroslavzghoba"
-version = "0.9.3"
+version = libs.versions.version.get()
+
+// Print the current version of the project
+task("printVersion") {
+    doLast {
+        println(project.version)
+    }
+}
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
