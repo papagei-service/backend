@@ -27,7 +27,7 @@ jobs:
       - run: ls
 
       - name: Checkout the previous commit
-        run: git reset --soft HEAD^
+        run: git checkout HEAD^ -- .
 
       - run: ls
 
