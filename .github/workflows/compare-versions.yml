@@ -27,7 +27,7 @@ jobs:
         run: |
           git clone https://github.com/${{ github.repository }}.git \
             --depth 1 \
-            --branch feature/ci/check-version \
+            --branch main \
             previous-version-repo
 
       - name: Save the previous code version
