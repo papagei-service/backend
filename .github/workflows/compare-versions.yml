@@ -28,7 +28,7 @@ jobs:
           PREVIOUS_COMMIT_SHA=$(git rev-parse HEAD^)
           git clone https://github.com/${{ github.repository }}.git \
             --depth 1 \
-            --branch $PREVIOUS_COMMIT_SHA \ 
+            --branch main \ 
             previous-version-repo
 
       - name: Save the previous code version
