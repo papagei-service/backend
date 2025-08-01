@@ -25,25 +25,18 @@ jobs:
 
       - name: Clone previous commit into a separate directory
         run: |
-          PREVIOUS_COMMIT_SHA=$(git rev-parse HEAD^)
           git clone https://github.com/${{ github.repository }}.git \
             --depth 1 \
-            --branch main \
+            --branch feature/ci/check-version \
             previous-version-repo
 
       - name: Save the previous code version
         run: |
           cd previous-version-repo
           chmod +x gradlew
+          ./gradlew printVersion
           ./gradlew printVersion --quiet > ../previous-version.txt
           cd ..
-          echo "The previous version: $(cat previous-version.txt)"
-
-      - name: Save the previous code version
-        run: |
-          chmod +x gradlew
-          ./gradlew printVersion
-          ./gradlew printVersion --quiet > previous-version.txt
 
       - name: Check if the current version is greater
         run: |
