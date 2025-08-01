@@ -2,9 +2,9 @@ name: Compare previous and current versions of the code
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "**" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "**" ]
 
 jobs:
   check-version:
@@ -17,6 +17,7 @@ jobs:
 
       - name: Extract the current code version
         run: |
+          git log
           chmod +x gradlew
           ./gradlew printVersion
           ./gradlew printVersion --quiet > current-version.txt
@@ -31,6 +32,7 @@ jobs:
       - name: Save the previous code version
         run: |
           cd previous-version-repo
+          git log
           chmod +x gradlew
           ./gradlew printVersion
           ./gradlew printVersion --quiet > ../previous-version.txt
