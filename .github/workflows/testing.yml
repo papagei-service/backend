@@ -1,4 +1,4 @@
-name: Testing
+name: Run all unit and integration tests
 
 on:
   push:
