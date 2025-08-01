@@ -41,4 +41,4 @@ jobs:
       - name: Check if the current version is greater
         run: |
           chmod +x ./.github/workflows/utils/compare-versions.sh
-          ./.github/workflows/utils/compare-versions $(cat ./current-version.txt) $(cat ./previous-version.txt)
+          ./.github/workflows/utils/compare-versions.sh $(cat ./current-version.txt) $(cat ./previous-version.txt)
