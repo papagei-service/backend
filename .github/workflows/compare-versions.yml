@@ -21,21 +21,29 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew printVersion
-          ./gradlew printVersion --quiet > current-version.txt \
-            && echo "The current version: $(cat current-version.txt)"
+          ./gradlew printVersion --quiet > current-version.txt
 
-      - run: ls
+      - name: Clone previous commit into a separate directory
+        run: |
+          PREVIOUS_COMMIT_SHA=$(git rev-parse HEAD^)
+          git clone 
+            --depth 1 https://github.com/${{ github.repository }}.git 
+            --branch $PREVIOUS_COMMIT_SHA 
+            previous-version-repo
 
-      - name: Checkout the previous commit
-        run: git checkout HEAD^ -- .
-
-      - run: ls
+      - name: Save the previous code version
+        run: |
+          cd previous-version-repo
+          chmod +x gradlew
+          ./gradlew printVersion --quiet > ../previous-version.txt
+          cd ..
+          echo "The previous version: $(cat previous-version.txt)"
 
       - name: Save the previous code version
         run: |
           chmod +x gradlew
-          ./gradlew printVersion --quiet > previous-version.txt \ 
-            && echo "The previous version: $(cat previous-version.txt)"
+          ./gradlew printVersion
+          ./gradlew printVersion --quiet > previous-version.txt
 
       - name: Check if the current version is greater
         run: |
