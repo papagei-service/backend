@@ -26,9 +26,9 @@ jobs:
       - name: Clone previous commit into a separate directory
         run: |
           PREVIOUS_COMMIT_SHA=$(git rev-parse HEAD^)
-          git clone https://github.com/${{ github.repository }}.git 
-            --depth 1 
-            --branch $PREVIOUS_COMMIT_SHA 
+          git clone https://github.com/${{ github.repository }}.git \
+            --depth 1 \
+            --branch $PREVIOUS_COMMIT_SHA \ 
             previous-version-repo
 
       - name: Save the previous code version
