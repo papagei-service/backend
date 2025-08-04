@@ -17,9 +17,9 @@ jobs:
 
       - name: Extract the current code version
         run: |
-          git log -1; echo ""
+          git log -1 --oneline; echo "\n"
           chmod +x gradlew
-          ./gradlew printVersion
+          ./gradlew printVersion --quiet
           ./gradlew printVersion --quiet > current-version.txt
 
       - name: Clone previous commit into a separate directory
@@ -32,9 +32,9 @@ jobs:
       - name: Save the previous code version
         run: |
           cd previous-version-repo
-          git log -1; echo ""
+          git log -1 --oneline; echo "\n"
           chmod +x gradlew
-          ./gradlew printVersion
+          ./gradlew printVersion --quiet
           ./gradlew printVersion --quiet > ../previous-version.txt
           cd ..
 

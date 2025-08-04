@@ -1,5 +1,5 @@
 [versions]
-version = "0.10.3"
+version = "0.10.4"
 
 ktor-version = "3.0.3"
 kotlin-version = "2.1.0"
