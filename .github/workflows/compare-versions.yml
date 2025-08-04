@@ -17,7 +17,7 @@ jobs:
 
       - name: Extract the current code version
         run: |
-          git log
+          git log -1; echo ""
           chmod +x gradlew
           ./gradlew printVersion
           ./gradlew printVersion --quiet > current-version.txt
@@ -26,13 +26,13 @@ jobs:
         run: |
           git clone https://github.com/${{ github.repository }}.git \
             --depth 1 \
-            --branch main \
+            --branch hotfix/ci/chek-version \
             previous-version-repo
 
       - name: Save the previous code version
         run: |
           cd previous-version-repo
-          git log
+          git log -1; echo ""
           chmod +x gradlew
           ./gradlew printVersion
           ./gradlew printVersion --quiet > ../previous-version.txt
