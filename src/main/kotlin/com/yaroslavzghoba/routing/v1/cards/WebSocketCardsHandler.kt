@@ -1,6 +1,7 @@
 package com.yaroslavzghoba.routing.v1.cards
 
-import com.yaroslavzghoba.mappers.toCardAnswerOrNull
+import com.yaroslavzghoba.domain.HandleCardAnswerUseCase
+import com.yaroslavzghoba.mappers.toDifficultyLevelOrNull
 import com.yaroslavzghoba.model.*
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
@@ -11,19 +12,13 @@ import kotlinx.datetime.Clock
 
 @Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.V1.Cards.webSocketCards(
+    handleCardAnswerUseCase: HandleCardAnswerUseCase,
     repository: Repository,
 ): suspend DefaultWebSocketServerSession.() -> Unit = webSocketCardsHandler@{
     val session = call.sessions.get<UserSession>()
 
-    // Close the connection if the user is not authenticated
-    if (session == null) {
-        val message = "User session is missing, invalid or expired"
-        close(CloseReason(code = CloseReason.Codes.NORMAL, message = message))
-        return@webSocketCardsHandler
-    }
-
     // Send cards and receive answers
-    var cards = sendCards(repository = repository, ownerId = session.userId)
+    var cards = sendCards(repository = repository, ownerId = session!!.userId)
     while (true) {
         // Close the connection if there are no cards to review now
         if (cards.isEmpty()) {
@@ -32,16 +27,12 @@ fun RouteHandlersProvider.V1.Cards.webSocketCards(
         }
 
         // Receive the user's answer at the suggested card
-        val answer = receiveCardAnswerOrNull() ?: continue
-
+        val difficultyLevel = receiveDifficultyLevelOrNull() ?: continue
+        // Update the card using user's answer
         val sourceCard = cards.first()
-        val updatedNextTimeAt = Clock.System.now() + answer.interval * (sourceCard.correctAnswersInRow + 1)
+        val cardToUpdate = handleCardAnswerUseCase.execute(card = sourceCard, difficultyLevel = difficultyLevel)
+        repository.updateCard(card = cardToUpdate)
 
-        val isCorrect = answer != CardAnswer.WRONG
-        val correctAnswersInRow = sourceCard.correctAnswersInRow + if (isCorrect) 1 else 0
-
-        val updatedCard = sourceCard.copy(showNextTimeAt = updatedNextTimeAt, correctAnswersInRow = correctAnswersInRow)
-        repository.updateCard(card = updatedCard)
         cards = sendCards(repository = repository, ownerId = session.userId)
     }
 }
@@ -61,5 +52,5 @@ private suspend fun WebSocketServerSession.sendCards(
     return cards
 }
 
-private suspend fun WebSocketServerSession.receiveCardAnswerOrNull(): CardAnswer? =
-    receiveDeserialized<CardAnswerResponse>().toCardAnswerOrNull()
+private suspend fun WebSocketServerSession.receiveDifficultyLevelOrNull(): CardAnswerDifficultyLevel? =
+    receiveDeserialized<CardAnswerRequestWS>().toDifficultyLevelOrNull()

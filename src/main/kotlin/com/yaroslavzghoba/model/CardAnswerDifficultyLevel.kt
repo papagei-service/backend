@@ -4,9 +4,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 /**
- * Represents the answers to a single card in the process of repetition.
+ * Level of difficulty in recalling the correct answer for a single card.
  */
-enum class CardAnswer(val interval: Duration) {
+enum class CardAnswerDifficultyLevel(val interval: Duration) {
 
     /**
      * A user does not remember an answer to the card
