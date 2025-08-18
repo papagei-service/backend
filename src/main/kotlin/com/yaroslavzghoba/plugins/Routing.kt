@@ -1,5 +1,6 @@
 package com.yaroslavzghoba.plugins
 
+import com.yaroslavzghoba.domain.HandleCardAnswerUseCase
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.routing.v1.account.*
@@ -125,8 +126,10 @@ private fun Route.handleRoutingV1(
 
         route(path = "/cards") {
             webSocket(
-                handler = RouteHandlersProvider.V1.Cards
-                    .webSocketCards(repository = repository)
+                handler = RouteHandlersProvider.V1.Cards.webSocketCards(
+                    handleCardAnswerUseCase = HandleCardAnswerUseCase(),
+                    repository = repository,
+                )
             )
             get(body = RouteHandlersProvider.V1.Cards.getCards(repository = repository))
             get(
