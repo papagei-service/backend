@@ -2,9 +2,9 @@ name: Compare previous and current versions
 
 on:
   push:
-    branches: [ "**" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "**" ]
+    branches: [ "main" ]
 
 jobs:
   compare-versions:
