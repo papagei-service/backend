@@ -16,4 +16,5 @@ jobs:
           versions-extractor: |
             chmod u+x ./gradlew
             ./gradlew printVersion
+            ./gradlew printVersion -q
           shell: 'bash'
