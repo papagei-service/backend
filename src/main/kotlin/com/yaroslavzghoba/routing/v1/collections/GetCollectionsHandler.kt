@@ -12,7 +12,7 @@ import io.ktor.server.sessions.*
 fun RouteHandlersProvider.V1.Collections.getCollections(
     repository: Repository,
 ): suspend RoutingContext.() -> Unit = getCollectionsHandler@{
-    val session = call.sessions.get<UserSession>()
+    val session = call.sessions.get<UserSession>()!!
 
     // Get the optional parameter "card_id" if passed and return 400 if it is invalid
     val cardId: Long? = call.request.queryParameters["card_id"]?.let { param ->
@@ -27,9 +27,28 @@ fun RouteHandlersProvider.V1.Collections.getCollections(
 
     // Search collections by card id if it passed or by owner.
     val collections = if (cardId != null) {
+
+        // Return 404 if there is no card with a corresponding id in the storage
+        val correspondingCard = repository.getCardById(id = cardId)
+        if (correspondingCard == null) {
+            val message = mapOf("message" to "There is no card with \"id\" property equal to \"$cardId\"")
+            call.respond(status = HttpStatusCode.NotFound, message = message)
+            return@getCollectionsHandler
+        }
+
+        // Return 403 if the corresponding card is owned by another user
+        if (correspondingCard.ownerId != session.userId) {
+            val message = mapOf("message" to "You cannot access someone else's card")
+            call.respond(status = HttpStatusCode.Forbidden, message = message)
+            return@getCollectionsHandler
+        }
+
+        // Get collections that contain the corresponding card
         repository.getCollectionsByCardId(id = cardId, limit = 10, offset = 0)
     } else {
-        repository.getCollectionsByOwnerId(ownerId = session!!.userId)
+        // Get collections that belong to the user
+        repository.getCollectionsByOwnerId(ownerId = session.userId)
     }
+
     call.respond(status = HttpStatusCode.OK, message = collections)
 }

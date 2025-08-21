@@ -9,7 +9,10 @@ object RouteHandlersProvider {
 
         object Account
 
-        object Collections
+        object Collections {
+
+            object Cards
+        }
 
         object Cards {
 

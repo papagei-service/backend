@@ -8,6 +8,8 @@ import com.yaroslavzghoba.routing.v1.cards.*
 import com.yaroslavzghoba.routing.v1.cards.examples.getExamples
 import com.yaroslavzghoba.routing.v1.cards.examples.postExample
 import com.yaroslavzghoba.routing.v1.collections.*
+import com.yaroslavzghoba.routing.v1.collections.cards.deleteCard
+import com.yaroslavzghoba.routing.v1.collections.cards.postCard
 import com.yaroslavzghoba.routing.v1.examples.deleteExample
 import com.yaroslavzghoba.routing.v1.examples.getExampleById
 import com.yaroslavzghoba.routing.v1.examples.putExample
@@ -122,6 +124,17 @@ private fun Route.handleRoutingV1(
                 body = RouteHandlersProvider.V1.Collections
                     .deleteCollection(repository = repository)
             )
+
+            route(path = "/{collection_id}/cards/{card_id}") {
+                post(
+                    body = RouteHandlersProvider.V1.Collections.Cards
+                        .postCard(repository = repository)
+                )
+                delete(
+                    body = RouteHandlersProvider.V1.Collections.Cards
+                        .deleteCard(repository = repository)
+                )
+            }
         }
 
         route(path = "/cards") {

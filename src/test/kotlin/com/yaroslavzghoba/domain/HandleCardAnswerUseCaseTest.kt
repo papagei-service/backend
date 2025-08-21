@@ -3,9 +3,9 @@ package com.yaroslavzghoba.domain
 import com.yaroslavzghoba.mappers.toCard
 import com.yaroslavzghoba.model.CardAnswerDifficultyLevel
 import com.yaroslavzghoba.utils.MockData
+import kotlinx.datetime.Clock
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlinx.datetime.Clock
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
