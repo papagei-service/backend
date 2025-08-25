@@ -20,6 +20,9 @@ jobs:
       - name: Pull the database image
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:latest
 
+      - name: Check available Docker images
+        run: docker image list
+
       - name: Run a container based on the image
         run: |
           docker run -d \
