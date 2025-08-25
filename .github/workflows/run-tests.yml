@@ -2,23 +2,23 @@ name: Run unit and integration tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "**" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "**" ]
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
     steps:
       # Run a container with the test database
-      - name: Checkout the "papagei-service/database" repository
-        uses: actions/checkout@v5
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
         with:
-          repository: "papagei-service/database"
-          ref: main
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag papagei-db
+      - name: Pull the database image
+        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:latest
 
       - name: Run a container based on the image
         run: |
@@ -28,7 +28,7 @@ jobs:
           -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
           -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
           -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-          papagei-db
+          ${{ secrets.DOCKERHUB_REPOSITORY }}
 
       - name: Check the container's status
         run: docker container ls -a
