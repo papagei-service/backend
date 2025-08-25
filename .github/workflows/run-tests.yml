@@ -50,7 +50,6 @@ jobs:
           cache: "gradle"
 
       - name: Run unit and integration tests
-        id: tests
         env:
           PPG_TEST_DB_HOST_WITH_PATH: ${{ secrets.PPG_TEST_DB_HOST_WITH_PATH }}
           PPG_TEST_DB_USER: ${{ secrets.PPG_TEST_DB_USER }}
