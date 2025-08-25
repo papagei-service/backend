@@ -9,16 +9,24 @@ on:
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
+      TESTING_OUTPUT_FILE: "./.koverPrintCoverage-output.txt"
+      COVERAGE_EXTRACTOR: ./.github/workflows/utils/extract-coverage-percent.sh
+      COVERAGE_VALUE_FILE: "./.coverage-numeric-value.txt"
+      MINIMAL_CODE_COVERAGE_PERCENTAGE: 80
     steps:
-      # Start a test instance of the database
+      # START A TEST INSTANCE OF THE DATABASE
       - name: Log in to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_ACCESS_TOKEN
 
       - name: Pull the database image
-        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:latest
+        run: docker pull $DOCKERHUB_USERNAME/$DOCKERHUB_REPOSITORY:latest
 
       - name: Run a container based on the image
         run: |
@@ -28,12 +36,9 @@ jobs:
           -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
           -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
           -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-          ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}
+          $DOCKERHUB_USERNAME/$DOCKERHUB_REPOSITORY
 
-      - name: Check the container's status
-        run: docker container ls -a
-
-      # Build the project and run tests
+      # RUN UNIT AND INTEGRATION TESTS
       - name: Checkout the current repository
         uses: actions/checkout@v5
 
@@ -44,12 +49,24 @@ jobs:
           distribution: "corretto"
           cache: "gradle"
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build and test with Gradle
+      - name: Run unit and integration tests
+        id: tests
         env:
           PPG_TEST_DB_HOST_WITH_PATH: ${{ secrets.PPG_TEST_DB_HOST_WITH_PATH }}
           PPG_TEST_DB_USER: ${{ secrets.PPG_TEST_DB_USER }}
           PPG_TEST_DB_PASSWORD: ${{ secrets.PPG_TEST_DB_PASSWORD }}
-        run: ./gradlew build --no-daemon
+        run: |
+          chmod u+x ./gradlew
+          ./gradlew koverPrintCoverage --quiet >> ./$TESTING_OUTPUT_FILE
+
+      - name: Check the coverage percent
+        run: |
+          chmod u+x ./$COVERAGE_EXTRACTOR
+          COVERAGE_PERCENTAGE=$(./$COVERAGE_EXTRACTOR ./$TESTING_OUTPUT_FILE)
+          
+          echo "The coverage percentage is $COVERAGE_PERCENTAGE%"
+          if (( $(echo "$COVERAGE_PERCENT > $MINIMAL_CODE_COVERAGE_PERCENTAGE" | bc -l) )); then
+            echo "Success. The coverage percentage is greater than $MINIMAL_CODE_COVERAGE_PERCENTAGE."
+          else
+            echo "Error. The coverage percentage is less than or equal to $MINIMAL_CODE_COVERAGE_PERCENTAGE."
+          fi
