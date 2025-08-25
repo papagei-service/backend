@@ -22,11 +22,11 @@ jobs:
       - name: Log in to DockerHub
         uses: docker/login-action@v3
         with:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_ACCESS_TOKEN
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_ACCESS_TOKEN }}
 
       - name: Pull the database image
-        run: docker pull $DOCKERHUB_USERNAME/$DOCKERHUB_REPOSITORY:latest
+        run: docker pull ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_REPOSITORY }}:latest
 
       - name: Run a container based on the image
         run: |
@@ -36,7 +36,7 @@ jobs:
           -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
           -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
           -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-          $DOCKERHUB_USERNAME/$DOCKERHUB_REPOSITORY
+          ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_REPOSITORY }}
 
       # RUN UNIT AND INTEGRATION TESTS
       - name: Checkout the current repository
@@ -57,16 +57,16 @@ jobs:
           PPG_TEST_DB_PASSWORD: ${{ secrets.PPG_TEST_DB_PASSWORD }}
         run: |
           chmod u+x ./gradlew
-          ./gradlew koverPrintCoverage --quiet >> ./$TESTING_OUTPUT_FILE
+          ./gradlew koverPrintCoverage --quiet >> ./${{ env.TESTING_OUTPUT_FILE }}
 
       - name: Check the coverage percent
         run: |
-          chmod u+x ./$COVERAGE_EXTRACTOR
-          COVERAGE_PERCENTAGE=$(./$COVERAGE_EXTRACTOR ./$TESTING_OUTPUT_FILE)
+          chmod u+x ./${{ env.COVERAGE_EXTRACTOR }}
+          COVERAGE_PERCENTAGE=$(./${{ env.COVERAGE_EXTRACTOR }} ./${{ env.TESTING_OUTPUT_FILE }})
           
           echo "The coverage percentage is $COVERAGE_PERCENTAGE%"
-          if (( $(echo "$COVERAGE_PERCENT > $MINIMAL_CODE_COVERAGE_PERCENTAGE" | bc -l) )); then
-            echo "Success. The coverage percentage is greater than $MINIMAL_CODE_COVERAGE_PERCENTAGE."
+          if (( $(echo "$COVERAGE_PERCENT > ${{ env.MINIMAL_CODE_COVERAGE_PERCENTAGE }}" | bc -l) )); then
+            echo "Success. The coverage percentage is greater than ${{ env.MINIMAL_CODE_COVERAGE_PERCENTAGE }}."
           else
-            echo "Error. The coverage percentage is less than or equal to $MINIMAL_CODE_COVERAGE_PERCENTAGE."
+            echo "Error. The coverage percentage is less than or equal to ${{ env.MINIMAL_CODE_COVERAGE_PERCENTAGE }}."
           fi
