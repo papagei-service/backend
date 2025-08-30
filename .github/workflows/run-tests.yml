@@ -56,7 +56,7 @@ jobs:
           chmod u+x ./gradlew
           ./gradlew :koverPrintCoverage --quiet >> ./${{ env.COVERAGE_REPORT_FILE }}
 
-      - name: Check the coverage percent
+      - name: Check the coverage percentage
         run: |
           chmod u+x ./${{ env.COVERAGE_CHECKER }}
           ./${{ env.COVERAGE_CHECKER }} ./${{ env.TESTING_OUTPUT_FILE }}
