@@ -2,9 +2,9 @@ name: Run unit and integration tests
 
 on:
   push:
-    branches: [ "**" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "**" ]
+    branches: [ "main" ]
 
 jobs:
   run-tests:
