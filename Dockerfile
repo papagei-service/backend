@@ -13,6 +13,7 @@ RUN gradle clean build -i --stacktrace
 FROM gradle:8.10-jdk21-alpine AS build
 COPY --from=cache /home/gradle/cache_home /home/gradle/.gradle
 COPY --chown=gradle:gradle . /home/gradle/src
+RUN apk update && apk add bash
 WORKDIR /home/gradle/src
 RUN gradle buildFatJar --no-daemon
 

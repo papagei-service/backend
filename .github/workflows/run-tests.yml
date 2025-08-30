@@ -9,16 +9,22 @@ on:
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
+      COVERAGE_REPORT_FILE: "./.coverage-report.txt"
+      COVERAGE_CHECKER: ./.github/workflows/utils/check-coverage.sh
     steps:
-      # Run a container with the test database
-      - name: Checkout the "papagei-service/database" repository
-        uses: actions/checkout@v5
+      # START A TEST INSTANCE OF THE DATABASE
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
         with:
-          repository: "papagei-service/database"
-          ref: main
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_ACCESS_TOKEN }}
 
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag papagei-db
+      - name: Pull the database image
+        run: docker pull ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_REPOSITORY }}:latest
 
       - name: Run a container based on the image
         run: |
@@ -28,12 +34,9 @@ jobs:
           -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
           -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
           -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-          papagei-db
+          ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_REPOSITORY }}
 
-      - name: Check the container's status
-        run: docker container ls -a
-
-      # Build the project and run tests
+      # RUN UNIT AND INTEGRATION TESTS
       - name: Checkout the current repository
         uses: actions/checkout@v5
 
@@ -44,12 +47,16 @@ jobs:
           distribution: "corretto"
           cache: "gradle"
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build and test with Gradle
+      - name: Run unit and integration tests
         env:
           PPG_TEST_DB_HOST_WITH_PATH: ${{ secrets.PPG_TEST_DB_HOST_WITH_PATH }}
           PPG_TEST_DB_USER: ${{ secrets.PPG_TEST_DB_USER }}
           PPG_TEST_DB_PASSWORD: ${{ secrets.PPG_TEST_DB_PASSWORD }}
-        run: ./gradlew build --no-daemon
+        run: |
+          chmod u+x ./gradlew
+          ./gradlew :koverPrintCoverage --quiet >> ./${{ env.COVERAGE_REPORT_FILE }}
+
+      - name: Check the coverage percentage
+        run: |
+          chmod u+x ./${{ env.COVERAGE_CHECKER }}
+          ./${{ env.COVERAGE_CHECKER }} ./${{ env.COVERAGE_REPORT_FILE }}
