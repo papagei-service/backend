@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 class RoutingTest {
 
     @Test
-    fun `001= Receive 500 status code during error on server side`() = testConfiguredApplication { client, _ ->
+    fun `Receive 500 status code during error on server side`() = testConfiguredApplication { client, _ ->
         val response0 = client.get("/error")
         assertEquals(
             expected = HttpStatusCode.Companion.InternalServerError,

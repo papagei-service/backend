@@ -23,7 +23,7 @@ private val LOGGER = KtorSimpleLogger(ExamplesRoutingTest::class.java.name)
 class ExamplesRoutingTest {
 
     @Test
-    fun `001= Do not insert a new example if the request body is invalid`() =
+    fun `Do not insert a new example if the request body is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -45,7 +45,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `002= Do not insert a new example if the card id parameter is invalid`() =
+    fun `Do not insert a new example if the card id parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -67,7 +67,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `003= Do not insert a new example if the parent card is not found`() =
+    fun `Do not insert a new example if the parent card is not found`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -89,7 +89,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `004= Do not insert a new example if the parent card owned by another user`() =
+    fun `Do not insert a new example if the parent card owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a first user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -126,7 +126,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `005= Insert a new example`() = testConfiguredApplication { client, _ ->
+    fun `Insert a new example`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -153,7 +153,7 @@ class ExamplesRoutingTest {
     }
 
     @Test
-    fun `006= Do not update the example if the request body is invalid`() = testConfiguredApplication { client, _ ->
+    fun `Do not update the example if the request body is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -174,7 +174,7 @@ class ExamplesRoutingTest {
     }
 
     @Test
-    fun `007= Do not update the example if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
+    fun `Do not update the example if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -202,7 +202,7 @@ class ExamplesRoutingTest {
     }
 
     @Test
-    fun `008= Do not update the example if it was not found in the storage`() =
+    fun `Do not update the example if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -231,7 +231,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `009= Do not update the example if it owned by another user`() = testConfiguredApplication { client, _ ->
+    fun `Do not update the example if it owned by another user`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -274,7 +274,7 @@ class ExamplesRoutingTest {
     }
 
     @Test
-    fun `010= Do not update the example if its new parent card was not found in the storage`() =
+    fun `Do not update the example if its new parent card was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -310,7 +310,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `011= Do not update the example if its new parent card owned by another user`() =
+    fun `Do not update the example if its new parent card owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a first user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -362,7 +362,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `012= Update the example`() = testConfiguredApplication { client, _ ->
+    fun `Update the example`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -400,7 +400,7 @@ class ExamplesRoutingTest {
     }
 
     @Test
-    fun `013= Update the example including its parent card`() = testConfiguredApplication { client, _ ->
+    fun `Update the example including its parent card`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -445,7 +445,7 @@ class ExamplesRoutingTest {
     }
 
     @Test
-    fun `014= Do not delete the example if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
+    fun `Do not delete the example if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -465,7 +465,7 @@ class ExamplesRoutingTest {
     }
 
     @Test
-    fun `015= Do not delete the example if it was not found in the storage`() =
+    fun `Do not delete the example if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -486,7 +486,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `016= Do not delete the example if it owned by another user`() = testConfiguredApplication { client, _ ->
+    fun `Do not delete the example if it owned by another user`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -528,7 +528,7 @@ class ExamplesRoutingTest {
     }
 
     @Test
-    fun `017= Delete the example`() = testConfiguredApplication { client, _ ->
+    fun `Delete the example`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -563,7 +563,7 @@ class ExamplesRoutingTest {
     }
 
     @Test
-    fun `018= Do not grant access to the example if the id parameter is invalid`() =
+    fun `Do not grant access to the example if the id parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -585,7 +585,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `019= Do not grant access to the example if it was not found in the storage`() =
+    fun `Do not grant access to the example if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -607,7 +607,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `020= Do not grant access to the example if it owned by another user`() =
+    fun `Do not grant access to the example if it owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a first user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -650,7 +650,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `021= Grant access to the example by its id`() = testConfiguredApplication { client, _ ->
+    fun `Grant access to the example by its id`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -686,7 +686,7 @@ class ExamplesRoutingTest {
     }
 
     @Test
-    fun `022= Do not grant access to the examples if id parameter is invalid`() =
+    fun `Do not grant access to the examples if id parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -707,7 +707,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `023= Do not grant access to the examples if parent card was not found`() =
+    fun `Do not grant access to the examples if parent card was not found`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -728,28 +728,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `024= Do not grant access to the examples if parent card was not found`() =
-        testConfiguredApplication { client, _ ->
-            // Register, login a user and extract its cookie
-            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
-            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
-            val response0 = AuthUtils
-                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
-            val rawCookie = response0.rawCookie()  // Contains the user's session
-
-            val response1 = client.get("/v1/cards/1/examples") {
-                rawCookie(value = rawCookie)
-                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
-            }
-
-            assertEquals(
-                expected = HttpStatusCode.NotFound,
-                actual = response1.status,
-            )
-        }
-
-    @Test
-    fun `025= Do not grant access to the examples if parent card owned by another user`() =
+    fun `Do not grant access to the examples if parent card owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a first user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -785,7 +764,7 @@ class ExamplesRoutingTest {
         }
 
     @Test
-    fun `026= Grant access to the examples by card`() = testConfiguredApplication { client, _ ->
+    fun `Grant access to the examples by card`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)

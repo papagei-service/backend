@@ -23,7 +23,7 @@ private val LOGGER = KtorSimpleLogger(CollectionsRoutingTest::class.java.name)
 class CollectionsRoutingTest {
 
     @Test
-    fun `001= Do not insert a new collection if the request body is invalid`() =
+    fun `Do not insert a new collection if the request body is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -45,7 +45,7 @@ class CollectionsRoutingTest {
         }
 
     @Test
-    fun `002= Insert a new collection`() = testConfiguredApplication { client, _ ->
+    fun `Insert a new collection`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -66,7 +66,7 @@ class CollectionsRoutingTest {
     }
 
     @Test
-    fun `003= Do not update the collection if the request body is invalid`() = testConfiguredApplication { client, _ ->
+    fun `Do not update the collection if the request body is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -87,7 +87,7 @@ class CollectionsRoutingTest {
     }
 
     @Test
-    fun `004= Do not update the collection if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
+    fun `Do not update the collection if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -109,7 +109,7 @@ class CollectionsRoutingTest {
     }
 
     @Test
-    fun `005= Do not update the collection if it was not found in the storage`() =
+    fun `Do not update the collection if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -132,7 +132,7 @@ class CollectionsRoutingTest {
         }
 
     @Test
-    fun `006= Do not update the collection if it owned by another user`() = testConfiguredApplication { client, _ ->
+    fun `Do not update the collection if it owned by another user`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -170,7 +170,7 @@ class CollectionsRoutingTest {
     }
 
     @Test
-    fun `007= Update the collection`() = testConfiguredApplication { client, _ ->
+    fun `Update the collection`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -202,7 +202,7 @@ class CollectionsRoutingTest {
     }
 
     @Test
-    fun `008= Do not delete the collection if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
+    fun `Do not delete the collection if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -222,7 +222,7 @@ class CollectionsRoutingTest {
     }
 
     @Test
-    fun `009= Do not delete the collection if it was not found in the storage`() =
+    fun `Do not delete the collection if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -243,7 +243,7 @@ class CollectionsRoutingTest {
         }
 
     @Test
-    fun `010= Do not delete the collection if it owned by another user`() = testConfiguredApplication { client, _ ->
+    fun `Do not delete the collection if it owned by another user`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -279,7 +279,7 @@ class CollectionsRoutingTest {
     }
 
     @Test
-    fun `011= Delete the collection`() = testConfiguredApplication { client, _ ->
+    fun `Delete the collection`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -308,7 +308,7 @@ class CollectionsRoutingTest {
     }
 
     @Test
-    fun `012= Do not grant access to the collection if the id parameter is invalid`() =
+    fun `Do not grant access to the collection if the id parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -330,7 +330,7 @@ class CollectionsRoutingTest {
         }
 
     @Test
-    fun `013= Do not grant access to the collection if it was not found in the storage`() =
+    fun `Do not grant access to the collection if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -352,7 +352,7 @@ class CollectionsRoutingTest {
         }
 
     @Test
-    fun `014= Do not grant access to the collection if it owned by another user`() =
+    fun `Do not grant access to the collection if it owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a first user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -389,7 +389,7 @@ class CollectionsRoutingTest {
         }
 
     @Test
-    fun `015= Grant access to the collection by its id`() = testConfiguredApplication { client, _ ->
+    fun `Grant access to the collection by its id`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -418,7 +418,7 @@ class CollectionsRoutingTest {
     }
 
     @Test
-    fun `016= Grant access to the user's collections`() = testConfiguredApplication { client, _ ->
+    fun `Grant access to the user's collections`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -450,7 +450,7 @@ class CollectionsRoutingTest {
     }
 
     @Test
-    fun `017= Do not grant access to the collections if the card_id query parameter is invalid`() =
+    fun `Do not grant access to the collections if the card_id query parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -471,7 +471,7 @@ class CollectionsRoutingTest {
         }
 
     @Test
-    fun `018= Do not grant access to the collections if the card with id equals to card_id was not found`() =
+    fun `Do not grant access to the collections if the card with id equals to card_id was not found`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -492,7 +492,7 @@ class CollectionsRoutingTest {
         }
 
     @Test
-    fun `019= Do not grant access to the collections if the card owned by another user`() =
+    fun `Do not grant access to the collections if the card owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -526,7 +526,7 @@ class CollectionsRoutingTest {
         }
 
     @Test
-    fun `020= Grant access to collections to which the passed card belongs`() =
+    fun `Grant access to collections to which the passed card belongs`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -572,6 +572,4 @@ class CollectionsRoutingTest {
                 actual = actualCollections,
             )
         }
-
-    // TODO: Add test `018= Grant access to the collections by card id`
 }
