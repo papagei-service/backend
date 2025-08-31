@@ -23,7 +23,7 @@ private val LOGGER = KtorSimpleLogger(CardsRoutingTest::class.java.name)
 class CardsRoutingTest {
 
     @Test
-    fun `001= Do not insert a new card if the request body is invalid`() =
+    fun `Do not insert a new card if the request body is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -45,7 +45,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `002= Insert a new card`() = testConfiguredApplication { client, _ ->
+    fun `Insert a new card`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -66,7 +66,7 @@ class CardsRoutingTest {
     }
 
     @Test
-    fun `003= Do not update the card if the request body is invalid`() = testConfiguredApplication { client, _ ->
+    fun `Do not update the card if the request body is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -87,7 +87,7 @@ class CardsRoutingTest {
     }
 
     @Test
-    fun `004= Do not update the card if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
+    fun `Do not update the card if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -109,7 +109,7 @@ class CardsRoutingTest {
     }
 
     @Test
-    fun `005= Do not update the card if it was not found in the storage`() =
+    fun `Do not update the card if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -132,7 +132,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `006= Do not update the card if it owned by another user`() = testConfiguredApplication { client, _ ->
+    fun `Do not update the card if it owned by another user`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -170,7 +170,7 @@ class CardsRoutingTest {
     }
 
     @Test
-    fun `007= Update the card`() = testConfiguredApplication { client, _ ->
+    fun `Update the card`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -202,7 +202,7 @@ class CardsRoutingTest {
     }
 
     @Test
-    fun `008= Do not delete the card if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
+    fun `Do not delete the card if the id parameter is invalid`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials, AuthUtils.NOT_STRONG_TOKEN)
@@ -222,7 +222,7 @@ class CardsRoutingTest {
     }
 
     @Test
-    fun `009= Do not delete the card if it was not found in the storage`() =
+    fun `Do not delete the card if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -243,7 +243,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `010= Do not delete the card if it owned by another user`() = testConfiguredApplication { client, _ ->
+    fun `Do not delete the card if it owned by another user`() = testConfiguredApplication { client, _ ->
         // Register, login a first user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -279,7 +279,7 @@ class CardsRoutingTest {
     }
 
     @Test
-    fun `011= Delete the card`() = testConfiguredApplication { client, _ ->
+    fun `Delete the card`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -308,7 +308,7 @@ class CardsRoutingTest {
     }
 
     @Test
-    fun `012= Do not grant access to the card if the id parameter is invalid`() =
+    fun `Do not grant access to the card if the id parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -330,7 +330,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `013= Do not grant access to the card if it was not found in the storage`() =
+    fun `Do not grant access to the card if it was not found in the storage`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -352,7 +352,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `014= Do not grant access to the card if it owned by another user`() =
+    fun `Do not grant access to the card if it owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a first user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -389,7 +389,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `015= Grant access to the card by its id`() = testConfiguredApplication { client, _ ->
+    fun `Grant access to the card by its id`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -418,7 +418,7 @@ class CardsRoutingTest {
     }
 
     @Test
-    fun `016= Grant access to the user's cards`() = testConfiguredApplication { client, _ ->
+    fun `Grant access to the user's cards`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
         AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
@@ -450,7 +450,7 @@ class CardsRoutingTest {
     }
 
     @Test
-    fun `017= Do not grant access to the cards if the collection_id query parameter is invalid`() =
+    fun `Do not grant access to the cards if the collection_id query parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -471,7 +471,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `018= Do not grant access to the cards if the collection with id equals to collection_id was not found`() =
+    fun `Do not grant access to the cards if the collection with id equals to collection_id was not found`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -492,7 +492,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `019= Do not grant access to the cards if the collection owned by another user`() =
+    fun `Do not grant access to the cards if the collection owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -526,7 +526,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `020= Grant access to cards that belong the passed collection`() =
+    fun `Grant access to cards that belong the passed collection`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -574,7 +574,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `021= Do not add the card to the collection if the collection_id path parameter is invalid`() =
+    fun `Do not add the card to the collection if the collection_id path parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -595,7 +595,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `022= Do not add the card to the collection if the card_id path parameter is invalid`() =
+    fun `Do not add the card to the collection if the card_id path parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -616,7 +616,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `023= Do not add the card to the collection if the corresponding collection was not found`() =
+    fun `Do not add the card to the collection if the corresponding collection was not found`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -643,7 +643,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `024= Do not add the card to the collection if the corresponding card was not found`() =
+    fun `Do not add the card to the collection if the corresponding card was not found`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -670,7 +670,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `025= Do not add the card to the collection if the corresponding card owned by another user`() =
+    fun `Do not add the card to the collection if the corresponding card owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -710,7 +710,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `026= Do not add the card to the collection if the corresponding collection owned by another user`() =
+    fun `Do not add the card to the collection if the corresponding collection owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -750,7 +750,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `027= Add the card to the collection`() =
+    fun `Add the card to the collection`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -785,7 +785,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `028= Do not delete the card from the collection if the collection_id path parameter is invalid`() =
+    fun `Do not delete the card from the collection if the collection_id path parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -806,7 +806,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `029= Do not delete the card from the collection if the card_id path parameter is invalid`() =
+    fun `Do not delete the card from the collection if the card_id path parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -827,7 +827,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `030= Do not delete the card from the collection if the corresponding collection was not found`() =
+    fun `Do not delete the card from the collection if the corresponding collection was not found`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -854,7 +854,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `031= Do not delete the card from the collection if the corresponding card was not found`() =
+    fun `Do not delete the card from the collection if the corresponding card was not found`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -881,7 +881,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `032= Do not delete the card from the collection if the corresponding card owned by another user`() =
+    fun `Do not delete the card from the collection if the corresponding card owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -921,7 +921,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `033= Do not delete the card from the collection if the corresponding collection owned by another user`() =
+    fun `Do not delete the card from the collection if the corresponding collection owned by another user`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -961,7 +961,7 @@ class CardsRoutingTest {
         }
 
     @Test
-    fun `033= Delete the card from the collection`() =
+    fun `Delete the card from the collection`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
             val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
