@@ -726,7 +726,7 @@ class CardsRoutingTest {
             }
 
             val limit = 2
-            val response1 = client.get("/v1/cards?limit=$limit") {
+            val response1 = client.get("/v1/cards?collection_id=$collectionId&limit=$limit") {
                 rawCookie(value = rawCookie)
                 bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
             }.body<CardsResponse>()
