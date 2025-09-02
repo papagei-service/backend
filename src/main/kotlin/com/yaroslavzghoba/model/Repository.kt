@@ -145,16 +145,17 @@ interface Repository {
      * @param limit The maximal number of cards those will be returned.
      * @param offset Indicates how many cards should be skipped.
      *
-     * @return A list of cards that owned by the user with the [id] identifier.
+     * @return Pair consisting of the total number of cards found and the cards themselves,
+     * to which the limit and offset are also applied.
      */
     suspend fun getCardsByOwnerId(
         id: Long,
         sortByFirstPriority: CardSorting? = null,
         sortBySecondPriority: CardSorting? = null,
         nextTimeBefore: Instant? = null,
-        limit: Int = 20,  // TODO: Move default value to constants
-        offset: Long = 0,  // TODO: Move default value to constants
-    ): List<Card>
+        limit: Int,
+        offset: Long,
+    ): Pair<Long, List<Card>>
 
     /**
      * Get a list of cards included in the collection with an identifier equal to [id].
@@ -166,15 +167,18 @@ interface Repository {
      * @param nextTimeBefore The moment of time ahead of the time of the next repetition of the card.
      * @param limit The maximal number of cards those will be returned.
      * @param offset Indicates how many cards should be skipped.
+     *
+     * @return Pair consisting of the total number of cards found and the cards themselves,
+     * to which the limit and offset are also applied.
      */
     suspend fun getCardsByCollectionId(
         id: Long,
         sortByFirstPriority: CardSorting? = null,
         sortBySecondPriority: CardSorting? = null,
         nextTimeBefore: Instant? = null,
-        limit: Int = 20,  // TODO: Move default value to constants
-        offset: Long = 0,  // TODO: Move default value to constants
-    ): List<Card>
+        limit: Int,
+        offset: Long,
+    ): Pair<Long, List<Card>>
 
     /**
      * Try to insert a card into the storage.

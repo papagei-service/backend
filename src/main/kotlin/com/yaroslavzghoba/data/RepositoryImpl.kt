@@ -90,7 +90,7 @@ class RepositoryImpl(
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long,
-    ): List<Card> = cardStorage.getByOwnerId(
+    ): Pair<Long, List<Card>> = cardStorage.getByOwnerId(
         id = id,
         sortByFirstPriority = sortByFirstPriority,
         sortBySecondPriority = sortBySecondPriority,
@@ -106,7 +106,7 @@ class RepositoryImpl(
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long
-    ): List<Card> = cardStorage.getByCollectionId(
+    ): Pair<Long, List<Card>> = cardStorage.getByCollectionId(
         id = id,
         sortByFirstPriority = sortByFirstPriority,
         sortBySecondPriority = sortBySecondPriority,

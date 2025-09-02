@@ -29,7 +29,8 @@ interface CardStorage {
      * @param limit The maximal number of cards those will be returned.
      * @param offset Indicates how many cards should be skipped.
      *
-     * @return A list of cards that owned by the user with the [id] identifier.
+     * @return Pair consisting of the total number of cards found and the cards themselves,
+     * to which the limit and offset are also applied.
      */
     suspend fun getByOwnerId(
         id: Long,
@@ -38,7 +39,7 @@ interface CardStorage {
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long,
-    ): List<Card>
+    ): Pair<Long, List<Card>>
 
     /**
      * Get a list of cards included in the collection with an identifier equal to [id].
@@ -50,6 +51,9 @@ interface CardStorage {
      * @param nextTimeBefore The moment of time ahead of the time of the next repetition of the card.
      * @param limit The maximal number of cards those will be returned.
      * @param offset Indicates how many cards should be skipped.
+     *
+     * @return Pair consisting of the total number of cards found and the cards themselves,
+     * to which the limit and offset are also applied.
      */
     suspend fun getByCollectionId(
         id: Long,
@@ -58,7 +62,7 @@ interface CardStorage {
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long,
-    ): List<Card>
+    ): Pair<Long, List<Card>>
 
     /**
      * Try to insert a card into the storage.

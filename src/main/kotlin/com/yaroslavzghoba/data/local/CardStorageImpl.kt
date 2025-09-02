@@ -40,20 +40,53 @@ class CardStorageImpl : CardStorage {
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long,
-    ): List<Card> = suspendTransaction {
-        CardDao
-            .find {
-                val baseCondition = CardsTable.ownerId eq id
-                nextTimeBefore?.let {
-                    baseCondition and (CardsTable.showNextTimeAt neq null) and (CardsTable.showNextTimeAt lessEq it)
-                } ?: baseCondition
-            }
+    ): Pair<Long, List<Card>> = suspendTransaction {
+        val condition: SqlExpressionBuilder.() -> Op<Boolean> = {
+            val baseCondition = CardsTable.ownerId eq id
+            nextTimeBefore?.let {
+                baseCondition and (CardsTable.showNextTimeAt neq null) and (CardsTable.showNextTimeAt lessEq it)
+            } ?: baseCondition
+        }
+
+        // Apply filters and sorting to cards, create pairs of cards using limits and offsets,
+        // and the total number of cards found without applying limits and offsets.
+        val totalCountColumn = CardsTable.id.count().over().alias("total_count")
+        val cardsWithTotalCount = CardsTable
+            .select(columns = CardsTable.columns + totalCountColumn)
+            .where(predicate = condition)
             .apply {
                 val sorts = listOfNotNull(sortByFirstPriority, sortBySecondPriority)
                 orderBy(*sorts.toTypedArray())
             }
             .limit(limit).offset(offset)
-            .map { it.toCard() }
+            .map { row ->
+                Card(
+                    id = row[CardsTable.id].value,
+                    knownLanguageText = row[CardsTable.knownLanguageText],
+                    learningLanguageText = row[CardsTable.learningLanguageText],
+                    notes = row[CardsTable.notes],
+                    lastAnsweredAt = row[CardsTable.lastAnsweredAt],
+                    showNextTimeAt = row[CardsTable.showNextTimeAt],
+                    correctAnswersInRow = row[CardsTable.correctAnswersInRow],
+                    ownerId = row[CardsTable.ownerId].value,
+                ) to row[totalCountColumn]
+            }
+
+        // Convert `List<Pair<Card, Long>>` to `Pair<Long, List<Card>>`
+        // If the list of pairs is empty, then make another request to get the total number of cards
+        // and return it with an empty list of cards.
+        val result: Pair<Long, List<Card>> = if (cardsWithTotalCount.isEmpty()) {
+            val totalCount = CardsTable.selectAll()
+                .where(predicate = condition)
+                .count()
+            totalCount to emptyList()
+        } else {
+            val cards = cardsWithTotalCount.map { it.first }
+            val totalCount = cardsWithTotalCount.first().second
+            totalCount to cards
+        }
+
+        result
     }
 
     override suspend fun getByCollectionId(
@@ -63,24 +96,54 @@ class CardStorageImpl : CardStorage {
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long
-    ): List<Card> = suspendTransaction {
-        val baseCondition = CollectionsCardsTable.collectionId eq id
-        val query = CardsTable.innerJoin(CollectionsCardsTable)
-            .select(CardsTable.columns)
-            .where {
-                nextTimeBefore?.let {
-                    baseCondition and (CardsTable.showNextTimeAt neq null) and (CardsTable.showNextTimeAt lessEq it)
-                } ?: baseCondition
-            }
-            .withDistinct()
+    ): Pair<Long, List<Card>> = suspendTransaction {
+        val condition: SqlExpressionBuilder.() -> Op<Boolean> = {
+            val baseCondition = CollectionsCardsTable.collectionId eq id
+            nextTimeBefore?.let {
+                baseCondition and (CardsTable.showNextTimeAt neq null) and (CardsTable.showNextTimeAt lessEq it)
+            } ?: baseCondition
+        }
 
-        CardDao.wrapRows(query)
+        // Apply filters and sorting to cards, create pairs of cards using limits and offsets,
+        // and the total number of cards found without applying limits and offsets.
+        val totalCountColumn = CardsTable.id.count().over().alias("total_count")
+        val cardsWithTotalCount = CardsTable.innerJoin(CollectionsCardsTable)
+            .select(CardsTable.columns + totalCountColumn)
+            .where(predicate = condition)
+            .withDistinct()
             .apply {
                 val sorts = listOfNotNull(sortByFirstPriority, sortBySecondPriority)
                 orderBy(*sorts.toTypedArray())
             }
             .limit(limit).offset(offset)
-            .toList().map { it.toCard() }
+            .map { row ->
+                Card(
+                    id = row[CardsTable.id].value,
+                    knownLanguageText = row[CardsTable.knownLanguageText],
+                    learningLanguageText = row[CardsTable.learningLanguageText],
+                    notes = row[CardsTable.notes],
+                    lastAnsweredAt = row[CardsTable.lastAnsweredAt],
+                    showNextTimeAt = row[CardsTable.showNextTimeAt],
+                    correctAnswersInRow = row[CardsTable.correctAnswersInRow],
+                    ownerId = row[CardsTable.ownerId].value,
+                ) to row[totalCountColumn]
+            }
+
+        // Convert `List<Pair<Card, Long>>` to `Pair<Long, List<Card>>`
+        // If the list of pairs is empty, then make another request to get the total number of cards
+        // and return it with an empty list of cards.
+        val result: Pair<Long, List<Card>> = if (cardsWithTotalCount.isEmpty()) {
+            val totalCount = CardsTable.selectAll()
+                .where(predicate = condition)
+                .count()
+            totalCount to emptyList()
+        } else {
+            val cards = cardsWithTotalCount.map { it.first }
+            val totalCount = cardsWithTotalCount.first().second
+            totalCount to cards
+        }
+
+        result
     }
 
     override suspend fun insert(card: Card): Card = suspendTransaction {
@@ -202,7 +265,7 @@ class CardStorageImpl : CardStorage {
 /**
  * Returns a new [SizedIterable] with the cards sorted according to the [sorting].
  */
-private fun SizedIterable<CardDao>.orderBy(vararg sorting: CardSorting): SizedIterable<CardDao> {
+private fun Query.orderBy(vararg sorting: CardSorting): Query {
     val orders = sorting.map {
         it.column.toExpression() to it.order.toSqlSortOrder()
     }
