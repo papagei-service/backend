@@ -51,7 +51,7 @@ class CardStorageImpl : CardStorage {
         // Apply filters and sorting to cards, create pairs of cards using limits and offsets,
         // and the total number of cards found without applying limits and offsets.
         val totalCountColumn = CardsTable.id.count().over().alias("total_count")
-        val cardsWithTotalCount = CardsTable
+        val cardsWithTotalCount: List<Pair<Card, Long>> = CardsTable
             .select(columns = CardsTable.columns + totalCountColumn)
             .where(predicate = condition)
             .apply {
@@ -107,7 +107,7 @@ class CardStorageImpl : CardStorage {
         // Apply filters and sorting to cards, create pairs of cards using limits and offsets,
         // and the total number of cards found without applying limits and offsets.
         val totalCountColumn = CardsTable.id.count().over().alias("total_count")
-        val cardsWithTotalCount = CardsTable.innerJoin(CollectionsCardsTable)
+        val cardsWithTotalCount: List<Pair<Card, Long>> = CardsTable.innerJoin(CollectionsCardsTable)
             .select(CardsTable.columns + totalCountColumn)
             .where(predicate = condition)
             .withDistinct()
