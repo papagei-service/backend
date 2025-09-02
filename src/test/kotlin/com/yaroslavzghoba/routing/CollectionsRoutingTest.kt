@@ -5,6 +5,7 @@ import com.yaroslavzghoba.mappers.toCardCollectionUpdateRequest
 import com.yaroslavzghoba.mappers.toLoginCredentials
 import com.yaroslavzghoba.model.Card
 import com.yaroslavzghoba.model.CardCollection
+import com.yaroslavzghoba.model.CollectionsResponse
 import com.yaroslavzghoba.utils.AuthUtils
 import com.yaroslavzghoba.utils.MockData
 import com.yaroslavzghoba.utils.rawCookie
@@ -15,7 +16,6 @@ import io.ktor.http.*
 import io.ktor.util.logging.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @Suppress("unused")
 private val LOGGER = KtorSimpleLogger(CollectionsRoutingTest::class.java.name)
@@ -418,6 +418,48 @@ class CollectionsRoutingTest {
     }
 
     @Test
+    fun `Do not grant access to the collections if the limit query parameter is invalid`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            val response1 = client.get("/v1/collections?limit=-1") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.BadRequest,
+                actual = response1.status,
+            )
+        }
+
+    @Test
+    fun `Do not grant access to the collections if the offset query parameter is invalid`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            val response1 = client.get("/v1/collections?offset=-1") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.BadRequest,
+                actual = response1.status,
+            )
+        }
+
+    @Test
     fun `Grant access to the user's collections`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -439,15 +481,93 @@ class CollectionsRoutingTest {
             }.body<CardCollection>()
         }
 
-        val receivedCollections = client.get("/v1/collections") {
+        val response1 = client.get("/v1/collections") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
-        }.body<List<CardCollection>>()
+        }.body<CollectionsResponse>()
+        val receivedCollections = response1.collections
 
-        assertTrue {
-            insertedCollections == receivedCollections
-        }
+        assertEquals(expected = insertedCollections.size, actual = response1.totalCount.toInt())
+        assertEquals(
+            expected = insertedCollections,
+            actual = receivedCollections,
+        )
     }
+
+    @Test
+    fun `Grant access to the user's collections with limit query parameter`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            // Insert cards that will be received
+            val insertedCollections = listOf(
+                MockData.FIRST_COLLECTION_INSERT_REQUEST,
+                MockData.SECOND_COLLECTION_INSERT_REQUEST,
+                MockData.THIRD_COLLECTION_INSERT_REQUEST,
+            ).map { collectionInsertRequest ->
+                client.post("/v1/collections/") {
+                    rawCookie(value = rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                    setBody(collectionInsertRequest)
+                }.body<CardCollection>()
+            }
+
+            val limit = 2
+            val response1 = client.get("/v1/collections?limit=$limit") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }.body<CollectionsResponse>()
+            val receivedCollections = response1.collections
+
+            assertEquals(expected = insertedCollections.size, actual = response1.totalCount.toInt())
+            assertEquals(
+                expected = insertedCollections.subList(fromIndex = 0, toIndex = limit),
+                actual = receivedCollections,
+            )
+        }
+
+    @Test
+    fun `Grant access to the user's collections with offset query parameter`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            // Insert cards that will be received
+            val insertedCollections = listOf(
+                MockData.FIRST_COLLECTION_INSERT_REQUEST,
+                MockData.SECOND_COLLECTION_INSERT_REQUEST,
+                MockData.THIRD_COLLECTION_INSERT_REQUEST,
+            ).map { collectionInsertRequest ->
+                client.post("/v1/collections/") {
+                    rawCookie(value = rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                    setBody(collectionInsertRequest)
+                }.body<CardCollection>()
+            }
+
+            val limit = 2
+            val offset = 1
+            val response1 = client.get("/v1/collections?limit=$limit&offset=$offset") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }.body<CollectionsResponse>()
+            val receivedCollections = response1.collections
+
+            assertEquals(expected = insertedCollections.size, actual = response1.totalCount.toInt())
+            assertEquals(
+                expected = insertedCollections.subList(fromIndex = 0 + offset, toIndex = limit + offset),
+                actual = receivedCollections,
+            )
+        }
 
     @Test
     fun `Do not grant access to the collections if the card_id query parameter is invalid`() =
@@ -543,7 +663,7 @@ class CollectionsRoutingTest {
             }.body<Card>().id
 
             // Insert collections and add the card to them
-            val expectedCollections = listOf(
+            val insertedCollections = listOf(
                 MockData.FIRST_COLLECTION_INSERT_REQUEST,
                 MockData.SECOND_COLLECTION_INSERT_REQUEST,
                 MockData.THIRD_COLLECTION_INSERT_REQUEST,
@@ -562,14 +682,117 @@ class CollectionsRoutingTest {
             }
 
             // Get collections that contain the card
-            val actualCollections = client.get("/v1/collections?card_id=$cardId") {
+            val response1 = client.get("/v1/collections?card_id=$cardId") {
                 rawCookie(value = rawCookie0)
                 bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
-            }.body<List<CardCollection>>()
+            }.body<CollectionsResponse>()
+            val receivedCollections = response1.collections
 
+            assertEquals(expected = insertedCollections.size, actual = response1.totalCount.toInt())
             assertEquals(
-                expected = expectedCollections,
-                actual = actualCollections,
+                expected = insertedCollections,
+                actual = receivedCollections,
+            )
+        }
+
+    @Test
+    fun `Grant access to the collections by card id with limit query parameter`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            // Insert a card that will belong to the collections
+            val cardId = client.post("/v1/cards/") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(MockData.FIRST_CARD_REQUEST)
+            }.body<Card>().id
+
+            // Insert collections to which the card will belong and add the card to them
+            val insertedCollections = listOf(
+                MockData.FIRST_COLLECTION_INSERT_REQUEST,
+                MockData.SECOND_COLLECTION_INSERT_REQUEST,
+                MockData.THIRD_COLLECTION_INSERT_REQUEST,
+            ).map { collectionInsertRequest ->
+                val collection = client.post("/v1/collections/") {
+                    rawCookie(value = rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                    setBody(collectionInsertRequest)
+                }.body<CardCollection>()
+                val collectionId = collection.id
+                client.post("/v1/collections/$collectionId/cards/$cardId") {
+                    rawCookie(rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                }
+                collection
+            }
+
+            val limit = 2
+            val response1 = client.get("/v1/collections?limit=$limit") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }.body<CollectionsResponse>()
+            val receivedCollections = response1.collections
+
+            assertEquals(expected = insertedCollections.size, actual = response1.totalCount.toInt())
+            assertEquals(
+                expected = insertedCollections.subList(fromIndex = 0, toIndex = limit),
+                actual = receivedCollections,
+            )
+        }
+
+    @Test
+    fun `Grant access to the collections by card id with offset query parameter`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            // Insert a card that will belong to the collections
+            val cardId = client.post("/v1/cards/") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(MockData.FIRST_CARD_REQUEST)
+            }.body<Card>().id
+
+            // Insert collections to which the card will belong and add the card to them
+            val insertedCollections = listOf(
+                MockData.FIRST_COLLECTION_INSERT_REQUEST,
+                MockData.SECOND_COLLECTION_INSERT_REQUEST,
+                MockData.THIRD_COLLECTION_INSERT_REQUEST,
+            ).map { collectionInsertRequest ->
+                val collection = client.post("/v1/collections/") {
+                    rawCookie(value = rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                    setBody(collectionInsertRequest)
+                }.body<CardCollection>()
+                val collectionId = collection.id
+                client.post("/v1/collections/$collectionId/cards/$cardId") {
+                    rawCookie(rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                }
+                collection
+            }
+
+            val limit = 2
+            val offset = 1
+            val response1 = client.get("/v1/collections?limit=$limit&offset=$offset") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }.body<CollectionsResponse>()
+            val receivedCollections = response1.collections
+
+            assertEquals(expected = insertedCollections.size, actual = response1.totalCount.toInt())
+            assertEquals(
+                expected = insertedCollections.subList(fromIndex = 0 + offset, toIndex = limit + offset),
+                actual = receivedCollections,
             )
         }
 }

@@ -735,7 +735,7 @@ class CardsRoutingTest {
             assertEquals(expected = insertedCards.size, actual = response1.totalCount.toInt())
             assertEquals(
                 expected = insertedCards.subList(fromIndex = 0, toIndex = limit),
-                receivedCards,
+                actual = receivedCards,
             )
         }
 
@@ -749,22 +749,34 @@ class CardsRoutingTest {
                 .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
             val rawCookie = response0.rawCookie()  // Contains the user's session
 
+            val collectionId = client.post("/v1/collections/") {
+                rawCookie(rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(MockData.FIRST_COLLECTION_INSERT_REQUEST)
+            }.body<CardCollection>().id
+
             // Insert cards that will be received
             val insertedCards = listOf(
                 MockData.FIRST_CARD_REQUEST,
                 MockData.SECOND_CARD_REQUEST,
                 MockData.THIRD_CARD_REQUEST,
             ).map { cardInsertRequest ->
-                client.post("/v1/cards/") {
+                val card = client.post("/v1/cards/") {
                     rawCookie(value = rawCookie)
                     bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
                     setBody(cardInsertRequest)
                 }.body<Card>()
+                val cardId = card.id
+                client.post("/v1/collections/$collectionId/cards/$cardId") {
+                    rawCookie(rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                }
+                card
             }
 
             val limit = 2
             val offset = 1
-            val response1 = client.get("/v1/cards?limit=$limit&offset=$offset") {
+            val response1 = client.get("/v1/cards?collection_id=$collectionId&limit=$limit&offset=$offset") {
                 rawCookie(value = rawCookie)
                 bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
             }.body<CardsResponse>()

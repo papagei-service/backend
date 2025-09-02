@@ -67,12 +67,20 @@ interface Repository {
     suspend fun getCollectionById(id: Long): CardCollection?
 
     /**
-     * Get a list of collections owned by the owner with the [ownerId] id.
+     * Get a list of collections that owned by the user with an identifier equal to [id].
      *
-     * @param ownerId The unique identifier of a user whose card collections are to be selected.
-     * @return List of card collections owned by user with [ownerId] id.
+     * @param id The unique identifier of a user whose collections are to be selected.
+     * @param limit The maximal number of collections those will be returned.
+     * @param offset Indicates how many collections should be skipped.
+     *
+     * @return Pair consisting of the total number of collections found and the collections themselves,
+     * to which the limit and offset are also applied.
      */
-    suspend fun getCollectionsByOwnerId(ownerId: Long): List<CardCollection>
+    suspend fun getCollectionsByOwnerId(
+        id: Long,
+        limit: Int,
+        offset: Long,
+    ): Pair<Long, List<CardCollection>>
 
     /**
      * Get a list of collections that include the card with an identifier equal to [id].
@@ -81,13 +89,14 @@ interface Repository {
      * @param limit The maximal number of collections those will be returned.
      * @param offset Indicates how many cards should be skipped.
      *
-     * @return A list of collections that include the corresponding card.
+     * @return Pair consisting of the total number of collections found and the collections themselves,
+     * to which the limit and offset are also applied.
      */
     suspend fun getCollectionsByCardId(
         id: Long,
-        limit: Int = 20,  // TODO: Move default value to constants
-        offset: Long = 0,  // TODO: Move default value to constants
-    ): List<CardCollection>
+        limit: Int,
+        offset: Long,
+    ): Pair<Long, List<CardCollection>>
 
     /**
      * Try to insert a collection into the storage.
