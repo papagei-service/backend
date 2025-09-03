@@ -16,7 +16,6 @@ import io.ktor.http.*
 import io.ktor.util.logging.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @Suppress("unused")
 private val LOGGER = KtorSimpleLogger(CardsRoutingTest::class.java.name)
@@ -482,14 +481,33 @@ class CardsRoutingTest {
             }.body<Card>()
         }
 
-        val receivedCards = client.get("/v1/cards") {
+        val response1 = client.get("/v1/cards") {
             rawCookie(value = rawCookie)
             bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
-        }.body<CardsResponse>().cards
+        }.body<CardsResponse>()
+        val receivedCards = response1.cards
 
-        assertTrue {
-            insertedCards == receivedCards
-        }
+        assertEquals(expected = insertedCards.size, actual = response1.totalCount.toInt())
+        assertEquals(expected = insertedCards, actual = receivedCards)
+    }
+
+    @Test
+    fun `Grant access to the empty list of the user's cards`() = testConfiguredApplication { client, _ ->
+        // Register, login a user and extract its cookie
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+        AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+        val response0 = AuthUtils
+            .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+        val rawCookie = response0.rawCookie()  // Contains the user's session
+
+        val response1 = client.get("/v1/cards") {
+            rawCookie(value = rawCookie)
+            bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+        }.body<CardsResponse>()
+        val receivedCards = response1.cards
+
+        assertEquals(expected = 0, actual = response1.totalCount)
+        assertEquals(expected = 0, actual = receivedCards.size)
     }
 
     @Test
@@ -659,7 +677,7 @@ class CardsRoutingTest {
             }.body<CardCollection>().id
 
             // Insert cards and add them to the collection
-            val expectedCards = listOf(
+            val insertedCards = listOf(
                 MockData.FIRST_CARD_REQUEST,
                 MockData.SECOND_CARD_REQUEST,
                 MockData.THIRD_CARD_REQUEST,
@@ -678,15 +696,45 @@ class CardsRoutingTest {
             }
 
             // Get cards which belong to the collection
-            val actualCards = client.get("/v1/cards?collection_id=$collectionId") {
+            val response1 = client.get("/v1/cards?collection_id=$collectionId") {
                 rawCookie(value = rawCookie0)
                 bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
-            }.body<CardsResponse>().cards
+            }.body<CardsResponse>()
+            val receivedCards = response1.cards
 
+            assertEquals(expected = insertedCards.size, actual = response1.totalCount.toInt())
             assertEquals(
-                expected = expectedCards,
-                actual = actualCards,
+                expected = insertedCards,
+                actual = receivedCards,
             )
+        }
+
+    @Test
+    fun `Grant access to empty list of cards that belong the passed collection`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie0 = response0.rawCookie()  // Contains the user's session
+
+            // The collection to which the cards will belong
+            val collectionId = client.post("/v1/collections/") {
+                rawCookie(value = rawCookie0)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(MockData.FIRST_COLLECTION_INSERT_REQUEST)
+            }.body<CardCollection>().id
+
+            // Get cards which belong to the collection
+            val response1 = client.get("/v1/cards?collection_id=$collectionId") {
+                rawCookie(value = rawCookie0)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }.body<CardsResponse>()
+            val receivedCards = response1.cards
+
+            assertEquals(expected = 0, actual = response1.totalCount.toInt())
+            assertEquals(expected = 0, actual = receivedCards.size)
         }
 
     @Test

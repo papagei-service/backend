@@ -76,7 +76,8 @@ class CardStorageImpl : CardStorage {
         // If the list of pairs is empty, then make another request to get the total number of cards
         // and return it with an empty list of cards.
         val result: Pair<Long, List<Card>> = if (cardsWithTotalCount.isEmpty()) {
-            val totalCount = CardsTable.selectAll()
+            val totalCount = CardsTable
+                .selectAll()
                 .where(predicate = condition)
                 .count()
             totalCount to emptyList()
@@ -107,7 +108,8 @@ class CardStorageImpl : CardStorage {
         // Apply filters and sorting to cards, create pairs of cards using limits and offsets,
         // and the total number of cards found without applying limits and offsets.
         val totalCountColumn = CardsTable.id.count().over().alias("total_count")
-        val cardsWithTotalCount: List<Pair<Card, Long>> = CardsTable.innerJoin(CollectionsCardsTable)
+        val cardsWithTotalCount: List<Pair<Card, Long>> = CardsTable
+            .innerJoin(CollectionsCardsTable)
             .select(CardsTable.columns + totalCountColumn)
             .where(predicate = condition)
             .withDistinct()
@@ -133,7 +135,9 @@ class CardStorageImpl : CardStorage {
         // If the list of pairs is empty, then make another request to get the total number of cards
         // and return it with an empty list of cards.
         val result: Pair<Long, List<Card>> = if (cardsWithTotalCount.isEmpty()) {
-            val totalCount = CardsTable.selectAll()
+            val totalCount = CardsTable
+                .innerJoin(CollectionsCardsTable)
+                .selectAll()
                 .where(predicate = condition)
                 .count()
             totalCount to emptyList()

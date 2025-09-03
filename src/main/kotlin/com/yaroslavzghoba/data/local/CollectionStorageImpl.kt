@@ -57,7 +57,8 @@ class CollectionStorageImpl : CollectionStorage {
         // If the list of pairs is empty, then make another request to get the total number of collections
         // and return it with an empty list of collections.
         val result: Pair<Long, List<CardCollection>> = if (collectionsWithTotalCount.isEmpty()) {
-            val totalCount = CollectionsTable.selectAll()
+            val totalCount = CollectionsTable
+                .selectAll()
                 .where(predicate = condition)
                 .count()
             totalCount to emptyList()
@@ -103,7 +104,9 @@ class CollectionStorageImpl : CollectionStorage {
         // If the list of pairs is empty, then make another request to get the total number of collections
         // and return it with an empty list of collections.
         val result: Pair<Long, List<CardCollection>> = if (collectionsWithTotalCount.isEmpty()) {
-            val totalCount = CollectionsTable.selectAll()
+            val totalCount = CollectionsTable
+                .innerJoin(CollectionsCardsTable)
+                .selectAll()
                 .where(predicate = condition)
                 .count()
             totalCount to emptyList()
