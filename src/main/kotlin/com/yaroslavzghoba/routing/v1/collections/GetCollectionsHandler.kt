@@ -1,8 +1,10 @@
 package com.yaroslavzghoba.routing.v1.collections
 
+import com.yaroslavzghoba.model.CollectionsResponse
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
 import com.yaroslavzghoba.security.sessions.UserSession
+import com.yaroslavzghoba.utils.Constants
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -25,8 +27,32 @@ fun RouteHandlersProvider.V1.Collections.getCollections(
         }
     }
 
+    // Get the optional limit parameter if passed or default value
+    val limit = call.request.queryParameters[Constants.LIMIT_PARAM_NAME]?.let { param ->
+        param.toIntOrNull()?.takeIf { it >= 0 } ?: run {
+            call.respond(
+                status = HttpStatusCode.BadRequest,
+                message = "The passed query parameter \"${Constants.LIMIT_PARAM_NAME}\" must be an integer " +
+                        "greater than or equal to 0.",
+            )
+            return@getCollectionsHandler
+        }
+    } ?: Constants.DEFAULT_LIMIT
+
+    // Get the optional offset parameter if passed of default value
+    val offset = call.request.queryParameters[Constants.OFFSET_PARAM_NAME]?.let { param ->
+        param.toLongOrNull()?.takeIf { it >= 0 } ?: run {
+            call.respond(
+                status = HttpStatusCode.BadRequest,
+                message = "The passed query parameter \"${Constants.OFFSET_PARAM_NAME}\" must be an integer " +
+                        "greater than or equal to 0.",
+            )
+            return@getCollectionsHandler
+        }
+    } ?: Constants.DEFAULT_OFFSET
+
     // Search collections by card id if it passed or by owner.
-    val collections = if (cardId != null) {
+    val (totalCount, collections) = if (cardId != null) {
 
         // Return 404 if there is no card with a corresponding id in the storage
         val correspondingCard = repository.getCardById(id = cardId)
@@ -44,11 +70,11 @@ fun RouteHandlersProvider.V1.Collections.getCollections(
         }
 
         // Get collections that contain the corresponding card
-        repository.getCollectionsByCardId(id = cardId, limit = 10, offset = 0)
+        repository.getCollectionsByCardId(id = cardId, limit = limit, offset = offset)
     } else {
         // Get collections that belong to the user
-        repository.getCollectionsByOwnerId(ownerId = session.userId)
+        repository.getCollectionsByOwnerId(id = session.userId, limit = limit, offset = offset)
     }
-
-    call.respond(status = HttpStatusCode.OK, message = collections)
+    val message = CollectionsResponse(totalCount = totalCount, collections = collections)
+    call.respond(status = HttpStatusCode.OK, message = message)
 }

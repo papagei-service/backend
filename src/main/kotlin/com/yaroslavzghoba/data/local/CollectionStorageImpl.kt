@@ -9,9 +9,8 @@ import com.yaroslavzghoba.data.mappers.toCardCollection
 import com.yaroslavzghoba.data.model.CollectionStorage
 import com.yaroslavzghoba.model.CardCollection
 import com.yaroslavzghoba.utils.suspendTransaction
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteAll
-import org.jetbrains.exposed.sql.deleteWhere
 
 /**
  * Represents a storage of card collections in persistent memory.
@@ -27,27 +26,97 @@ class CollectionStorageImpl : CollectionStorage {
             .firstOrNull()
     }
 
-    override suspend fun getByOwnerId(ownerId: Long): List<CardCollection> = suspendTransaction {
-        CollectionDao
-            .find { CollectionsTable.ownerId eq ownerId }
-            .map { it.toCardCollection() }
+    override suspend fun getByOwnerId(
+        id: Long,
+        limit: Int,
+        offset: Long
+    ): Pair<Long, List<CardCollection>> = suspendTransaction {
+        val condition: SqlExpressionBuilder.() -> Op<Boolean> = {
+            CollectionsTable.ownerId eq id
+        }
+
+        // Apply filters to collections, create pairs of collections using limit and offset,
+        // and the total number of cards found without applying limits and offsets.
+        val totalCountColumn = CollectionsTable.id.count().over().alias("total_count")
+        val collectionsWithTotalCount: List<Pair<CardCollection, Long>> = CollectionsTable
+            .select(CollectionsTable.columns + totalCountColumn)
+            .where(predicate = condition)
+            .limit(limit).offset(offset)
+            .map { row ->
+                CardCollection(
+                    id = row[CollectionsTable.id].value,
+                    title = row[CollectionsTable.title],
+                    description = row[CollectionsTable.description],
+                    knownLanguage = row[CollectionsTable.knownLanguage],
+                    learningLanguage = row[CollectionsTable.learningLanguage],
+                    ownerId = row[CollectionsTable.ownerId].value,
+                ) to row[totalCountColumn]
+            }
+
+        // Convert `List<Pair<CardCollection, Long>>` to `Pair<Long, List<CardCollection>>`
+        // If the list of pairs is empty, then make another request to get the total number of collections
+        // and return it with an empty list of collections.
+        val result: Pair<Long, List<CardCollection>> = if (collectionsWithTotalCount.isEmpty()) {
+            val totalCount = CollectionsTable
+                .selectAll()
+                .where(predicate = condition)
+                .count()
+            totalCount to emptyList()
+        } else {
+            val collections = collectionsWithTotalCount.map { it.first }
+            val totalCount = collectionsWithTotalCount.first().second
+            totalCount to collections
+        }
+
+        result
     }
 
     override suspend fun getByCardId(
         id: Long,
         limit: Int,
         offset: Long
-    ): List<CardCollection> = suspendTransaction {
-        val query = CollectionsTable.innerJoin(CollectionsCardsTable)
-            .select(CollectionsTable.columns)
-            .where {
-                CollectionsCardsTable.cardId eq id
-            }
-            .withDistinct()
+    ): Pair<Long, List<CardCollection>> = suspendTransaction {
+        val condition: SqlExpressionBuilder.() -> Op<Boolean> = {
+            CollectionsCardsTable.cardId eq id
+        }
 
-        CollectionDao.wrapRows(query)
+        // Apply filters to collections, create pairs of collections using limit and offset,
+        // and the total number of cards found without applying limits and offsets.
+        val totalCountColumn = CollectionsTable.id.count().over().alias("total_count")
+        val collectionsWithTotalCount: List<Pair<CardCollection, Long>> = CollectionsTable
+            .innerJoin(CollectionsCardsTable)
+            .select(CollectionsTable.columns + totalCountColumn)
+            .where(predicate = condition)
+            .withDistinct()
             .limit(limit).offset(offset)
-            .toList().map { it.toCardCollection() }
+            .map { row ->
+                CardCollection(
+                    id = row[CollectionsTable.id].value,
+                    title = row[CollectionsTable.title],
+                    description = row[CollectionsTable.description],
+                    knownLanguage = row[CollectionsTable.knownLanguage],
+                    learningLanguage = row[CollectionsTable.learningLanguage],
+                    ownerId = row[CollectionsTable.ownerId].value,
+                ) to row[totalCountColumn]
+            }
+
+        // Convert `List<Pair<CardCollection, Long>>` to `Pair<Long, List<CardCollection>>`
+        // If the list of pairs is empty, then make another request to get the total number of collections
+        // and return it with an empty list of collections.
+        val result: Pair<Long, List<CardCollection>> = if (collectionsWithTotalCount.isEmpty()) {
+            val totalCount = CollectionsTable
+                .innerJoin(CollectionsCardsTable)
+                .selectAll()
+                .where(predicate = condition)
+                .count()
+            totalCount to emptyList()
+        } else {
+            val collections = collectionsWithTotalCount.map { it.first }
+            val totalCount = collectionsWithTotalCount.first().second
+            totalCount to collections
+        }
+
+        result
     }
 
     override suspend fun insert(collection: CardCollection): CardCollection = suspendTransaction {

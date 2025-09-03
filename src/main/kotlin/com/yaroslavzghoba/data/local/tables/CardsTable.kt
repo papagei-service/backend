@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
  */
 object CardsTable : LongIdTable(name = "cards", columnName = "id") {
 
-    val knowsLanguageText = text(name = "known_language_text")
+    val knownLanguageText = text(name = "known_language_text")
     val learningLanguageText = text(name = "learning_language_text")
     val notes = text(name = "notes")
     val lastAnsweredAt = timestamp(name = "last_answered_at").nullable()

@@ -45,15 +45,21 @@ class RepositoryImpl(
         return collectionStorage.getById(id = id)
     }
 
-    override suspend fun getCollectionsByOwnerId(ownerId: Long): List<CardCollection> {
-        return collectionStorage.getByOwnerId(ownerId = ownerId)
-    }
+    override suspend fun getCollectionsByOwnerId(
+        id: Long,
+        limit: Int,
+        offset: Long,
+    ): Pair<Long, List<CardCollection>> = collectionStorage.getByOwnerId(
+        id = id,
+        limit = limit,
+        offset = offset,
+    )
 
     override suspend fun getCollectionsByCardId(
         id: Long,
         limit: Int,
-        offset: Long
-    ): List<CardCollection> = collectionStorage.getByCardId(
+        offset: Long,
+    ): Pair<Long, List<CardCollection>> = collectionStorage.getByCardId(
         id = id,
         limit = limit,
         offset = offset,
@@ -90,7 +96,7 @@ class RepositoryImpl(
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long,
-    ): List<Card> = cardStorage.getByOwnerId(
+    ): Pair<Long, List<Card>> = cardStorage.getByOwnerId(
         id = id,
         sortByFirstPriority = sortByFirstPriority,
         sortBySecondPriority = sortBySecondPriority,
@@ -106,7 +112,7 @@ class RepositoryImpl(
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long
-    ): List<Card> = cardStorage.getByCollectionId(
+    ): Pair<Long, List<Card>> = cardStorage.getByCollectionId(
         id = id,
         sortByFirstPriority = sortByFirstPriority,
         sortBySecondPriority = sortBySecondPriority,

@@ -8,7 +8,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 class CardDao(id: EntityID<Long>) : LongEntity(id = id) {
     companion object : LongEntityClass<CardDao>(CardsTable)
 
-    var knownLanguageText by CardsTable.knowsLanguageText
+    var knownLanguageText by CardsTable.knownLanguageText
     var learningLanguageText by CardsTable.learningLanguageText
     var notes by CardsTable.notes
     var lastAnsweredAt by CardsTable.lastAnsweredAt
