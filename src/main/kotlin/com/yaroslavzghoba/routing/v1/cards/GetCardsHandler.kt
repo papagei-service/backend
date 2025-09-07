@@ -1,5 +1,6 @@
 package com.yaroslavzghoba.routing.v1.cards
 
+import com.yaroslavzghoba.model.CardSorting
 import com.yaroslavzghoba.model.CardsResponse
 import com.yaroslavzghoba.model.Repository
 import com.yaroslavzghoba.routing.RouteHandlersProvider
@@ -26,6 +27,21 @@ fun RouteHandlersProvider.V1.Cards.getCards(
             return@getCardsHandler
         }
     }
+
+    val sortings = (call.request.queryParameters[Constants.SORT_BY_PARAM_NAME] ?: Constants.DEFAULT_SORT_BY)
+        ?.split(Constants.SORTING_DELIMITER)
+        ?.map { string ->
+            val cardSorting = CardSorting.fromStringOrNull(string = string)
+            if (cardSorting == null) {
+                call.respond(
+                    status = HttpStatusCode.BadRequest,
+                    message = "The passed query parameter \"${Constants.SORT_BY_PARAM_NAME}\" is invalid.",
+                )
+                return@getCardsHandler
+            }
+            cardSorting
+        }
+        ?: emptyList()
 
     // Get the optional limit parameter if passed or default value
     val limit = call.request.queryParameters[Constants.LIMIT_PARAM_NAME]?.let { param ->
@@ -70,10 +86,20 @@ fun RouteHandlersProvider.V1.Cards.getCards(
         }
 
         // Get cards that belong to the corresponding collection
-        repository.getCardsByCollectionId(id = collectionId, limit = limit, offset = offset)
+        repository.getCardsByCollectionId(
+            id = collectionId,
+            sortings = sortings,
+            limit = limit,
+            offset = offset,
+        )
     } else {
         // Get cards that belong to the user
-        repository.getCardsByOwnerId(id = session.userId, limit = limit, offset = offset)
+        repository.getCardsByOwnerId(
+            id = session.userId,
+            sortings = sortings,
+            limit = limit,
+            offset = offset,
+        )
     }
     val message = CardsResponse(totalCount = totalCount, cards = cards)
     call.respond(status = HttpStatusCode.OK, message = message)

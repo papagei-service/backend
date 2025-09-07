@@ -5,17 +5,17 @@ import com.yaroslavzghoba.mappers.toCardUpdateRequest
 import com.yaroslavzghoba.mappers.toLoginCredentials
 import com.yaroslavzghoba.model.Card
 import com.yaroslavzghoba.model.CardCollection
+import com.yaroslavzghoba.model.CardFieldNames
 import com.yaroslavzghoba.model.CardsResponse
-import com.yaroslavzghoba.utils.AuthUtils
-import com.yaroslavzghoba.utils.MockData
-import com.yaroslavzghoba.utils.rawCookie
-import com.yaroslavzghoba.utils.testConfiguredApplication
+import com.yaroslavzghoba.utils.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.util.logging.*
+import kotlinx.datetime.Clock
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.days
 
 @Suppress("unused")
 private val LOGGER = KtorSimpleLogger(CardsRoutingTest::class.java.name)
@@ -418,6 +418,27 @@ class CardsRoutingTest {
     }
 
     @Test
+    fun `Do not grant access to the cards if the sort_by query parameter is invalid`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            val response1 = client.get("/v1/cards?${Constants.SORT_BY_PARAM_NAME}=sss") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.BadRequest,
+                actual = response1.status,
+            )
+        }
+
+    @Test
     fun `Do not grant access to the cards if the limit query parameter is invalid`() =
         testConfiguredApplication { client, _ ->
             // Register, login a user and extract its cookie
@@ -581,6 +602,51 @@ class CardsRoutingTest {
             expected = insertedCards.subList(fromIndex = 0 + offset, toIndex = limit + offset),
             actual = receivedCards,
         )
+    }
+
+    @Test
+    fun `Grant access to the cards by owner with sort query parameter`() = testConfiguredApplication { client, _ ->
+        // Register, login a user and extract its cookie
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+        AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+        val response0 = AuthUtils
+            .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+        val rawCookie = response0.rawCookie()  // Contains the user's session
+
+        // Insert cards that will be sorted and received
+        val now = Clock.System.now()
+        val sortedCards = listOf(
+            MockData.FIRST_CARD_REQUEST
+                .copy(learningLanguageText = "banana", showNextTimeAt = now + 5.days),
+            MockData.SECOND_CARD_REQUEST
+                .copy(learningLanguageText = "apple", showNextTimeAt = now + 2.days),
+            MockData.THIRD_CARD_REQUEST
+                .copy(learningLanguageText = "orange", showNextTimeAt = now + 5.days),
+        ).map { cardInsertRequest ->
+            client.post("/v1/cards/") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(cardInsertRequest)
+            }.body<Card>()
+        }.sortedWith(
+            compareBy<Card> { it.showNextTimeAt }.thenByDescending { it.learningLanguageText }
+        )
+
+        val response1 = client.get {
+            url {
+                path("v1", "cards")
+                parameters.append(
+                    Constants.SORT_BY_PARAM_NAME,
+                    "+${CardFieldNames.SHOW_NEXT_TIME_AT},-${CardFieldNames.LEARNING_LANGUAGE_TEXT}"
+                )
+            }
+            rawCookie(value = rawCookie)
+            bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+        }.body<CardsResponse>()
+        val receivedCards = response1.cards
+
+        assertEquals(expected = sortedCards.size, actual = response1.totalCount.toInt())
+        assertEquals(expected = sortedCards, actual = receivedCards)
     }
 
     @Test
@@ -836,6 +902,62 @@ class CardsRoutingTest {
                 actual = receivedCards,
             )
         }
+
+    @Test
+    fun `Grant access to the cards by collection with sort query parameter`() = testConfiguredApplication { client, _ ->
+        // Register, login a user and extract its cookie
+        val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+        AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+        val response0 = AuthUtils
+            .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+        val rawCookie = response0.rawCookie()  // Contains the user's session
+
+        // Insert the collection to which the cards will belong
+        val collectionId = client.post("/v1/collections/") {
+            rawCookie(rawCookie)
+            bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            setBody(MockData.FIRST_COLLECTION_INSERT_REQUEST)
+        }.body<CardCollection>().id
+
+        // Insert cards that will be sorted and received
+        val now = Clock.System.now()
+        val sortedCards = listOf(
+            MockData.FIRST_CARD_REQUEST.copy(learningLanguageText = "banana", showNextTimeAt = now + 5.days),
+            MockData.SECOND_CARD_REQUEST.copy(learningLanguageText = "apple", showNextTimeAt = now + 2.days),
+            MockData.THIRD_CARD_REQUEST.copy(learningLanguageText = "orange", showNextTimeAt = now + 5.days),
+        ).map { cardInsertRequest ->
+            val card = client.post("/v1/cards/") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(cardInsertRequest)
+            }.body<Card>()
+            val cardId = card.id
+            client.post("/v1/collections/$collectionId/cards/$cardId") {
+                rawCookie(rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }
+            card
+        }.sortedWith(
+            compareBy<Card> { it.showNextTimeAt }.thenByDescending { it.learningLanguageText }
+        )
+
+        val response1 = client.get {
+            url {
+                path("v1", "cards")
+                parameters.append(name = "collection_id", value = collectionId.toString())
+                parameters.append(
+                    name = Constants.SORT_BY_PARAM_NAME,
+                    value = "+${CardFieldNames.SHOW_NEXT_TIME_AT},-${CardFieldNames.LEARNING_LANGUAGE_TEXT}"
+                )
+            }
+            rawCookie(value = rawCookie)
+            bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+        }.body<CardsResponse>()
+        val receivedCards = response1.cards
+
+        assertEquals(expected = sortedCards.size, actual = response1.totalCount.toInt())
+        assertEquals(expected = sortedCards, actual = receivedCards)
+    }
 
     @Test
     fun `Do not add the card to the collection if the collection_id path parameter is invalid`() =

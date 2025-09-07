@@ -1,19 +1,17 @@
 package com.yaroslavzghoba.model
 
 /**
- * Represents the sort order of a specific column in a SQL database table.
- *
- * @param parameterCode The name of the code that the client specifies in the request parameters in the URL.
+ * Sort order of a specific column in a SQL database table.
  */
-enum class SortOrder(val parameterCode: String) {
+enum class SortOrder() {
 
     /**
      * Sort in ascending order.
      */
-    ASC(parameterCode = "asc"),
+    ASC,
 
     /**
      * Sort in descending order.
      */
-    DESC(parameterCode = "desc"),
+    DESC,
 }

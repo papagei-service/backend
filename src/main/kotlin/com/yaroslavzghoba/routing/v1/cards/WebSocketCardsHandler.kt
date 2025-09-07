@@ -43,7 +43,9 @@ private suspend fun WebSocketServerSession.sendCards(
 ): List<Card> {
     val (_, cards) = repository.getCardsByOwnerId(
         id = ownerId,
-        sortByFirstPriority = CardSorting(column = CardSortingColumn.SHOW_NEXT_TIME_AT, order = SortOrder.ASC),
+        sortings = listOf(
+            CardSorting(column = CardSortingColumn.SHOW_NEXT_TIME_AT, order = SortOrder.ASC),
+        ),
         nextTimeBefore = Clock.System.now(),
         limit = 2,
         offset = 0,

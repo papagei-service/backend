@@ -18,12 +18,12 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class Card(
-    @SerialName("id") val id: Long?,
-    @SerialName("known_language_text") val knownLanguageText: String,
-    @SerialName("learning_language_text") val learningLanguageText: String,
-    @SerialName("notes") val notes: String,
-    @SerialName("last_answered_at") val lastAnsweredAt: Instant?,
-    @SerialName("show_next_time_at") val showNextTimeAt: Instant?,
-    @SerialName("correct_answers_in_row") val correctAnswersInRow: Int,
-    @SerialName("owner_id") val ownerId: Long,
+    @SerialName(CardFieldNames.ID) val id: Long?,
+    @SerialName(CardFieldNames.KNOWN_LANGUAGE_TEXT) val knownLanguageText: String,
+    @SerialName(CardFieldNames.LEARNING_LANGUAGE_TEXT) val learningLanguageText: String,
+    @SerialName(CardFieldNames.NOTES) val notes: String,
+    @SerialName(CardFieldNames.LAST_ANSWERED_AT) val lastAnsweredAt: Instant?,
+    @SerialName(CardFieldNames.SHOW_NEXT_TIME_AT) val showNextTimeAt: Instant?,
+    @SerialName(CardFieldNames.CORRECT_ANSWERS_IN_ROW) val correctAnswersInRow: Int,
+    @SerialName(CardFieldNames.OWNER_ID) val ownerId: Long,
 )

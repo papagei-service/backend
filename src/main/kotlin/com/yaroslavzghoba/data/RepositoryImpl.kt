@@ -91,15 +91,13 @@ class RepositoryImpl(
 
     override suspend fun getCardsByOwnerId(
         id: Long,
-        sortByFirstPriority: CardSorting?,
-        sortBySecondPriority: CardSorting?,
+        sortings: List<CardSorting>,
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long,
     ): Pair<Long, List<Card>> = cardStorage.getByOwnerId(
         id = id,
-        sortByFirstPriority = sortByFirstPriority,
-        sortBySecondPriority = sortBySecondPriority,
+        sortings = sortings,
         nextTimeBefore = nextTimeBefore,
         limit = limit,
         offset = offset,
@@ -107,15 +105,13 @@ class RepositoryImpl(
 
     override suspend fun getCardsByCollectionId(
         id: Long,
-        sortByFirstPriority: CardSorting?,
-        sortBySecondPriority: CardSorting?,
+        sortings: List<CardSorting>,
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long
     ): Pair<Long, List<Card>> = cardStorage.getByCollectionId(
         id = id,
-        sortByFirstPriority = sortByFirstPriority,
-        sortBySecondPriority = sortBySecondPriority,
+        sortings = sortings,
         nextTimeBefore = nextTimeBefore,
         limit = limit,
         offset = offset,
