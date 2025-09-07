@@ -35,8 +35,7 @@ class CardStorageImpl : CardStorage {
 
     override suspend fun getByOwnerId(
         id: Long,
-        sortByFirstPriority: CardSorting?,
-        sortBySecondPriority: CardSorting?,
+        sortings: List<CardSorting>,
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long,
@@ -54,10 +53,7 @@ class CardStorageImpl : CardStorage {
         val cardsWithTotalCount: List<Pair<Card, Long>> = CardsTable
             .select(columns = CardsTable.columns + totalCountColumn)
             .where(predicate = condition)
-            .apply {
-                val sorts = listOfNotNull(sortByFirstPriority, sortBySecondPriority)
-                orderBy(*sorts.toTypedArray())
-            }
+            .apply { orderBy(*sortings.toTypedArray()) }
             .limit(limit).offset(offset)
             .map { row ->
                 Card(
@@ -92,8 +88,7 @@ class CardStorageImpl : CardStorage {
 
     override suspend fun getByCollectionId(
         id: Long,
-        sortByFirstPriority: CardSorting?,
-        sortBySecondPriority: CardSorting?,
+        sortings: List<CardSorting>,
         nextTimeBefore: Instant?,
         limit: Int,
         offset: Long
@@ -113,10 +108,7 @@ class CardStorageImpl : CardStorage {
             .select(CardsTable.columns + totalCountColumn)
             .where(predicate = condition)
             .withDistinct()
-            .apply {
-                val sorts = listOfNotNull(sortByFirstPriority, sortBySecondPriority)
-                orderBy(*sorts.toTypedArray())
-            }
+            .apply { orderBy(*sortings.toTypedArray()) }
             .limit(limit).offset(offset)
             .map { row ->
                 Card(
@@ -283,7 +275,14 @@ private fun Query.orderBy(vararg sorting: CardSorting): Query {
  * @return An expression consisting of the corresponding column.
  */
 private fun CardSortingColumn.toExpression(): Expression<*> = when (this) {
+    CardSortingColumn.ID -> CardsTable.id
+    CardSortingColumn.KNOWN_LANGUAGE_TEXT -> CardsTable.knownLanguageText
+    CardSortingColumn.LEARNING_LANGUAGE_TEXT -> CardsTable.learningLanguageText
+    CardSortingColumn.NOTES -> CardsTable.notes
+    CardSortingColumn.LAST_ANSWERED_AT -> CardsTable.lastAnsweredAt
     CardSortingColumn.SHOW_NEXT_TIME_AT -> CardsTable.showNextTimeAt
+    CardSortingColumn.CORRECT_ANSWERS_IN_ROW -> CardsTable.correctAnswersInRow
+    CardSortingColumn.OWNER_ID -> CardsTable.ownerId
 }
 
 /**

@@ -147,9 +147,8 @@ interface Repository {
      * Get a list of cards that owned by the user with an identifier equal to [id].
      *
      * @param id Unique identifier of the user that own the requested cards.
-     * @param sortByFirstPriority Options for the card sort that is performed first.
-     * @param sortBySecondPriority Options for the card sort that is performed at the second stage
-     * on cards with the same values in the column by which the first sort was performed.
+     * @param sortings Options for sorting cards. The sorting order will be the same
+     * as the order in which the cards are listed.
      * @param nextTimeBefore The moment of time ahead of the time of the next repetition of the card.
      * @param limit The maximal number of cards those will be returned.
      * @param offset Indicates how many cards should be skipped.
@@ -159,8 +158,7 @@ interface Repository {
      */
     suspend fun getCardsByOwnerId(
         id: Long,
-        sortByFirstPriority: CardSorting? = null,
-        sortBySecondPriority: CardSorting? = null,
+        sortings: List<CardSorting>,
         nextTimeBefore: Instant? = null,
         limit: Int,
         offset: Long,
@@ -170,9 +168,8 @@ interface Repository {
      * Get a list of cards included in the collection with an identifier equal to [id].
      *
      * @param id The unique identifier of the collection that include cards.
-     * @param sortByFirstPriority Options for the card sort that is performed first.
-     * @param sortBySecondPriority Options for the card sort that is performed at the second stage
-     * on cards with the same values in the column by which the first sort was performed.
+     * @param sortings Options for sorting cards. The sorting order will be the same
+     * as the order in which the cards are listed.
      * @param nextTimeBefore The moment of time ahead of the time of the next repetition of the card.
      * @param limit The maximal number of cards those will be returned.
      * @param offset Indicates how many cards should be skipped.
@@ -182,8 +179,7 @@ interface Repository {
      */
     suspend fun getCardsByCollectionId(
         id: Long,
-        sortByFirstPriority: CardSorting? = null,
-        sortBySecondPriority: CardSorting? = null,
+        sortings: List<CardSorting>,
         nextTimeBefore: Instant? = null,
         limit: Int,
         offset: Long,

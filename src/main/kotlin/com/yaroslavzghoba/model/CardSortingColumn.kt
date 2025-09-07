@@ -1,12 +1,15 @@
 package com.yaroslavzghoba.model
 
 /**
- * Represents a column by which cards are sorted.
+ * Columns of the `Card` entity by which the list of cards can be sorted.
  */
 enum class CardSortingColumn {
-
-    /**
-     * Time of the next repetition.
-     */
+    ID,
+    KNOWN_LANGUAGE_TEXT,
+    LEARNING_LANGUAGE_TEXT,
+    NOTES,
+    LAST_ANSWERED_AT,
     SHOW_NEXT_TIME_AT,
+    CORRECT_ANSWERS_IN_ROW,
+    OWNER_ID
 }
