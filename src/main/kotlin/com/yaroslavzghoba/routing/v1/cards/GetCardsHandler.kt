@@ -10,6 +10,7 @@ import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import kotlinx.datetime.Instant
 
 @Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.V1.Cards.getCards(
@@ -42,6 +43,19 @@ fun RouteHandlersProvider.V1.Cards.getCards(
             cardSorting
         }
         ?: emptyList()
+
+    val nextTimeBefore = (call.request.queryParameters[Constants.NEXT_TIME_BEFORE_PARAM_NAME]
+        ?: Constants.DEFAULT_NEXT_TIME_BEFORE)
+        ?.let { string ->
+            try {
+                Instant.parse(string)
+            } catch (_: IllegalArgumentException) {
+                val message = "The value \"$string\" passed to the \"${Constants.NEXT_TIME_BEFORE_PARAM_NAME}\" " +
+                        "query parameter is invalid."
+                call.respond(status = HttpStatusCode.BadRequest, message = message)
+                return@getCardsHandler
+            }
+        }
 
     // Get the optional limit parameter if passed or default value
     val limit = call.request.queryParameters[Constants.LIMIT_PARAM_NAME]?.let { param ->
@@ -89,6 +103,7 @@ fun RouteHandlersProvider.V1.Cards.getCards(
         repository.getCardsByCollectionId(
             id = collectionId,
             sortings = sortings,
+            nextTimeBefore = nextTimeBefore,
             limit = limit,
             offset = offset,
         )
@@ -97,6 +112,7 @@ fun RouteHandlersProvider.V1.Cards.getCards(
         repository.getCardsByOwnerId(
             id = session.userId,
             sortings = sortings,
+            nextTimeBefore = nextTimeBefore,
             limit = limit,
             offset = offset,
         )

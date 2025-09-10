@@ -53,4 +53,24 @@ object Constants {
      * Delimiter between different sortings.
      */
     const val SORTING_DELIMITER = ","
+
+    /**
+     * Name of a parameter that contains a time point is designed to select only cards
+     * where the time of the next show is greater than or less than the passed value.
+     *
+     * A combination of time and date in ISO 8601 format is expected.
+     * For example: "2007-04-05T14:30Z" or "2007-04-05T12:30-02:00".
+     * To learn more, read: https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations
+     */
+    const val NEXT_TIME_BEFORE_PARAM_NAME = "next_time_before"
+
+    /**
+     * Default value of a parameter that contains a time point is designed to select only cards
+     * where the time of the next show is greater than or less than the passed value.
+     *
+     * A combination of time and date in ISO 8601 format is expected.
+     * For example: "2007-04-05T14:30Z" or "2007-04-05T12:30-02:00".
+     * To learn more, read: https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations
+     */
+    val DEFAULT_NEXT_TIME_BEFORE: String? = null
 }

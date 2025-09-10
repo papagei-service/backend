@@ -159,7 +159,7 @@ interface Repository {
     suspend fun getCardsByOwnerId(
         id: Long,
         sortings: List<CardSorting>,
-        nextTimeBefore: Instant? = null,
+        nextTimeBefore: Instant?,
         limit: Int,
         offset: Long,
     ): Pair<Long, List<Card>>
@@ -180,7 +180,7 @@ interface Repository {
     suspend fun getCardsByCollectionId(
         id: Long,
         sortings: List<CardSorting>,
-        nextTimeBefore: Instant? = null,
+        nextTimeBefore: Instant?,
         limit: Int,
         offset: Long,
     ): Pair<Long, List<Card>>

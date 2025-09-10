@@ -16,6 +16,7 @@ import kotlinx.datetime.Clock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 
 @Suppress("unused")
 private val LOGGER = KtorSimpleLogger(CardsRoutingTest::class.java.name)
@@ -481,6 +482,34 @@ class CardsRoutingTest {
         }
 
     @Test
+    fun `Do not grant access to the cards if the next show time before query parameter is invalid`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            val response1 = client.get {
+                url {
+                    path("v1", "cards")
+                    parameters.append(
+                        name = Constants.NEXT_TIME_BEFORE_PARAM_NAME,
+                        value = "bruh",  // Invalid time format
+                    )
+                }
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(
+                expected = HttpStatusCode.BadRequest,
+                actual = response1.status
+            )
+        }
+
+    @Test
     fun `Grant access to the user's cards`() = testConfiguredApplication { client, _ ->
         // Register, login a user and extract its cookie
         val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
@@ -648,6 +677,49 @@ class CardsRoutingTest {
         assertEquals(expected = sortedCards.size, actual = response1.totalCount.toInt())
         assertEquals(expected = sortedCards, actual = receivedCards)
     }
+
+    @Test
+    fun `Grant access to the cards by owner with the next show time before query parameter`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            // Insert cards that will be filtered by time of next show
+            val now = Clock.System.now()
+            val filteredCards = listOf(
+                MockData.FIRST_CARD_REQUEST.copy(showNextTimeAt = now + 4.hours),
+                MockData.SECOND_CARD_REQUEST.copy(showNextTimeAt = now - 1.days),
+                MockData.THIRD_CARD_REQUEST.copy(showNextTimeAt = now + 2.days),
+            ).map { cardInsertRequest ->
+                client.post("/v1/cards/") {
+                    rawCookie(value = rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                    setBody(cardInsertRequest)
+                }.body<Card>()
+            }.filter { insertedCard ->
+                insertedCard.showNextTimeAt!! < now
+            }
+
+            val response1 = client.get {
+                url {
+                    path("v1", "cards")
+                    parameters.append(
+                        name = Constants.NEXT_TIME_BEFORE_PARAM_NAME,
+                        value = now.toString(),
+                    )
+                }
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }.body<CardsResponse>()
+            val receivedCards = response1.cards
+
+            assertEquals(expected = filteredCards.size, actual = response1.totalCount.toInt())
+            assertEquals(expected = filteredCards, actual = receivedCards)
+        }
 
     @Test
     fun `Do not grant access to the cards if the collection_id query parameter is invalid`() =
@@ -958,6 +1030,63 @@ class CardsRoutingTest {
         assertEquals(expected = sortedCards.size, actual = response1.totalCount.toInt())
         assertEquals(expected = sortedCards, actual = receivedCards)
     }
+
+    @Test
+    fun `Grant access to the cards by collection with next show time before query parameter`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            // Insert the collection to which the cards will belong
+            val collectionId = client.post("/v1/collections/") {
+                rawCookie(rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(MockData.FIRST_COLLECTION_INSERT_REQUEST)
+            }.body<CardCollection>().id
+
+            // Insert cards that will be sorted and received
+            val now = Clock.System.now()
+            val filteredCards = listOf(
+                MockData.FIRST_CARD_REQUEST.copy(showNextTimeAt = now + 4.hours),
+                MockData.SECOND_CARD_REQUEST.copy(showNextTimeAt = now - 1.days),
+                MockData.THIRD_CARD_REQUEST.copy(showNextTimeAt = now + 2.days),
+            ).map { cardInsertRequest ->
+                val card = client.post("/v1/cards/") {
+                    rawCookie(value = rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                    setBody(cardInsertRequest)
+                }.body<Card>()
+                val cardId = card.id
+                client.post("/v1/collections/$collectionId/cards/$cardId") {
+                    rawCookie(rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                }
+                card
+            }.filter { insertedCard ->
+                insertedCard.showNextTimeAt!! < now
+            }
+
+            val response1 = client.get {
+                url {
+                    path("v1", "cards")
+                    parameters.append(name = "collection_id", value = collectionId.toString())
+                    parameters.append(
+                        name = Constants.NEXT_TIME_BEFORE_PARAM_NAME,
+                        value = now.toString(),
+                    )
+                }
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+            }.body<CardsResponse>()
+            val receivedCards = response1.cards
+
+            assertEquals(expected = filteredCards.size, actual = response1.totalCount.toInt())
+            assertEquals(expected = filteredCards, actual = receivedCards)
+        }
 
     @Test
     fun `Do not add the card to the collection if the collection_id path parameter is invalid`() =
