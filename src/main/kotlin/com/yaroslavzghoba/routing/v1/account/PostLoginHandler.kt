@@ -20,11 +20,11 @@ fun RouteHandlersProvider.V1.Account.postLogin(
     // Receive credentials sent by the client
     val loginCredentials = call.receive<LoginCredentials>()
 
-    // Return 401 if no user with the corresponding name is found in the user storage
+    // Return 404 if no user with the corresponding name is found in the user storage
     val correspondingUser = repository.getUserByUsername(username = loginCredentials.username)
     if (correspondingUser == null) {
         val message = mapOf("message" to "There is no the user with the \"${loginCredentials.username}\" username")
-        call.respond(status = HttpStatusCode.Unauthorized, message = message)
+        call.respond(status = HttpStatusCode.NotFound, message = message)
         return@postLoginHandler
     }
 
