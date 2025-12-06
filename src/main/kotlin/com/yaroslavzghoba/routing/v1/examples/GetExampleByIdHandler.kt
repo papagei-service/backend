@@ -30,7 +30,7 @@ fun RouteHandlersProvider.V1.Examples.getExampleById(
         return@getExampleByIdHandler
     }
 
-    // Return 404 if parent card not found
+    // Return 403 if parent card not found
     val parentCard = repository.getCardById(id = example.cardId)!!
     if (parentCard.ownerId != session.userId) {
         val message = mapOf("message" to "You cannot access someone else's example")

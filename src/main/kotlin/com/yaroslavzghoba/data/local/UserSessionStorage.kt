@@ -33,6 +33,6 @@ class UserSessionStorage : PurgeableSessionStorage {
         UserSessionDao
             .find { UserSessionsTable.id eq id }
             .firstOrNull()?.value
-            ?: throw NoSuchElementException("Session $id not found")
+            ?: throw NoSuchElementException("Session with id equals to $id not found.")
     }
 }

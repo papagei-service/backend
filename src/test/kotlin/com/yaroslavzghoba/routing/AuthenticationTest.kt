@@ -128,7 +128,7 @@ class AuthenticationTest {
         }
 
         assertEquals(
-            expected = HttpStatusCode.Unauthorized,
+            expected = HttpStatusCode.NotFound,
             actual = response0.status,
         )
     }

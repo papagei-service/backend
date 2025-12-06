@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.ktor.server.auth.jwt)
     implementation(libs.ktor.server.sessions)
     implementation(libs.ktor.server.status.pages)
+    implementation(libs.ktor.server.swagger)
     implementation(libs.exposed.core)
     implementation(libs.exposed.jdbc)
     implementation(libs.exposed.kotlin.datetime)

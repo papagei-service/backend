@@ -1,5 +1,5 @@
 [versions]
-version = "0.14.0"
+version = "0.15.0"
 
 ktor-version = "3.2.3"
 kotlin-version = "2.2.10"
@@ -19,6 +19,7 @@ ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor-ve
 ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor-version" }
 ktor-server-sessions = { module = "io.ktor:ktor-server-sessions", version.ref = "ktor-version" }
 ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages", version.ref = "ktor-version" }
+ktor-server-swagger = { module = "io.ktor:ktor-server-swagger", version.ref = "ktor-version" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-version" }
 exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed-version" }
