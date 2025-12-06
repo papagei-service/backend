@@ -18,7 +18,12 @@ fun RouteHandlersProvider.V1.Account.postLogin(
 ): suspend RoutingContext.() -> Unit = postLoginHandler@{
 
     // Receive credentials sent by the client
-    val loginCredentials = call.receive<LoginCredentials>()
+    val loginCredentials = runCatching { call.receive<LoginCredentials>() }.getOrNull()
+    if (loginCredentials == null) {
+        val message = mapOf("message" to "The request body cannot be converted to a login credentials.")
+        call.respond(status = HttpStatusCode.BadRequest, message = message)
+        return@postLoginHandler
+    }
 
     // Return 404 if no user with the corresponding name is found in the user storage
     val correspondingUser = repository.getUserByUsername(username = loginCredentials.username)

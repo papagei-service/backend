@@ -21,6 +21,8 @@ import com.yaroslavzghoba.security.jwt.JwtTokenService
 import com.yaroslavzghoba.utils.KeyGenerator
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.plugins.swagger.SwaggerConfig
+import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 
@@ -33,6 +35,7 @@ fun Application.configureRouting(
     keyGenerator: KeyGenerator,
 ) {
     routing {
+        swaggerUI("/docs", "/help", swaggerFile = "openapi/documentation.yaml")
         route(path = "/v1") {
             authenticate("jwt-authentication-v1", strategy = AuthenticationStrategy.Required) {
                 handleRoutingV1(
@@ -192,5 +195,18 @@ private fun Route.handleRoutingV1(
                 body = RouteHandlersProvider.V1.Examples.deleteExample(repository = repository),
             )
         }
+    }
+}
+
+/**
+ * Generate Swagger documentation for each passed path.
+ */
+private fun Routing.swaggerUI(
+    vararg paths: String,
+    swaggerFile: String = "openapi/documentation.yaml",
+    block: SwaggerConfig.() -> Unit = {},
+) {
+    paths.forEach { path ->
+        swaggerUI(path = path, swaggerFile = swaggerFile, block = block)
     }
 }
