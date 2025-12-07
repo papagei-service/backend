@@ -1,2 +1,2 @@
-log: ls && pwd && cd build/libs && ls && pwd && cd ../..
-web: java -jar build/libs/com.yaroslavzghoba.papagei-all.jar
+log: ls && pwd && cd ./build/libs && ls && pwd && cd ../..
+web: ./build/install/com.yaroslavzghoba.papagei/bin/com.yaroslavzghoba.papagei

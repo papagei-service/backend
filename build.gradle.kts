@@ -15,8 +15,9 @@ task("printVersion") {
     }
 }
 
+// Make a production-ready executable
 task("stage") {
-
+    dependsOn("installDist")
 }
 
 application {
