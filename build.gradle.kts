@@ -15,6 +15,10 @@ task("printVersion") {
     }
 }
 
+task("stage") {
+
+}
+
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 
