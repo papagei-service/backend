@@ -1,1 +1,1 @@
-web: java -jar build/libs/*.jar
+web: java -jar build/libs/com.yaroslavzghoba.papagei-all.jar
