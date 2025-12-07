@@ -15,6 +15,11 @@ task("printVersion") {
     }
 }
 
+// Make a production-ready executable
+task("stage") {
+    dependsOn("installDist")
+}
+
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 
