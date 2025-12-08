@@ -1,7 +1,7 @@
 ktor:
   application:
     modules:
-      - com.yaroslavzghoba.ApplicationKt.module
+      - space.zghoba.ApplicationKt.module
   deployment:
     port: $PORT
 

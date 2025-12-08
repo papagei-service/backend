@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.kover)
 }
 
-group = "com.yaroslavzghoba"
-version = libs.versions.version.get()
+group = "space.zghoba"
+version = libs.versions.project.get()
 
 // Print the current version of the project
 task("printVersion") {
