@@ -1,1 +1,1 @@
-web: ./build/install/com.yaroslavzghoba.papagei/bin/com.yaroslavzghoba.papagei
+web: ./build/install/space.zghoba.papagei/bin/space.zghoba.papagei
