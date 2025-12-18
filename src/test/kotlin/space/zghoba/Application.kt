@@ -70,6 +70,7 @@ fun Application.testingModule() {
     configureWebSockets()
     configureRouting(
         repository = Repository,
+        sessionStorage = SessionStorage,
         jwtTokenConfig = jwtTokenConfig,
         jwtTokenService = jwtTokenService,
         hashingService = hashingService,

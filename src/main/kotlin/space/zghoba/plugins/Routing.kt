@@ -24,10 +24,12 @@ import io.ktor.server.auth.*
 import io.ktor.server.plugins.swagger.SwaggerConfig
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.SessionStorage
 import io.ktor.server.websocket.*
 
 fun Application.configureRouting(
     repository: Repository,
+    sessionStorage: SessionStorage,
     jwtTokenConfig: JwtTokenConfig,
     jwtTokenService: JwtTokenService,
     hashingService: HashingService,
@@ -40,6 +42,7 @@ fun Application.configureRouting(
             authenticate("jwt-authentication-v1", strategy = AuthenticationStrategy.Required) {
                 handleRoutingV1(
                     repository = repository,
+                    sessionStorage = sessionStorage,
                     jwtTokenConfig = jwtTokenConfig,
                     jwtTokenService = jwtTokenService,
                     hashingService = hashingService,
@@ -53,6 +56,7 @@ fun Application.configureRouting(
 
 private fun Route.handleRoutingV1(
     repository: Repository,
+    sessionStorage: SessionStorage,
     jwtTokenConfig: JwtTokenConfig,
     jwtTokenService: JwtTokenService,
     hashingService: HashingService,
@@ -80,6 +84,7 @@ private fun Route.handleRoutingV1(
             path = "/login",
             body = RouteHandlersProvider.V1.Account.postLogin(
                 repository = repository,
+                sessionStorage = sessionStorage,
                 hashingService = hashingService,
             ),
         )
