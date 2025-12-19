@@ -99,11 +99,17 @@ private fun Route.handleRoutingV1(
         authenticate("session-authentication-v1", strategy = AuthenticationStrategy.Required) {
             post(
                 path = "/logout",
-                body = RouteHandlersProvider.V1.Account.postLogout(),
+                body = RouteHandlersProvider.V1.Account.postLogout(
+                    sessionStorage = sessionStorage,
+                ),
             )
 
             authenticate("strong-jwt-authentication-v1", strategy = AuthenticationStrategy.Required) {
-                delete(body = RouteHandlersProvider.V1.Account.deleteAccount(repository = repository))
+                delete(
+                    body = RouteHandlersProvider.V1.Account.deleteAccount(
+                        repository = repository,
+                    )
+                )
             }
         }
     }
