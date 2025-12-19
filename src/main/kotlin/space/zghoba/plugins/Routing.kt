@@ -84,7 +84,6 @@ private fun Route.handleRoutingV1(
             path = "/login",
             body = RouteHandlersProvider.V1.Account.postLogin(
                 repository = repository,
-                sessionStorage = sessionStorage,
                 hashingService = hashingService,
             ),
         )

@@ -15,7 +15,6 @@ import space.zghoba.utils.Constants
 @Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.V1.Account.postLogin(
     repository: Repository,
-    sessionStorage: SessionStorage,
     hashingService: HashingService,
 ): suspend RoutingContext.() -> Unit = postLoginHandler@{
 
@@ -47,7 +46,6 @@ fun RouteHandlersProvider.V1.Account.postLogin(
     // Delete the previous user session, if provided, and create a new one
     call.attributes.allKeys
         .firstOrNull { it.name == Constants.USER_SESSION_ID_ATTRIBUTE_KEY }
-        ?.also { sessionStorage.invalidate(call.sessionId<UserSession>()!!) }
         ?.also { call.attributes.remove(it) }
     call.sessions.set(UserSession(userId = correspondingUser.id!!))
 
