@@ -73,6 +73,7 @@ fun Application.module() {
     configureWebSockets()
     configureRouting(
         repository = repository,
+        sessionStorage = sessionsConfig.sessionStorage,
         jwtTokenConfig = jwtTokenConfig,
         jwtTokenService = jwtTokenService,
         hashingService = hashingService,
