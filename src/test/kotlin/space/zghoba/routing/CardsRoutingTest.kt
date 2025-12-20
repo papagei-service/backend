@@ -9,14 +9,20 @@ import space.zghoba.model.CardFieldNames
 import space.zghoba.model.CardsResponse
 import space.zghoba.utils.*
 import io.ktor.client.call.*
+import io.ktor.client.plugins.websocket.receiveDeserialized
+import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.util.logging.*
 import kotlinx.datetime.Clock
+import kotlin.collections.sortedWith
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @Suppress("unused")
 private val LOGGER = KtorSimpleLogger(CardsRoutingTest::class.java.name)
@@ -1086,6 +1092,130 @@ class CardsRoutingTest {
 
             assertEquals(expected = filteredCards.size, actual = response1.totalCount.toInt())
             assertEquals(expected = filteredCards, actual = receivedCards)
+        }
+
+    @Test
+    fun `Grant access to the cards by owner id via WebSockets`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a first user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie0 = response0.rawCookie()  // Contains the user's session
+
+            // Insert cards that will be sorted and received
+            val now = Clock.System.now()
+            val expectedCards = listOf(
+                MockData.FIRST_CARD_REQUEST.copy(showNextTimeAt = now - 4.hours),
+                MockData.SECOND_CARD_REQUEST.copy(showNextTimeAt = now - 1.days),
+                MockData.THIRD_CARD_REQUEST.copy(showNextTimeAt = now + 2.days),
+                MockData.FIRST_CARD_REQUEST.copy(showNextTimeAt = now - 30.minutes),
+                MockData.SECOND_CARD_REQUEST.copy(showNextTimeAt = now + 50.seconds),
+            ).map { cardInsertRequest ->
+                client.post("/v1/cards/") {
+                    rawCookie(value = rawCookie0)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                    setBody(cardInsertRequest)
+                }.body<Card>()
+            }.filter { insertedCard ->
+                insertedCard.showNextTimeAt!! < now
+            }.sortedBy { card ->
+                card.showNextTimeAt
+            }.subList(fromIndex = 0, toIndex = 2) // 2 items
+
+            // Register, login a second user and extract its cookie.
+            val registrationCredentials1 = MockData.SECOND_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials1, AuthUtils.NOT_STRONG_TOKEN)
+            val response1 = AuthUtils
+                .loginUser(client, registrationCredentials1.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie1 = response1.rawCookie()  // Contains the user's session
+
+            // Insert a new card belonging to the second user.
+            client.post("/v1/cards/") {
+                rawCookie(value = rawCookie1)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(
+                    // If this card belonged to the first user, it would be returned first.
+                    MockData.THIRD_CARD_REQUEST.copy(showNextTimeAt = now - 54.days)
+                )
+            }.body<Card>()
+
+            client.webSocket(
+                urlString = "/v1/cards",
+                request = {
+                    rawCookie(value = rawCookie0)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                },
+            ) {
+                val actualCards = receiveDeserialized<List<Card>>()
+                assertContentEquals(expected = expectedCards, actual = actualCards)
+            }
+        }
+
+    @Test
+    fun `Grant access to the cards by collection id via WebSockets`() =
+        testConfiguredApplication { client, _ ->
+            // Register, login a first user and extract its cookie
+            val registrationCredentials0 = MockData.FIRST_REGISTRATION_CREDENTIALS
+            AuthUtils.registerUser(client, registrationCredentials0, AuthUtils.NOT_STRONG_TOKEN)
+            val response0 = AuthUtils
+                .loginUser(client, registrationCredentials0.toLoginCredentials(), AuthUtils.NOT_STRONG_TOKEN)
+            val rawCookie = response0.rawCookie()  // Contains the user's session
+
+            // Insert the collection to which the cards will belong
+            val collectionId = client.post("/v1/collections/") {
+                rawCookie(rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(MockData.FIRST_COLLECTION_INSERT_REQUEST)
+            }.body<CardCollection>().id
+
+            // Insert cards that will be sorted and received
+            val now = Clock.System.now()
+            val expectedCards = listOf(
+                MockData.FIRST_CARD_REQUEST.copy(showNextTimeAt = now - 4.hours),
+                MockData.SECOND_CARD_REQUEST.copy(showNextTimeAt = now - 1.days),
+                MockData.THIRD_CARD_REQUEST.copy(showNextTimeAt = now + 2.days),
+                MockData.FIRST_CARD_REQUEST.copy(showNextTimeAt = now - 30.minutes),
+                MockData.SECOND_CARD_REQUEST.copy(showNextTimeAt = now + 50.seconds),
+            ).map { cardInsertRequest ->
+                val card = client.post("/v1/cards/") {
+                    rawCookie(value = rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                    setBody(cardInsertRequest)
+                }.body<Card>()
+                val cardId = card.id
+                client.post("/v1/collections/$collectionId/cards/$cardId") {
+                    rawCookie(rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                }
+                card
+            }.filter { insertedCard ->
+                insertedCard.showNextTimeAt!! < now
+            }.sortedBy { card ->
+                card.showNextTimeAt
+            }.subList(fromIndex = 0, toIndex = 2) // 2 items
+
+            // Insert a new card that does not belong to any collection.
+            client.post("/v1/cards/") {
+                rawCookie(value = rawCookie)
+                bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                setBody(
+                    // If this card belonged to the first user, it would be returned first.
+                    MockData.THIRD_CARD_REQUEST.copy(showNextTimeAt = now - 54.days)
+                )
+            }.body<Card>()
+
+            client.webSocket(
+                urlString = "/v1/cards?collection_id=$collectionId",
+                request = {
+                    rawCookie(value = rawCookie)
+                    bearerAuth(AuthUtils.NOT_STRONG_TOKEN)
+                },
+            ) {
+                val actualCards = receiveDeserialized<List<Card>>()
+                assertContentEquals(expected = expectedCards, actual = actualCards)
+            }
         }
 
     @Test

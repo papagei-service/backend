@@ -1,5 +1,5 @@
 [versions]
-project = "0.19.0"
+project = "0.20.0"
 ktor = "3.2.3"
 kotlin = "2.2.10"
 kover = "0.9.1"
