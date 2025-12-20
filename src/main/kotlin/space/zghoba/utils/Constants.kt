@@ -73,4 +73,9 @@ object Constants {
      * To learn more, read: https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations
      */
     val DEFAULT_NEXT_TIME_BEFORE: String? = null
+
+    /**
+     * Name of the attribute in which the user session ID is stored in the request context. 
+     */
+    const val USER_SESSION_ID_ATTRIBUTE_KEY = "SessionId"
 }

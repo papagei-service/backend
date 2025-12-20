@@ -281,6 +281,100 @@ class AuthenticationTest {
     }
 
     @Test
+    fun `Log in the existing user a second time`() = testConfiguredApplication { client, _ ->
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
+        val loginCredentials = registrationCredentials.toLoginCredentials()
+
+        // Register the new user
+        client.post("/v1/account/register") {
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+            setBody(registrationCredentials)
+        }
+
+        // Login the existing user a first time
+        client.post("/v1/account/login") {
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+            setBody(loginCredentials)
+        }
+
+        // Login the existing user a first time
+        val response0 = client.post("/v1/account/login") {
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+            setBody(loginCredentials)
+        }
+
+        assertEquals(
+            expected = HttpStatusCode.OK,
+            actual = response0.status,
+        )
+    }
+
+    @Test
+    fun `Provide a new session during second-time login`() = testConfiguredApplication { client, _ ->
+        val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
+        val loginCredentials = registrationCredentials.toLoginCredentials()
+
+        // Register the new user
+        client.post("/v1/account/register") {
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+            setBody(registrationCredentials)
+        }
+
+        // Login the existing user a first time
+        val response0 = client.post("/v1/account/login") {
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+            setBody(loginCredentials)
+        }
+        val rawCookie0 = response0.rawCookie()  // Contains the user's session
+
+        // Login the existing user a second time
+        val response1 = client.post("/v1/account/login") {
+            bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+            rawCookie(rawCookie0)
+            setBody(loginCredentials)
+        }
+        val rawCookie1 = response1.rawCookie()  // Contains the user's session
+
+        assertEquals(expected = HttpStatusCode.OK, actual = response1.status)
+        assertTrue { rawCookie0 != rawCookie1 }  // Session id has been changed
+    }
+
+    @Test
+    fun `Grant access to the session-protected resource with the previous session id`() =
+        testConfiguredApplication { client, _ ->
+            val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
+            val loginCredentials = registrationCredentials.toLoginCredentials()
+
+            // Register the new user
+            client.post("/v1/account/register") {
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+                setBody(registrationCredentials)
+            }
+
+            // Login the existing user a first time
+            val response0 = client.post("/v1/account/login") {
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+                setBody(loginCredentials)
+            }
+            val rawCookie0 = response0.rawCookie()  // Contains the user's session
+
+            // Login the existing user a second time
+            client.post("/v1/account/login") {
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+                rawCookie(rawCookie0)
+                setBody(loginCredentials)
+            }
+
+            // Get access to the session-protected resource
+            val response1 = client.get("/v1/account") {
+                rawCookie(value = rawCookie0)
+                bearerAuth(token = AuthUtils.NOT_STRONG_TOKEN)
+            }
+
+            assertEquals(expected = HttpStatusCode.OK, actual = response1.status)
+        }
+
+    @Test
     fun `Grant access to the session-protected resource with active session`() =
         testConfiguredApplication { client, _ ->
             val registrationCredentials = MockData.FIRST_REGISTRATION_CREDENTIALS
