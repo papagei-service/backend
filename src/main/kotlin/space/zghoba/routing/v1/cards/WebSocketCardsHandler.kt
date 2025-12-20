@@ -9,34 +9,26 @@ import space.zghoba.routing.RouteHandlersProvider
 import space.zghoba.security.sessions.UserSession
 import io.ktor.server.sessions.*
 import io.ktor.server.websocket.*
-import io.ktor.util.logging.KtorSimpleLogger
 import io.ktor.websocket.*
 import kotlinx.datetime.Clock
-
-private val LOGGER =
-    KtorSimpleLogger(RouteHandlersProvider.V1.Cards::webSocketCards.javaClass.packageName)
 
 @Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.V1.Cards.webSocketCards(
     handleCardAnswerUseCase: HandleCardAnswerUseCase,
     repository: Repository,
 ): suspend DefaultWebSocketServerSession.() -> Unit = webSocketCardsHandler@{
-    LOGGER.debug("Request was registered")
     val session = call.sessions.get<UserSession>()!!
 
     // Get the optional parameter "collection_id" if passed and return 400 if it is invalid
-    val collectionId: Long? = call.request.queryParameters["collection_id"]
-        ?.toLongOrNull()
-        ?.takeIf { it > 0 }
-        ?: run {
-            // Return 400 if the `collection_id` parameter is not invalid.
+    val collectionId: Long? = call.request.queryParameters["collection_id"]?.let { param ->
+        param.toLongOrNull()?.takeIf { it > 0 } ?: run {
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = "The passed query parameter \"collection_id\" must be a positive integer.",
             )
             return@webSocketCardsHandler
         }
-    LOGGER.debug("collectionId=$collectionId")
+    }
 
     collectionId?.let { collectionId ->
         val correspondingCollection = repository.getCollectionById(id = collectionId)
