@@ -1,6 +1,6 @@
 package space.zghoba.utils
 
-import io.ktor.http.Parameters
+import io.ktor.http.*
 
 /**
  * Get first value from the query parameters associated with a [name],

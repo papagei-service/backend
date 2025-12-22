@@ -1,12 +1,12 @@
 package space.zghoba.data.local
 
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.deleteAll
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
+import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import space.zghoba.data.local.dao.UserSessionDao
 import space.zghoba.data.local.tables.UserSessionsTable
 import space.zghoba.data.model.PurgeableSessionStorage
-import space.zghoba.utils.suspendTransaction
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteAll
-import org.jetbrains.exposed.sql.deleteWhere
 
 /**
  * Represents a storage of active user sessions in persistent memory.

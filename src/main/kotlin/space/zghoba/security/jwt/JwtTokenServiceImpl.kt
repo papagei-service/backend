@@ -2,8 +2,8 @@ package space.zghoba.security.jwt
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import space.zghoba.utils.Constants
 import io.ktor.util.logging.*
+import space.zghoba.utils.Constants
 import java.time.Instant
 import java.util.*
 

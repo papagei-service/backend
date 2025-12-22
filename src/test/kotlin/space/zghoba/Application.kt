@@ -1,5 +1,10 @@
 package space.zghoba
 
+// import space.zghoba.utils.generateTokens
+import io.ktor.server.application.*
+import io.ktor.server.routing.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import space.zghoba.data.RepositoryImpl
 import space.zghoba.data.local.*
 import space.zghoba.data.model.PurgeableSessionStorage
@@ -13,9 +18,7 @@ import space.zghoba.security.sessions.SessionsConfig
 import space.zghoba.utils.DbConnectionConfig
 import space.zghoba.utils.KeyGeneratorImpl
 import space.zghoba.utils.connectDatabase
-// import space.zghoba.utils.generateTokens
-import io.ktor.server.application.*
-import io.ktor.server.routing.*
+import space.zghoba.utils.executeDbSchemaMigrations
 
 private val Repository: Repository = RepositoryImpl(
     userStorage = UserStorageImpl(),

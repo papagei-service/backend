@@ -4,6 +4,7 @@ import space.zghoba.model.CardCollectionInsertRequest
 import space.zghoba.model.CardInsertRequest
 import space.zghoba.model.ExampleInsertRequest
 import space.zghoba.model.RegistrationCredentials
+import kotlin.time.ExperimentalTime
 
 @Suppress("unused")
 object MockData {
@@ -38,6 +39,7 @@ object MockData {
         learningLanguage = "ja",
     )
 
+    @OptIn(ExperimentalTime::class)
     val FIRST_CARD_REQUEST = CardInsertRequest(
         knownLanguageText = "Bonjour",
         learningLanguageText = "Hola",
@@ -46,6 +48,7 @@ object MockData {
         showNextTimeAt = null,
         correctAnswersInRow = 0,
     )
+    @OptIn(ExperimentalTime::class)
     val SECOND_CARD_REQUEST = CardInsertRequest(
         knownLanguageText = "Дякую",
         learningLanguageText = "Danke schön",
@@ -54,6 +57,7 @@ object MockData {
         showNextTimeAt = null,
         correctAnswersInRow = 0
     )
+    @OptIn(ExperimentalTime::class)
     val THIRD_CARD_REQUEST = CardInsertRequest(
         knownLanguageText = "a cat",
         learningLanguageText = "猫 (Neko)",

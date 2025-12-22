@@ -1,9 +1,9 @@
 package space.zghoba.data.local.dao
 
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.dao.LongEntity
+import org.jetbrains.exposed.v1.dao.LongEntityClass
 import space.zghoba.data.local.tables.CollectionsCardsTable
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
 
 class CollectionCardDao(id: EntityID<Long>) : LongEntity(id = id) {
     companion object : LongEntityClass<CollectionCardDao>(CollectionsCardsTable)

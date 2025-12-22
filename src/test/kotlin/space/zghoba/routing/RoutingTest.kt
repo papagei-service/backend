@@ -1,8 +1,8 @@
 package space.zghoba.routing
 
-import space.zghoba.utils.testConfiguredApplication
 import io.ktor.client.request.*
 import io.ktor.http.*
+import space.zghoba.utils.testConfiguredApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,5 +1,13 @@
 package space.zghoba.data.local
 
+import org.jetbrains.exposed.v1.core.alias
+import org.jetbrains.exposed.v1.core.count
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.deleteAll
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
+import org.jetbrains.exposed.v1.jdbc.select
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import space.zghoba.data.local.dao.CollectionDao
 import space.zghoba.data.local.dao.UserDao
 import space.zghoba.data.local.tables.CollectionsCardsTable
@@ -8,9 +16,6 @@ import space.zghoba.data.local.tables.UsersTable
 import space.zghoba.data.mappers.toCardCollection
 import space.zghoba.data.model.CollectionStorage
 import space.zghoba.model.CardCollection
-import space.zghoba.utils.suspendTransaction
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 /**
  * Represents a storage of card collections in persistent memory.
@@ -31,9 +36,7 @@ class CollectionStorageImpl : CollectionStorage {
         limit: Int,
         offset: Long
     ): Pair<Long, List<CardCollection>> = suspendTransaction {
-        val condition: SqlExpressionBuilder.() -> Op<Boolean> = {
-            CollectionsTable.ownerId eq id
-        }
+        val condition = { CollectionsTable.ownerId eq id }
 
         // Apply filters to collections, create pairs of collections using limit and offset,
         // and the total number of cards found without applying limits and offsets.
@@ -76,9 +79,7 @@ class CollectionStorageImpl : CollectionStorage {
         limit: Int,
         offset: Long
     ): Pair<Long, List<CardCollection>> = suspendTransaction {
-        val condition: SqlExpressionBuilder.() -> Op<Boolean> = {
-            CollectionsCardsTable.cardId eq id
-        }
+        val condition = { CollectionsCardsTable.cardId eq id }
 
         // Apply filters to collections, create pairs of collections using limit and offset,
         // and the total number of cards found without applying limits and offsets.

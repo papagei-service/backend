@@ -4,7 +4,7 @@ ktor = "3.2.3"
 kotlin = "2.2.10"
 kover = "0.9.1"
 logback = "1.5.18"
-exposed = "0.61.0"
+exposed = "1.0.0-rc-4"
 postgresql = "42.7.7"
 serialization = "2.2.10"
 

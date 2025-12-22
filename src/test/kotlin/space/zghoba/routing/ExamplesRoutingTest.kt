@@ -1,5 +1,9 @@
 package space.zghoba.routing
 
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.util.logging.*
 import space.zghoba.mappers.toExample
 import space.zghoba.mappers.toExampleUpdateRequest
 import space.zghoba.mappers.toLoginCredentials
@@ -9,10 +13,6 @@ import space.zghoba.utils.AuthUtils
 import space.zghoba.utils.MockData
 import space.zghoba.utils.rawCookie
 import space.zghoba.utils.testConfiguredApplication
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.util.logging.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

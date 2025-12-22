@@ -1,11 +1,11 @@
 package space.zghoba.routing.v1.account
 
-import space.zghoba.routing.RouteHandlersProvider
-import space.zghoba.security.sessions.UserSession
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import space.zghoba.routing.RouteHandlersProvider
+import space.zghoba.security.sessions.UserSession
 import space.zghoba.utils.Constants
 
 @Suppress("UnusedReceiverParameter")

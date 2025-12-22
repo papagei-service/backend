@@ -2,15 +2,15 @@ package space.zghoba.plugins
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import space.zghoba.security.jwt.JwtTokenConfig
-import space.zghoba.security.sessions.SessionsConfig
-import space.zghoba.security.sessions.UserSession
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
+import space.zghoba.security.jwt.JwtTokenConfig
+import space.zghoba.security.sessions.SessionsConfig
+import space.zghoba.security.sessions.UserSession
 
 private const val MILLISECONDS_IN_SECOND: Long = 1000
 

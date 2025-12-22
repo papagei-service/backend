@@ -1,15 +1,16 @@
 package space.zghoba.domain
 
+import kotlin.time.Clock
 import space.zghoba.mappers.toCard
 import space.zghoba.model.CardAnswerDifficultyLevel
 import space.zghoba.utils.MockData
-import kotlinx.datetime.Clock
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.time.ExperimentalTime
 
-// Unit tests for the HandleCardAnswerUseCase
+@OptIn(ExperimentalTime::class)
 class HandleCardAnswerUseCaseTest {
 
     private lateinit var useCase: HandleCardAnswerUseCase
@@ -20,7 +21,7 @@ class HandleCardAnswerUseCaseTest {
     }
 
     @Test
-    fun `=001 Reset correctAnswersInRow and set up next time if difficulty level is WRONG`() {
+    fun `Reset correctAnswersInRow and set up next time if difficulty level is WRONG`() {
         val difficultyLevel = CardAnswerDifficultyLevel.WRONG
         val now = Clock.System.now()
         val initialCard = MockData.FIRST_CARD_REQUEST.toCard(id = 0, ownerId = 0)
@@ -33,7 +34,7 @@ class HandleCardAnswerUseCaseTest {
     }
 
     @Test
-    fun `=002 Increment correctAnswersInRow and set up next time if difficulty level is not WRONG`() {
+    fun `Increment correctAnswersInRow and set up next time if difficulty level is not WRONG`() {
         val difficultyLevels = CardAnswerDifficultyLevel.entries
             .filter { it.name != CardAnswerDifficultyLevel.WRONG.name }
 
@@ -64,7 +65,7 @@ class HandleCardAnswerUseCaseTest {
     }
 
     @Test
-    fun `=003 Increase correctly the next time if the correctAnswersInRow is zero`() {
+    fun `Increase correctly the next time if the correctAnswersInRow is zero`() {
         val difficultyLevel = CardAnswerDifficultyLevel.WRONG
         val now = Clock.System.now()
         val initialCard = MockData.FIRST_CARD_REQUEST.toCard(id = 0, ownerId = 0)
@@ -88,7 +89,7 @@ class HandleCardAnswerUseCaseTest {
     }
 
     @Test
-    fun `=004 Increase the next show time as the correctAnswersInRow increases`() {
+    fun `Increase the next show time as the correctAnswersInRow increases`() {
         val difficultyLevel = CardAnswerDifficultyLevel.NORMAL
         val initialCard = MockData.FIRST_CARD_REQUEST.toCard(id = 0, ownerId = 0)
 
@@ -121,7 +122,7 @@ class HandleCardAnswerUseCaseTest {
     }
 
     @Test
-    fun `=005 Do not modify other card's fields`() {
+    fun `Do not modify other card's fields`() {
         val difficultyLevel = CardAnswerDifficultyLevel.WRONG
         val now = Clock.System.now()
         val initialCard = MockData.FIRST_CARD_REQUEST.toCard(id = 0, ownerId = 0)

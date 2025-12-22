@@ -1,5 +1,9 @@
 package space.zghoba.data.local
 
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.deleteAll
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
+import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import space.zghoba.data.local.dao.CardDao
 import space.zghoba.data.local.dao.ExampleDao
 import space.zghoba.data.local.tables.CardsTable
@@ -7,10 +11,6 @@ import space.zghoba.data.local.tables.ExamplesTable
 import space.zghoba.data.mappers.toExample
 import space.zghoba.data.model.ExampleStorage
 import space.zghoba.model.Example
-import space.zghoba.utils.suspendTransaction
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteAll
-import org.jetbrains.exposed.sql.deleteWhere
 
 /**
  * Represents a storage of card learning material usage examples in persistent memory.

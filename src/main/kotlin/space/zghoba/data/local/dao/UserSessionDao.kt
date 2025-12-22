@@ -1,9 +1,9 @@
 package space.zghoba.data.local.dao
 
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.dao.Entity
+import org.jetbrains.exposed.v1.dao.EntityClass
 import space.zghoba.data.local.tables.UserSessionsTable
-import org.jetbrains.exposed.dao.Entity
-import org.jetbrains.exposed.dao.EntityClass
-import org.jetbrains.exposed.dao.id.EntityID
 
 class UserSessionDao(id: EntityID<String>) : Entity<String>(id = id) {
     companion object : EntityClass<String, UserSessionDao>(UserSessionsTable)

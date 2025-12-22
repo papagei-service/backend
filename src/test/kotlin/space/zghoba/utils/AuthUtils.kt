@@ -1,11 +1,11 @@
 package space.zghoba.utils
 
-import space.zghoba.model.LoginCredentials
-import space.zghoba.model.RegistrationCredentials
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import space.zghoba.model.LoginCredentials
+import space.zghoba.model.RegistrationCredentials
 
 object AuthUtils {
     const val STRONG_TOKEN =

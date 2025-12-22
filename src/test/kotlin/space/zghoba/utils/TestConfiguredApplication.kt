@@ -1,6 +1,5 @@
 package space.zghoba.utils
 
-import space.zghoba.clearTestingDatabase
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -12,6 +11,7 @@ import io.ktor.server.config.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
+import space.zghoba.clearTestingDatabase
 import kotlin.time.Duration.Companion.seconds
 
 fun testConfiguredApplication(
