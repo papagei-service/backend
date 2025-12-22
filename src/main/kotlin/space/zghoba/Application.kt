@@ -54,9 +54,11 @@ fun Application.module() {
         user = environment.config.property("database.user").getString(),
         password = environment.config.property("database.password").getString(),
     )
+    val dbMigrationScriptsDirectoryPath =
+        environment.config.property("database.migrations-dir-path").getString()
 
     // Generate strong tokens and save them in a file
-    launch {
+    launch(context = Dispatchers.IO) {
         generateAndSaveStrongTokens(
             tokensAmount = 1,
             jwtTokenConfig = jwtTokenConfig,
@@ -79,6 +81,10 @@ fun Application.module() {
         keyGenerator = keyGenerator,
     )
     configureSerialization()
-    connectDatabase(dbConnectionConfig = dbConnectionConfig)
     configureStatusPages()
+
+    connectDatabase(dbConnectionConfig = dbConnectionConfig)
+    launch(context = Dispatchers.IO) {
+        executeDbSchemaMigrations(scriptsDirectoryPath = dbMigrationScriptsDirectoryPath)
+    }
 }

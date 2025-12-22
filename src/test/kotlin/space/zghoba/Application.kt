@@ -59,6 +59,8 @@ fun Application.testingModule() {
         user = environment.config.property("database.user").getString(),
         password = environment.config.property("database.password").getString(),
     )
+    val dbMigrationScriptsDirectoryPath =
+        environment.config.property("database.migrations-dir-path").getString()
 
     // Generate test access tokens and print them to console
     // generateTokens(
@@ -81,8 +83,12 @@ fun Application.testingModule() {
         keyGenerator = keyGenerator,
     )
     configureSerialization()
-    connectDatabase(dbConnectionConfig = dbConnectionConfig)
     configureStatusPages()
+
+    connectDatabase(dbConnectionConfig = dbConnectionConfig)
+    launch(context = Dispatchers.IO) {
+        executeDbSchemaMigrations(scriptsDirectoryPath = dbMigrationScriptsDirectoryPath)
+    }
 
     // Necessary to test the functionality of the StatusPages plugin
     routing {
