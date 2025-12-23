@@ -3,7 +3,7 @@ ktor:
     modules:
       - space.zghoba.ApplicationKt.module
   deployment:
-    port: 8080
+    port: $PORT
 
 security:
   jwt:
