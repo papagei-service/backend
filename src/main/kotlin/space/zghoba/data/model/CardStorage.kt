@@ -3,7 +3,8 @@ package space.zghoba.data.model
 import space.zghoba.model.Card
 import space.zghoba.model.CardCollection
 import space.zghoba.model.CardSorting
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Defines methods for storing and reading cards.
@@ -30,7 +31,10 @@ interface CardStorage {
      *
      * @return Pair consisting of the total number of cards found and the cards themselves,
      * to which the limit and offset are also applied.
+     *
+     * @throws
      */
+    @OptIn(ExperimentalTime::class)
     suspend fun getByOwnerId(
         id: Long,
         sortings: List<CardSorting>,
@@ -52,6 +56,7 @@ interface CardStorage {
      * @return Pair consisting of the total number of cards found and the cards themselves,
      * to which the limit and offset are also applied.
      */
+    @OptIn(ExperimentalTime::class)
     suspend fun getByCollectionId(
         id: Long,
         sortings: List<CardSorting>,

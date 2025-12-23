@@ -1,8 +1,10 @@
 package space.zghoba.model
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import space.zghoba.utils.InstantSerializer
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Represents the body of a request to insert a card.
@@ -15,11 +17,24 @@ import kotlinx.serialization.Serializable
  * @param correctAnswersInRow A number of correct answers in a row.
  */
 @Serializable
-data class CardInsertRequest(
-    @SerialName("known_language_text") val knownLanguageText: String,
-    @SerialName("learning_language_text") val learningLanguageText: String,
-    @SerialName("notes") val notes: String,
-    @SerialName("last_answered_at") val lastAnsweredAt: Instant?,
-    @SerialName("show_next_time_at") val showNextTimeAt: Instant?,
-    @SerialName("correct_answers_in_row") val correctAnswersInRow: Int,
+data class CardInsertRequest @OptIn(ExperimentalTime::class) constructor(
+    @SerialName(CardFieldNames.KNOWN_LANGUAGE_TEXT)
+    val knownLanguageText: String,
+
+    @SerialName(CardFieldNames.LEARNING_LANGUAGE_TEXT)
+    val learningLanguageText: String,
+
+    @SerialName(CardFieldNames.NOTES)
+    val notes: String,
+
+    @Serializable(with = InstantSerializer::class)
+    @SerialName(CardFieldNames.LAST_ANSWERED_AT)
+    val lastAnsweredAt: Instant?,
+
+    @Serializable(with = InstantSerializer::class)
+    @SerialName(CardFieldNames.SHOW_NEXT_TIME_AT)
+    val showNextTimeAt: Instant?,
+
+    @SerialName(CardFieldNames.CORRECT_ANSWERS_IN_ROW)
+    val correctAnswersInRow: Int,
 )

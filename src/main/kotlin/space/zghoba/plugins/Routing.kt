@@ -1,5 +1,11 @@
 package space.zghoba.plugins
 
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.plugins.swagger.*
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
+import io.ktor.server.websocket.*
 import space.zghoba.domain.HandleCardAnswerUseCase
 import space.zghoba.model.Repository
 import space.zghoba.routing.RouteHandlersProvider
@@ -19,13 +25,6 @@ import space.zghoba.security.hashing.PasswordSaltConfig
 import space.zghoba.security.jwt.JwtTokenConfig
 import space.zghoba.security.jwt.JwtTokenService
 import space.zghoba.utils.KeyGenerator
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.plugins.swagger.SwaggerConfig
-import io.ktor.server.plugins.swagger.swaggerUI
-import io.ktor.server.routing.*
-import io.ktor.server.sessions.SessionStorage
-import io.ktor.server.websocket.*
 
 fun Application.configureRouting(
     repository: Repository,

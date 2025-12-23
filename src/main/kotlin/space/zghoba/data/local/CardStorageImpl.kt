@@ -1,5 +1,8 @@
 package space.zghoba.data.local
 
+import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import space.zghoba.data.local.dao.CardDao
 import space.zghoba.data.local.dao.CollectionCardDao
 import space.zghoba.data.local.dao.CollectionDao
@@ -14,15 +17,11 @@ import space.zghoba.model.Card
 import space.zghoba.model.CardCollection
 import space.zghoba.model.CardSorting
 import space.zghoba.model.CardSortingColumn
-import space.zghoba.utils.suspendTransaction
-import kotlinx.datetime.Instant
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Represents a storage of cards in persistent memory.
- *
- * @throws IllegalArgumentException When trying to update a card with a `null` identifier.
  */
 class CardStorageImpl : CardStorage {
 
@@ -33,6 +32,7 @@ class CardStorageImpl : CardStorage {
             .firstOrNull()
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun getByOwnerId(
         id: Long,
         sortings: List<CardSorting>,
@@ -40,7 +40,7 @@ class CardStorageImpl : CardStorage {
         limit: Int,
         offset: Long,
     ): Pair<Long, List<Card>> = suspendTransaction {
-        val condition: SqlExpressionBuilder.() -> Op<Boolean> = {
+        val condition = {
             val baseCondition = CardsTable.ownerId eq id
             nextTimeBefore?.let {
                 baseCondition and (CardsTable.showNextTimeAt neq null) and (CardsTable.showNextTimeAt lessEq it)
@@ -86,6 +86,7 @@ class CardStorageImpl : CardStorage {
         result
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun getByCollectionId(
         id: Long,
         sortings: List<CardSorting>,
@@ -93,7 +94,7 @@ class CardStorageImpl : CardStorage {
         limit: Int,
         offset: Long
     ): Pair<Long, List<Card>> = suspendTransaction {
-        val condition: SqlExpressionBuilder.() -> Op<Boolean> = {
+        val condition = {
             val baseCondition = CollectionsCardsTable.collectionId eq id
             nextTimeBefore?.let {
                 baseCondition and (CardsTable.showNextTimeAt neq null) and (CardsTable.showNextTimeAt lessEq it)
@@ -142,6 +143,7 @@ class CardStorageImpl : CardStorage {
         result
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun insert(card: Card): Card = suspendTransaction {
         // Get the card owner
         val owner = UserDao
@@ -160,6 +162,7 @@ class CardStorageImpl : CardStorage {
         }.toCard()
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun update(card: Card): Card = suspendTransaction {
         if (card.id == null)
             throw IllegalArgumentException("The id of the card to be updated cannot be null")
@@ -259,10 +262,10 @@ class CardStorageImpl : CardStorage {
 }
 
 /**
- * Returns a new [SizedIterable] with the cards sorted according to the [sorting].
+ * Returns a new [org.jetbrains.exposed.v1.jdbc.SizedIterable] with the cards sorted according to the [sortings].
  */
-private fun Query.orderBy(vararg sorting: CardSorting): Query {
-    val orders = sorting.map {
+private fun Query.orderBy(vararg sortings: CardSorting): Query {
+    val orders = sortings.map {
         it.column.toExpression() to it.order.toSqlSortOrder()
     }
     return orderBy(*orders.toTypedArray())
@@ -274,6 +277,7 @@ private fun Query.orderBy(vararg sorting: CardSorting): Query {
  * @receiver An enum value of the [CardSortingColumn], representing a column in the table by which cards can be sorted.
  * @return An expression consisting of the corresponding column.
  */
+@OptIn(ExperimentalTime::class)
 private fun CardSortingColumn.toExpression(): Expression<*> = when (this) {
     CardSortingColumn.ID -> CardsTable.id
     CardSortingColumn.KNOWN_LANGUAGE_TEXT -> CardsTable.knownLanguageText

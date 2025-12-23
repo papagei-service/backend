@@ -1,15 +1,15 @@
 package space.zghoba.routing.v1
 
+import io.ktor.http.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 import space.zghoba.routing.RouteHandlersProvider
 import space.zghoba.security.jwt.JwtTokenClaim
 import space.zghoba.security.jwt.JwtTokenConfig
 import space.zghoba.security.jwt.JwtTokenService
 import space.zghoba.security.sessions.UserSession
 import space.zghoba.utils.Constants
-import io.ktor.http.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.server.sessions.*
 
 @Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.getToken(

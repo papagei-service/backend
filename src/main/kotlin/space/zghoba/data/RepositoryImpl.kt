@@ -5,7 +5,8 @@ import space.zghoba.data.model.CollectionStorage
 import space.zghoba.data.model.ExampleStorage
 import space.zghoba.data.model.UserStorage
 import space.zghoba.model.*
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Represents a storage of user data on the local disk.
@@ -89,6 +90,7 @@ class RepositoryImpl(
         return cardStorage.getById(id = id)
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun getCardsByOwnerId(
         id: Long,
         sortings: List<CardSorting>,
@@ -103,6 +105,7 @@ class RepositoryImpl(
         offset = offset,
     )
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun getCardsByCollectionId(
         id: Long,
         sortings: List<CardSorting>,

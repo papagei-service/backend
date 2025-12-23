@@ -1,5 +1,8 @@
 package space.zghoba
 
+import io.ktor.server.application.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import space.zghoba.data.RepositoryImpl
 import space.zghoba.data.local.*
 import space.zghoba.plugins.*
@@ -8,12 +11,7 @@ import space.zghoba.security.hashing.PasswordSaltConfig
 import space.zghoba.security.jwt.JwtTokenConfig
 import space.zghoba.security.jwt.JwtTokenServiceImpl
 import space.zghoba.security.sessions.SessionsConfig
-import space.zghoba.utils.DbConnectionConfig
-import space.zghoba.utils.KeyGeneratorImpl
-import space.zghoba.utils.connectDatabase
-import space.zghoba.utils.generateAndSaveStrongTokens
-import io.ktor.server.application.*
-import kotlinx.coroutines.launch
+import space.zghoba.utils.*
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -56,9 +54,11 @@ fun Application.module() {
         user = environment.config.property("database.user").getString(),
         password = environment.config.property("database.password").getString(),
     )
+    val dbMigrationScriptsDirectoryPath =
+        environment.config.property("database.migrations-dir-path").getString()
 
     // Generate strong tokens and save them in a file
-    launch {
+    launch(context = Dispatchers.IO) {
         generateAndSaveStrongTokens(
             tokensAmount = 1,
             jwtTokenConfig = jwtTokenConfig,
@@ -81,6 +81,10 @@ fun Application.module() {
         keyGenerator = keyGenerator,
     )
     configureSerialization()
-    connectDatabase(dbConnectionConfig = dbConnectionConfig)
     configureStatusPages()
+
+    connectDatabase(dbConnectionConfig = dbConnectionConfig)
+    launch(context = Dispatchers.IO) {
+        executeDbSchemaMigrations(scriptsDirectoryPath = dbMigrationScriptsDirectoryPath)
+    }
 }

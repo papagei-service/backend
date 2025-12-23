@@ -1,5 +1,9 @@
 package space.zghoba.routing.v1.account
 
+import io.ktor.http.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import space.zghoba.model.RegistrationCredentials
 import space.zghoba.model.Repository
 import space.zghoba.model.User
@@ -7,10 +11,6 @@ import space.zghoba.routing.RouteHandlersProvider
 import space.zghoba.security.hashing.HashingService
 import space.zghoba.security.hashing.PasswordSaltConfig
 import space.zghoba.utils.KeyGenerator
-import io.ktor.http.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
 
 @Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.V1.Account.postRegister(

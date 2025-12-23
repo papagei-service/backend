@@ -1,9 +1,9 @@
 package space.zghoba.model
 
-import space.zghoba.security.hashing.HashingService
-import space.zghoba.security.hashing.HashingServiceImpl
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import space.zghoba.security.hashing.HashingService
+import space.zghoba.security.hashing.HashingServiceImpl
 
 /**
  * Represent a user of the service.

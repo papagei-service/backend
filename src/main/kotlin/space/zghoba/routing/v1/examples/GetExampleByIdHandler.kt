@@ -1,12 +1,12 @@
 package space.zghoba.routing.v1.examples
 
-import space.zghoba.model.Repository
-import space.zghoba.routing.RouteHandlersProvider
-import space.zghoba.security.sessions.UserSession
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import space.zghoba.model.Repository
+import space.zghoba.routing.RouteHandlersProvider
+import space.zghoba.security.sessions.UserSession
 
 @Suppress("UnusedReceiverParameter")
 fun RouteHandlersProvider.V1.Examples.getExampleById(

@@ -2,7 +2,9 @@ package space.zghoba.domain
 
 import space.zghoba.model.Card
 import space.zghoba.model.CardAnswerDifficultyLevel
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Update the card using the user's answer to it.
@@ -17,8 +19,9 @@ class HandleCardAnswerUseCase() {
      *
      * @return Updated card.
      */
+    @OptIn(ExperimentalTime::class)
     fun execute(card: Card, difficultyLevel: CardAnswerDifficultyLevel): Card {
-        val now = Clock.System.now()
+        val now: Instant = Clock.System.now()
         // Increase the `correctAnswersInRow` if correct and reset if wrong
         val isCorrect = difficultyLevel != CardAnswerDifficultyLevel.WRONG
         val correctAnswersInRow = if (isCorrect) card.correctAnswersInRow + 1 else 0

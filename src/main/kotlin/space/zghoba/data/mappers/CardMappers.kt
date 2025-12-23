@@ -2,10 +2,12 @@ package space.zghoba.data.mappers
 
 import space.zghoba.data.local.dao.CardDao
 import space.zghoba.model.Card
+import kotlin.time.ExperimentalTime
 
 /**
  * Converts an instance of the [CardDao] class to an instance of the [Card] class.
  */
+@OptIn(ExperimentalTime::class)
 @Suppress("unused", "nothing_to_inline")
 inline fun CardDao.toCard() = Card(
     id = this.id.value,

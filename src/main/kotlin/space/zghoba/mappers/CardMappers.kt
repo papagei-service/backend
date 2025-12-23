@@ -3,10 +3,12 @@ package space.zghoba.mappers
 import space.zghoba.model.Card
 import space.zghoba.model.CardInsertRequest
 import space.zghoba.model.CardUpdateRequest
+import kotlin.time.ExperimentalTime
 
 /**
  * Converts an instance of the [CardInsertRequest] class to an instance of the [Card] class.
  */
+@OptIn(ExperimentalTime::class)
 @Suppress("unused", "nothing_to_inline")
 inline fun CardInsertRequest.toCard(id: Long?, ownerId: Long) = Card(
     id = id,
@@ -22,6 +24,7 @@ inline fun CardInsertRequest.toCard(id: Long?, ownerId: Long) = Card(
 /**
  * Converts an instance of the [CardInsertRequest] class to an instance of the [CardUpdateRequest] class.
  */
+@OptIn(ExperimentalTime::class)
 @Suppress("unused", "nothing_to_inline")
 inline fun CardInsertRequest.toCardUpdateRequest() = CardUpdateRequest(
     knownLanguageText = this.knownLanguageText,
@@ -35,6 +38,7 @@ inline fun CardInsertRequest.toCardUpdateRequest() = CardUpdateRequest(
 /**
  * Converts an instance of the [CardUpdateRequest] class to an instance of the [Card] class.
  */
+@OptIn(ExperimentalTime::class)
 @Suppress("unused", "nothing_to_inline")
 inline fun CardUpdateRequest.toCard(id: Long?, ownerId: Long) = Card(
     id = id,
@@ -50,6 +54,7 @@ notes = this.notes,
 /**
  * Converts an instance of the [CardUpdateRequest] class to an instance of the [CardInsertRequest] class.
  */
+@OptIn(ExperimentalTime::class)
 @Suppress("unused", "nothing_to_inline")
 inline fun CardUpdateRequest.toCardInsertRequest() = CardInsertRequest(
     knownLanguageText = this.knownLanguageText,
@@ -63,6 +68,7 @@ inline fun CardUpdateRequest.toCardInsertRequest() = CardInsertRequest(
 /**
  * Converts an instance of the [Card] class to an instance of the [CardInsertRequest] class.
  */
+@OptIn(ExperimentalTime::class)
 @Suppress("unused", "nothing_to_inline")
 inline fun Card.toCardInsertRequest() = CardInsertRequest(
     knownLanguageText = this.knownLanguageText,
@@ -76,6 +82,7 @@ inline fun Card.toCardInsertRequest() = CardInsertRequest(
 /**
  * Converts an instance of the [Card] class to an instance of the [CardUpdateRequest] class.
  */
+@OptIn(ExperimentalTime::class)
 @Suppress("unused", "nothing_to_inline")
 inline fun Card.toCardUpdateRequest() = CardUpdateRequest(
     knownLanguageText = this.knownLanguageText,

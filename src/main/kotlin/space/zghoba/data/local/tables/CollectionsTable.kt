@@ -1,6 +1,7 @@
 package space.zghoba.data.local.tables
 
-import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.v1.core.ReferenceOption
+import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
 
 /**
  * Represents a database table object that stores card collections.
@@ -11,5 +12,10 @@ object CollectionsTable : LongIdTable(name = "collections", columnName = "id") {
     val description = text(name = "description").nullable()
     val knownLanguage = varchar(name = "known_language_iso_639_1", length = 2).nullable()
     val learningLanguage = varchar(name = "learning_language_iso_639_1", length = 2).nullable()
-    val ownerId = reference(name = "owner_id", foreign = UsersTable)
+    val ownerId = reference(
+        name = "owner_id",
+        foreign = UsersTable,
+        onDelete = ReferenceOption.CASCADE,
+        onUpdate = ReferenceOption.CASCADE,
+    )
 }

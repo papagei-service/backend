@@ -1,8 +1,10 @@
 package space.zghoba.model
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import space.zghoba.utils.InstantSerializer
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Represents a flash card for learning a unit of information.
@@ -17,13 +19,30 @@ import kotlinx.serialization.Serializable
  * @param ownerId The unique identifier of the user to whom the cards belong.
  */
 @Serializable
-data class Card(
-    @SerialName(CardFieldNames.ID) val id: Long?,
-    @SerialName(CardFieldNames.KNOWN_LANGUAGE_TEXT) val knownLanguageText: String,
-    @SerialName(CardFieldNames.LEARNING_LANGUAGE_TEXT) val learningLanguageText: String,
-    @SerialName(CardFieldNames.NOTES) val notes: String,
-    @SerialName(CardFieldNames.LAST_ANSWERED_AT) val lastAnsweredAt: Instant?,
-    @SerialName(CardFieldNames.SHOW_NEXT_TIME_AT) val showNextTimeAt: Instant?,
-    @SerialName(CardFieldNames.CORRECT_ANSWERS_IN_ROW) val correctAnswersInRow: Int,
-    @SerialName(CardFieldNames.OWNER_ID) val ownerId: Long,
+data class Card @OptIn(ExperimentalTime::class) constructor(
+    @SerialName(CardFieldNames.ID)
+    val id: Long?,
+
+    @SerialName(CardFieldNames.KNOWN_LANGUAGE_TEXT)
+    val knownLanguageText: String,
+
+    @SerialName(CardFieldNames.LEARNING_LANGUAGE_TEXT)
+    val learningLanguageText: String,
+
+    @SerialName(CardFieldNames.NOTES)
+    val notes: String,
+
+    @Serializable(with = InstantSerializer::class)
+    @SerialName(CardFieldNames.LAST_ANSWERED_AT)
+    val lastAnsweredAt: Instant?,
+
+    @Serializable(with = InstantSerializer::class)
+    @SerialName(CardFieldNames.SHOW_NEXT_TIME_AT)
+    val showNextTimeAt: Instant?,
+
+    @SerialName(CardFieldNames.CORRECT_ANSWERS_IN_ROW)
+    val correctAnswersInRow: Int,
+
+    @SerialName(CardFieldNames.OWNER_ID)
+    val ownerId: Long,
 )

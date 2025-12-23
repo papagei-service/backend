@@ -1,9 +1,9 @@
 package space.zghoba.utils
 
+import io.ktor.util.logging.*
 import space.zghoba.security.jwt.JwtTokenClaim
 import space.zghoba.security.jwt.JwtTokenConfig
 import space.zghoba.security.jwt.JwtTokenService
-import io.ktor.util.logging.*
 
 private val LOGGER = KtorSimpleLogger(::generateTokens.javaClass.packageName)
 

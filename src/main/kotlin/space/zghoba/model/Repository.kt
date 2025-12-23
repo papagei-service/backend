@@ -1,6 +1,7 @@
 package space.zghoba.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Defines methods for storing and reading user data.
@@ -156,6 +157,7 @@ interface Repository {
      * @return Pair consisting of the total number of cards found and the cards themselves,
      * to which the limit and offset are also applied.
      */
+    @OptIn(ExperimentalTime::class)
     suspend fun getCardsByOwnerId(
         id: Long,
         sortings: List<CardSorting>,
@@ -177,6 +179,7 @@ interface Repository {
      * @return Pair consisting of the total number of cards found and the cards themselves,
      * to which the limit and offset are also applied.
      */
+    @OptIn(ExperimentalTime::class)
     suspend fun getCardsByCollectionId(
         id: Long,
         sortings: List<CardSorting>,
