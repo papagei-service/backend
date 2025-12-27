@@ -11,7 +11,7 @@ import org.jetbrains.exposed.v1.jdbc.Database
  */
 fun connectDatabase(dbConnectionConfig: DbConnectionConfig) {
     Database.connect(
-        url = dbConnectionConfig.url,
+        url = with(dbConnectionConfig) { "$driver://$host:$port/$name" },
         user = dbConnectionConfig.user,
         password = dbConnectionConfig.password,
         databaseConfig = DatabaseConfig {

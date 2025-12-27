@@ -3,11 +3,11 @@ ktor:
     modules:
       - space.zghoba.ApplicationKt.module
   deployment:
-    port: $PORT
+    port: 8080
 
 security:
   jwt:
-    secret: $PPG_JWT_SECRET
+    secret: $JWT_SECRET
     issuer: "/v1/token"
     audience: "/v1"
     realm: "Access to the API"
@@ -15,14 +15,16 @@ security:
   sessions:
     lifetime-ms: 900000  # 15 min
   hashing:
-    pepper: $PPG_PEPPER
+    pepper: $PEPPER
     algorithm: "SHA-512"
     salt-min-length: 32
     salt-max-length: 48
 
 database:
-  protocol: "jdbc:postgresql"
-  host-with-path: $PPG_PROD_DB_HOST_WITH_PATH
-  user: $PPG_PROD_DB_USER
-  password: $PPG_PROD_DB_PASSWORD
+  driver: "jdbc:postgresql"
+  host: $DB_HOST
+  port: $DB_PORT
+  name: $DB_NAME
+  user: $DB_USER
+  password: $DB_PASSWORD
   migrations-dir-path: "./migrations"

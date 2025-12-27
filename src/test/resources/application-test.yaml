@@ -7,7 +7,7 @@ ktor:
 
 security:
   jwt:
-    secret: "kK*hmb$*A*0rx$i!CoP6cNXGaQO*p4z5kjwk"
+    secret: $JWT_SECRET
     issuer: "/v1/token"
     audience: "/v1"
     realm: "Access to the API"
@@ -15,14 +15,16 @@ security:
   sessions:
     lifetime-ms: 300000  # 5 min
   hashing:
-    pepper: "fUSF*mHjOt7qTpHW$zvR3xaJyAInt9#sGFn0"
+    pepper: $PEPPER
     algorithm: "SHA-512"
     salt-min-length: 32
     salt-max-length: 48
 
 database:
-  protocol: "jdbc:postgresql"
-  host-with-path: $PPG_TEST_DB_HOST_WITH_PATH
-  user: $PPG_TEST_DB_USER
-  password: $PPG_TEST_DB_PASSWORD
+  driver: "jdbc:postgresql"
+  host: $DB_HOST
+  port: $DB_PORT
+  name: $DB_NAME
+  user: $DB_USER
+  password: $DB_PASSWORD
   migrations-dir-path: "./migrations"

@@ -11,7 +11,6 @@ import io.ktor.server.config.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
-import space.zghoba.clearTestingDatabase
 import kotlin.time.Duration.Companion.seconds
 
 fun testConfiguredApplication(
@@ -35,12 +34,6 @@ fun testConfiguredApplication(
             contentType(ContentType.Application.Json)
         }
     }
-
-    startApplication()  // Must be running to access the database
-
-    // Delete all rows in the database to make the tests independent of each other
-    // This is equivalent to clearing the database in the method annotated with @BeforeTest (using kotlin-test library).
-    clearTestingDatabase()
 
     // Run a test with a limited execution time
     withTimeout(10.seconds) {
