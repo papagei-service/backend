@@ -1,8 +1,6 @@
 package space.zghoba
 
 import io.ktor.server.application.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import space.zghoba.data.RepositoryImpl
 import space.zghoba.data.local.*
 import space.zghoba.plugins.*
@@ -18,7 +16,7 @@ fun main(args: Array<String>) {
 }
 
 @Suppress("unused")  // Mark the IDE that the function is actually used
-fun Application.module() {
+suspend fun Application.module() {
     val repository = RepositoryImpl(
         userStorage = UserStorageImpl(),
         collectionStorage = CollectionStorageImpl(),
@@ -47,24 +45,16 @@ fun Application.module() {
     )
     val keyGenerator = KeyGeneratorImpl()
 
-    val dbProtocol = environment.config.property("database.protocol").getString()
-    val dbHostWithPath = environment.config.property("database.host-with-path").getString()
     val dbConnectionConfig = DbConnectionConfig(
-        url = "$dbProtocol://$dbHostWithPath",
+        driver = environment.config.property("database.driver").getString(),
+        host = environment.config.property("database.host").getString(),
+        port = environment.config.property("database.port").getString().toInt(),
+        name = environment.config.property("database.name").getString(),
         user = environment.config.property("database.user").getString(),
         password = environment.config.property("database.password").getString(),
     )
     val dbMigrationScriptsDirectoryPath =
         environment.config.property("database.migrations-dir-path").getString()
-
-    // Generate strong tokens and save them in a file
-    launch(context = Dispatchers.IO) {
-        generateAndSaveStrongTokens(
-            tokensAmount = 1,
-            jwtTokenConfig = jwtTokenConfig,
-            jwtTokenService = jwtTokenService,
-        )
-    }
 
     configureAuthentication(
         jwtTokenConfig = jwtTokenConfig,
@@ -84,7 +74,5 @@ fun Application.module() {
     configureStatusPages()
 
     connectDatabase(dbConnectionConfig = dbConnectionConfig)
-    launch(context = Dispatchers.IO) {
-        executeDbSchemaMigrations(scriptsDirectoryPath = dbMigrationScriptsDirectoryPath)
-    }
+    executeDbSchemaMigrations(scriptsDirectoryPath = dbMigrationScriptsDirectoryPath)
 }

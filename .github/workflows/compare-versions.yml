@@ -15,6 +15,6 @@ jobs:
           repo-clone-url: 'https://${{ secrets.PAT_FOR_CLONING }}@github.com/${{ github.repository }}.git'
           versions-extractor: |
             chmod u+x ./gradlew
-            ./gradlew printVersion > /dev/null
+            ./gradlew wrapper > /dev/null
             ./gradlew printVersion -q
           shell: 'bash'

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Extract a numeric value from a specific line in a text file.
+# Get the code coverage percentage and compare it with the minimum required.
 
 # --- Functions ---
 
@@ -8,7 +8,7 @@
 # Returns:
 #   The specific line from the file on stdout.
 #   Returns 0 on success, 1 on failure.
-get_coverage_line() {
+extract_coverage_line() {
   local filename="$1"
 
   # Check if the file exists and is readable.
@@ -55,6 +55,9 @@ extract_number_from_line() {
 }
 
 # Check if current code coverage is greater than required.
+# Returns:
+#   0 if the current code coverage percentage is greater than or equal to the minimum required.
+#   1 if the current code coverage percentage is less than or equal to the minimum required.
 check_coverage_percentage() {
   local current="$1"
   local minimal="$2"
@@ -73,36 +76,36 @@ check_coverage_percentage() {
 
 # --- Main script logic ---
 
-# Check if exactly one argument was provided.
-if [[ $# -ne 1 ]]; then
-  echo "Usage: $0 <coverage_report_file>" >&2
-  exit 1
-fi
+# Navigate to the script directory and define essential paths.
+script_dir_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_dir_path="$script_dir_path/.."
+coverage_report_file_path="$project_dir_path/kover-coverage-report.out"
 
-# Get the line with coverage percent.
-echo "Extracting the line that contains coverage percentage..."
-coverage_report_file="$1"
-coverage_line=$(get_coverage_line "$coverage_report_file")
-get_coverage_line_status=$?
+# Generate the coverage report file.
+gradle :koverPrintCoverage --quiet >> "$coverage_report_file_path"
 
-if [[ $get_coverage_line_status -ne 0 ]]; then
+# Extract the line with coverage percent from the file.
+coverage_line=$(extract_coverage_line "$coverage_report_file_path")
+extract_coverage_line_status=$?
+if [[ $extract_coverage_line_status -ne 0 ]]; then
   exit 1
 fi
 
 # Extract the coverage value from the line.
-echo "Extracting the coverage percentage from the corresponding line..."
+echo "Extracting the coverage percentage from the line..."
 current_coverage=$(extract_number_from_line "$coverage_line")
-extract_number_status=$?
-
-if [[ $extract_number_status -ne 0 ]]; then
+extract_number_from_line_status=$?
+if [[ $extract_number_from_line_status -ne 0 ]]; then
   exit 1
 fi
 
 # Check if current code coverage is greater than required.
-minimal_coverage=80
+minimal_coverage="$MINIMAL_CODE_COVERAGE"
 check_coverage_percentage "$current_coverage" "$minimal_coverage"
 check_coverage_status=$?
-
 if [[ $check_coverage_status -ne 0 ]]; then
   exit 1
 fi
+
+# Clear the cache.
+rm "$coverage_report_file_path"

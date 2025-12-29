@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  papagei-prod-backend:
+    build:
+      context: ..
+      target: prod
+    container_name: papagei-prod-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - "../env/prod.env"
+    depends_on:
+      papagei-prod-db:
+        condition: service_healthy
+    volumes:
+      - papagei-prod-db-data:/var/lib/postgresql/data
+    networks:
+      - papagei_prod_network
+
+  papagei-prod-db:
+    image: postgres:18-alpine3.23
+    container_name: papagei-prod-db
+    restart: always
+    ports:
+      - "8081:5432"
+    env_file:
+      - "../env/prod.env"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 5s
+      retries: 10
+      timeout: 10s
+    networks:
+      - papagei_prod_network
+
+volumes:
+  papagei-prod-db-data:
+
+networks:
+  papagei_prod_network:
+    driver: bridge

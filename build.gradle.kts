@@ -9,15 +9,20 @@ group = "space.zghoba"
 version = libs.versions.project.get()
 
 // Print the current version of the project
-task("printVersion") {
+tasks.register("printVersion") {
     doLast {
         println(project.version)
     }
 }
 
-// Make a production-ready executable
-task("stage") {
+// Make a production-ready executable (required for Heroku)
+tasks.register("stage") {
     dependsOn("installDist")
+}
+
+// Get the code coverage percentage and compare it with the minimum required.
+tasks.register<Exec>("checkCoverage") {
+    commandLine("bash", "scripts/check-coverage.sh")
 }
 
 application {

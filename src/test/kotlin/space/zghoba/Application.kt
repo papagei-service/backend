@@ -1,10 +1,7 @@
 package space.zghoba
 
-// import space.zghoba.utils.generateTokens
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import space.zghoba.data.RepositoryImpl
 import space.zghoba.data.local.*
 import space.zghoba.data.model.PurgeableSessionStorage
@@ -29,7 +26,7 @@ private val Repository: Repository = RepositoryImpl(
 private val SessionStorage: PurgeableSessionStorage = UserSessionStorage()
 
 @Suppress("unused")  // Mark the IDE that the function is actually used
-fun Application.testingModule() {
+suspend fun Application.testingModule() {
     val jwtTokenConfig = JwtTokenConfig(
         secret = environment.config.property("security.jwt.secret").getString(),
         issuer = environment.config.property("security.jwt.issuer").getString(),
@@ -52,21 +49,16 @@ fun Application.testingModule() {
     )
     val keyGenerator = KeyGeneratorImpl()
 
-    val dbProtocol = environment.config.property("database.protocol").getString()
-    val dbHostWithPath = environment.config.property("database.host-with-path").getString()
     val dbConnectionConfig = DbConnectionConfig(
-        url = "$dbProtocol://$dbHostWithPath",
+        driver = environment.config.property("database.driver").getString(),
+        host = environment.config.property("database.host").getString(),
+        port = environment.config.property("database.port").getString().toInt(),
+        name = environment.config.property("database.name").getString(),
         user = environment.config.property("database.user").getString(),
         password = environment.config.property("database.password").getString(),
     )
     val dbMigrationScriptsDirectoryPath =
         environment.config.property("database.migrations-dir-path").getString()
-
-    // Generate test access tokens and print them to console
-    // generateTokens(
-    //     jwtTokenConfig = jwtTokenConfig.copy(lifetimeMs = null),
-    //     jwtTokenService = jwtTokenService,
-    // )
 
     configureAuthentication(
         jwtTokenConfig = jwtTokenConfig,
@@ -85,10 +77,10 @@ fun Application.testingModule() {
     configureSerialization()
     configureStatusPages()
 
+    // Configure the database
     connectDatabase(dbConnectionConfig = dbConnectionConfig)
-    launch(context = Dispatchers.IO) {
-        executeDbSchemaMigrations(scriptsDirectoryPath = dbMigrationScriptsDirectoryPath)
-    }
+    executeDbSchemaMigrations(scriptsDirectoryPath = dbMigrationScriptsDirectoryPath)
+    clearAllRowsInDatabase()
 
     // Necessary to test the functionality of the StatusPages plugin
     routing {
@@ -101,7 +93,7 @@ fun Application.testingModule() {
 /**
  * Delete all rows in all testing database tables.
  */
-suspend fun clearTestingDatabase() {
+private suspend fun clearAllRowsInDatabase() {
     Repository.clear()
     SessionStorage.invalidateAll()
 }

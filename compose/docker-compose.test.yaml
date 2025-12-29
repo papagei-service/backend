@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  papagei-test-backend:
+    build:
+      context: ..
+      target: test
+    container_name: papagei-test-backend
+    restart: no
+    env_file:
+      - "../env/test.env"
+    depends_on:
+      papagei-test-db:
+        condition: service_healthy
+    networks:
+      - papagei_test_network
+
+  papagei-test-db:
+    image: postgres:18-alpine3.23
+    container_name: papagei-test-db
+    restart: no
+    env_file:
+      - "../env/test.env"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 5s
+      retries: 10
+      timeout: 10s
+    networks:
+      - papagei_test_network
+
+networks:
+  papagei_test_network:
+    driver: bridge

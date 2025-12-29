@@ -9,9 +9,9 @@ import space.zghoba.model.RegistrationCredentials
 
 object AuthUtils {
     const val STRONG_TOKEN =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvdjEiLCJpc3MiOiIvdjEvdG9rZW4iLCJzdHJvbmciOiJ0cnVlIiwiaWF0IjoxNzUwNTQwMTg0fQ.3TaS_csDP-nLM6obI84oUw6YzXq7pwB1umyx_ivc-3M"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvdjEiLCJpc3MiOiIvdjEvdG9rZW4iLCJzdHJvbmciOiJ0cnVlIiwiaWF0IjoxNzY2Nzk1NjkzfQ.ZDVzUQSanBgPeI3seYNkzdE-UsGPNpyxd2mWGg2dXk8"
     const val NOT_STRONG_TOKEN =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvdjEiLCJpc3MiOiIvdjEvdG9rZW4iLCJzdHJvbmciOiJmYWxzZSIsImlhdCI6MTc1MDU0MDE4NH0.fwPG0GsqTVsiL4I9-zu8rC528mQf3tvVqQTXFgpN9Iw"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIvdjEiLCJpc3MiOiIvdjEvdG9rZW4iLCJzdHJvbmciOiJmYWxzZSIsImlhdCI6MTc2Njc5NTY5M30.7TxgruzR3aCfbux1mzk35d7UhDe8ZY7ihNcKPvCex4M"
 
     suspend fun registerUser(
         client: HttpClient,
