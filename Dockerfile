@@ -13,7 +13,8 @@ ENV GRADLE_USER_HOME=/home/gradle/.gradle
 WORKDIR /home/gradle/src
 COPY --from=build /home/gradle/.gradle /home/gradle/.gradle
 COPY --chown=gradle:gradle . .
-ENTRYPOINT ["gradle", "test", "--no-daemon"]
+RUN apk update && apk add bash
+ENTRYPOINT ["gradle", "checkCoverage", "--no-daemon"]
 
 # Stage 3: Production image
 FROM amazoncorretto:21-alpine3.21 AS prod
