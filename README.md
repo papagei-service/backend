@@ -37,6 +37,8 @@ The repository contains a Kotlin + Ktor HTTP API (with WebSocket support) backed
     - Docker Compose config files for testing and deployment
     - GitHub Actions workflows for testing and version control
 
+---
+
 ## ▶️ Running the Backend
 
 ### Option 1: Without using Docker Compose (better for development)
