@@ -2,16 +2,14 @@
 
 <p align="center">
     <a href="https://github.com/JetBrains/kotlin">
-        <img alt="Docker Pull Count" src="https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fpapagei-service%2Fbackend%2Frefs%2Fheads%2Fmain%2Fgradle%2Flibs.versions.toml&query=%24.versions.kotlin&logo=kotlin&logoColor=%237F52FF&label=Kotlin&color=slateblue"/>
+        <img alt="Kotlin version" src="https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fpapagei-service%2Fbackend%2Frefs%2Fheads%2Fmain%2Fgradle%2Flibs.versions.toml&query=%24.versions.kotlin&logo=kotlin&logoColor=%237F52FF&label=Kotlin&color=slateblue"/>
     </a>
-    <a href="https://github.com/JetBrains/kotlin">
-        <img alt="Docker Pull Count" src="https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fpapagei-service%2Fbackend%2Frefs%2Fheads%2Fmain%2Fgradle%2Flibs.versions.toml&query=%24.versions.ktor&logo=ktor&logoColor=%23087CFA&label=Ktor&color=royalblue"/>
+    <a href="https://github.com/ktorio/ktor">
+        <img alt="Ktor version" src="https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fpapagei-service%2Fbackend%2Frefs%2Fheads%2Fmain%2Fgradle%2Flibs.versions.toml&query=%24.versions.ktor&logo=ktor&logoColor=%23087CFA&label=Ktor&color=royalblue"/>
     </a>
+    <img alt="Release" src="https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fpapagei-service%2Fbackend%2Frefs%2Fheads%2Fmain%2Fgradle%2Flibs.versions.toml&query=%24.versions.project&label=release&color=darksalmon"/>
     <a href="https://github.com/papagei-service/backend/blob/main/LICENSE">
-        <img alt="Docker Pull Count" src="https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fpapagei-service%2Fbackend%2Frefs%2Fheads%2Fmain%2Fgradle%2Flibs.versions.toml&query=%24.versions.project&label=release&color=darksalmon"/>
-    </a>
-    <a href="https://github.com/papagei-service/backend/blob/main/LICENSE">
-        <img alt="Docker Pull Count" src="https://img.shields.io/badge/license-Apache_License_2.0-cadetblue"/>
+        <img alt="License" src="https://img.shields.io/badge/license-Apache_License_2.0-cadetblue"/>
     </a>
 </p>
 
