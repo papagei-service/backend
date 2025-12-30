@@ -22,7 +22,7 @@ tasks.register("stage") {
 
 // Get the code coverage percentage and compare it with the minimum required.
 tasks.register<Exec>("checkCoverage") {
-    commandLine("bash", "scripts/check-coverage.sh")
+    commandLine("bash", "scripts/check-coverage.bash")
 }
 
 application {

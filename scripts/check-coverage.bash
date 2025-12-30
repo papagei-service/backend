@@ -13,8 +13,7 @@ extract_coverage_line() {
 
   # Check if the file exists and is readable.
   if [[ ! -f "$filename" ]]; then
-    echo "Error: Source coverage report file not found at the following path:" >&2
-    echo "=> $coverage_report_file" >&2
+    echo "Error: Source coverage report file not found at the path" >&2
     return 2
   fi
 
