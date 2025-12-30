@@ -189,6 +189,8 @@ docker compose -f ./compose/docker-compose.prod.yaml up --build
 
 </details>
 
+---
+
 ## 🤝 Contributing
 
 - Follow existing code patterns (Kotlin + Ktor idioms)
